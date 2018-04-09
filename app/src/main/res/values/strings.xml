@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">app</string>
+    <string name="app_name">Medituner Kids</string>
+    <string name="btn_show_popup">Show Popup</string>
 </resources>
