@@ -1,5 +1,7 @@
 package se.medituner.app;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.support.constraint.ConstraintLayout;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,6 +18,15 @@ public class Popup {
 
     protected PopupWindow popupWindow = null;
     protected View popupView;
+    protected boolean animationEnabled = true;
+
+    protected int animationDuration = -1;
+
+    /**
+     * A special value for animation duration.
+     * Passing it as an animation duration will make the popup use system's short animation duration.
+     */
+    public static final int ANIM_DURATION_SHORT = -1;
 
     /**
      * Create a new QuestionPopup. Will cache a view for ease of use.
@@ -27,6 +38,25 @@ public class Popup {
         // Inflate the popup layout
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         popupView = inflater.inflate(layout_id, null);
+    }
+
+    /**
+     * Set if the popup fade animation should be played.
+     *
+     * @param enabled
+     */
+    public void setAnimationEnabled(boolean enabled) {
+        animationEnabled = enabled;
+    }
+
+    /**
+     * Set the animation duration to a given value.
+     * Using special values will use system's resources to get the actual value.
+     *
+     * @param animationDuration
+     */
+    public void setAnimationDuration(int animationDuration) {
+        this.animationDuration = animationDuration;
     }
 
     /**
@@ -44,7 +74,15 @@ public class Popup {
             popupWindow = new PopupWindow(popupView, width, height, focusable);
         }
 
-        // Show the popup window
+        if (animationEnabled) {
+            // Set the popup initially invisible.
+            popupView.setAlpha(0.0f);
+            // Show the popup window
+            popupView.animate()     // create a ViewAnimator
+                    .alpha(1.0f)    // set the animator to animate the alpha to 1
+                    .setDuration(animationDuration) // set the animation's duration
+                    .setListener(null); // clear any listeners
+        }
         popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
     }
 
@@ -53,8 +91,23 @@ public class Popup {
      */
     public void dismissPopupWindow() {
         if (popupWindow != null) {
-            popupWindow.dismiss();
-            popupWindow = null;
+            if (animationEnabled) {
+                popupView.animate()
+                        .alpha(0.0f)
+                        .setDuration(animationDuration)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                dismiss();
+                            }
+                        });
+            } else
+                dismiss();
         }
+    }
+
+    protected void dismiss() {
+        popupWindow.dismiss();
+        popupWindow = null;
     }
 }

@@ -17,7 +17,11 @@ public class MojoScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mojo_screen);
+
+        // Set up popup
         questionPopup = new Popup(this, R.layout.popup);
+        questionPopup.setAnimationEnabled(true);
+        questionPopup.setAnimationDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
     }
 
     /**
