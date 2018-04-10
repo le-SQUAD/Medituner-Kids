@@ -1,44 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
     android:background="@android:color/darker_gray">
 
-    <TextView
-        android:id="@+id/textView"
+    <Button
+        android:id="@+id/button_jump"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/popup_question"
-        android:textSize="22sp"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:onClick="playsound"
+        android:text="jump"
+        />
 
     <Button
-        android:id="@+id/btn_popup_no"
+        android:id="@+id/button_blink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"
-        android:onClick="onButtonNo"
-        android:text="@string/btn_no"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.8"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        android:onClick="playsound"
+        android:text="blink"
+        />
 
     <Button
-        android:id="@+id/btn_popup_yes"
+        android:id="@+id/button_happy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"
-        android:onClick="onButtonYes"
-        android:text="@string/btn_yes"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        android:onClick="playsound"
+        android:text="happy"
+        />
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
