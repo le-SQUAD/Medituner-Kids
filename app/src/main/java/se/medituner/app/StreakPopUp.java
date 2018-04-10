@@ -25,7 +25,7 @@ public class StreakPopUp extends Activity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                // Do something after 5s = 5000ms
+                // Do something after 2s = 2000ms
                 Intent intent=new Intent(StreakPopUp.this,MojoScreen.class);
 
                 startActivity(intent);
