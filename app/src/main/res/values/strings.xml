@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">app</string>
+    <string name="app_name">MediTuner</string>
+    <string name="streak_number">Streak Number</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
 </resources>
+
