@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     //this is popup-image
-
+    //it's going to be great
     <Button
         android:id="@+id/btn_popup_no"
         android:layout_width="wrap_content"
