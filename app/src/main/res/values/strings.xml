@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">Sound test</string>
+    <string name="app_name">Medituner Kids</string>
+    <string name="streak_number">Streak Number</string>
     <string name="btn_show_popup">Show Popup</string>
     <string name="popup_question">Have you taken your medication?</string>
     <string name="btn_yes">Yes!</string>
     <string name="btn_no">No.</string>
 </resources>
+
