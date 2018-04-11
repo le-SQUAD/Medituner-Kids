@@ -1,36 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_mojo_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MySounds">
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@android:color/darker_gray">
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/button_jumping"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Jump"
-        tools:layout_editor_absoluteX="161dp"
-        tools:layout_editor_absoluteY="130dp"
-        tools:ignore="MissingConstraints" />
+        android:onClick="playsound"
+        android:text="jumping"
+        />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/button_blink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
-        tools:layout_editor_absoluteX="161dp"
-        tools:layout_editor_absoluteY="229dp"
-        tools:ignore="MissingConstraints" />
+        android:onClick="playsound"
+        android:text="blink"
+        />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/button_happy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
-        tools:layout_editor_absoluteX="161dp"
-        tools:layout_editor_absoluteY="333dp"
-        tools:ignore="MissingConstraints" />
-</android.support.constraint.ConstraintLayout>
+        android:onClick="playsound"
+        android:text="happy"
+        />
+
+    <Button
+    android:id="@+id/button_cough"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:onClick="playsound"
+    android:text="cough"
+    />
+
+    <Button
+        android:id="@+id/button_sad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="playsound"
+        android:text="sad"
+        />
+
+    <Button
+        android:id="@+id/button_star1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="playsound"
+        android:text="star1"
+        />
+
+    <Button
+        android:id="@+id/button_star2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="playsound"
+        android:text="star2"
+        />
+
+    <Button
+        android:id="@+id/button_star3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="playsound"
+        android:text="star3"
+        />
+
+</LinearLayout>
