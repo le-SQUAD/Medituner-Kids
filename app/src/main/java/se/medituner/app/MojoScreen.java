@@ -19,6 +19,9 @@ public class MojoScreen extends AppCompatActivity {
         // Set up popup.
         questionPopup = new Popup(this, R.layout.question_popup);
         questionPopup.setAnimationStyle(android.R.style.Animation_Dialog);
+
+        // Load sounds
+        Sounds.getInstance().loadSounds(this);
     }
 
     /**
@@ -35,15 +38,24 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     public void onButtonYes(View view) {
-
+        // Increase the streak
         TextView tv = findViewById(R.id.streak_text);
         streak++;
         tv.setText(Integer.toString(streak));
+
+        // Play happy sound
+        Sounds.getInstance().playSound(Sounds.Sound.S_HAPPY);
+
         // TODO: process taking medication
+        // Hide the popup
         questionPopup.dismissPopupWindow();
     }
 
     public void onButtonNo(View view) {
+        // Play sad sound
+        Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
+
+        // Hide the popup
         questionPopup.dismissPopupWindow();
     }
 }
