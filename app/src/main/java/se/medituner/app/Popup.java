@@ -1,5 +1,7 @@
 package se.medituner.app;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.support.constraint.ConstraintLayout;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ public class Popup {
 
     protected PopupWindow popupWindow = null;
     protected View popupView;
+    protected int animationStyle = -1;
 
     /**
      * Create a new QuestionPopup. Will cache a view for ease of use.
@@ -30,11 +33,14 @@ public class Popup {
     }
 
     /**
-     * Show the popup window. Will create one if necessary.
+     * Show the popup window, creating one if necessary at given location.
      *
-     * @param view The parent view for the popup.
+     * @param parentView The parent view for the popup.
+     * @param gravity The gravity setting
+     * @param x x
+     * @param y y
      */
-    public void showPopupWindow(View view) {
+    public void showPopupWindow(View parentView, int gravity, int x, int y) {
         if (popupWindow == null) {
             // Create the popup window
             int width = ConstraintLayout.LayoutParams.WRAP_CONTENT;
@@ -42,19 +48,44 @@ public class Popup {
             boolean focusable = true;   // Tapping outside of the window will still be processed by it
 
             popupWindow = new PopupWindow(popupView, width, height, focusable);
+            popupWindow.setAnimationStyle(animationStyle);
         }
 
-        // Show the popup window
-        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+        popupWindow.showAtLocation(parentView, gravity, x, y);
+    }
+
+    /**
+     * Get the reference to the view of the popup.
+     *
+     * @return The reference to popup view.
+     */
+    public View getPopupView() {
+        return popupView;
+    }
+
+    /**
+     * Set the animation style for the window
+     *
+     * @param animationStyle The animation style of the window.
+     */
+    public void setAnimationStyle(int animationStyle) {
+        this.animationStyle = animationStyle;
+    }
+
+    /**
+     * Show the popup window, creating one if necessary in the middle of the screen.
+     *
+     * @param parentView The parent view.
+     */
+    public void showPopupWindow(View parentView) {
+        showPopupWindow(parentView, Gravity.CENTER, 0, 0);
     }
 
     /**
      * Dismiss the PopupWindow.
      */
     public void dismissPopupWindow() {
-        if (popupWindow != null) {
-            popupWindow.dismiss();
-            popupWindow = null;
-        }
+        popupWindow.dismiss();
+        popupWindow = null;
     }
 }

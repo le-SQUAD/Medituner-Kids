@@ -6,9 +6,6 @@ import android.animation.TimeInterpolator;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateInterpolator;
@@ -28,7 +25,10 @@ public class MojoScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mojo_screen);
-        questionPopup = new Popup(this, R.layout.popup);
+
+        // Set up popup.
+        questionPopup = new Popup(this, R.layout.question_popup);
+        questionPopup.setAnimationStyle(android.R.style.Animation_Dialog);
     }
 
     /**
