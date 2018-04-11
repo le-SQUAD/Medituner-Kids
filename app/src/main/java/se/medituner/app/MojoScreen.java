@@ -15,8 +15,8 @@ import android.widget.TextView;
 
 public class MojoScreen extends AppCompatActivity {
 
-    protected Popup questionPopup;
-    int streak = 0;
+    private Popup questionPopup;
+    private int streak = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
