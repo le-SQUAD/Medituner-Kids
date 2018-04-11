@@ -32,6 +32,7 @@ public class MojoScreen extends AppCompatActivity {
         tv.setText(Integer.toString(streak));
         if (streak >= 3) {
             startActivity(new Intent(MojoScreen.this, StreakPopUp.class));
+            MojoScreen.this.overridePendingTransition(R.anim.fade_in, R.anim.abc_fade_out);
             tv.setText(Integer.toString(streak));
 
         }

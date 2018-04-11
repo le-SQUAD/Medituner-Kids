@@ -2,9 +2,11 @@ package se.medituner.app;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.transition.Explode;
 import android.util.DisplayMetrics;
 
 import java.util.Timer;
@@ -26,9 +28,15 @@ public class StreakPopUp extends Activity {
             @Override
             public void run() {
                 // Do something after 2s = 2000ms
-                Intent intent=new Intent(StreakPopUp.this,MojoScreen.class);
 
-                startActivity(intent);
+                //Intent intent=new Intent(StreakPopUp.this,MojoScreen.class);
+                finish();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //cheks the API of the user
+                    StreakPopUp.this.overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                }
+
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+               // startActivity(intent);
             }
         }, 2000);
     }
