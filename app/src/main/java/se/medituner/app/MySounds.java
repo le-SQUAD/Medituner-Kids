@@ -62,6 +62,10 @@ public class MySounds extends AppCompatActivity {
     public void playsound(View v) {
         switch (v.getId()){
 
+            /*  calling for the different sounds in XML
+                android:id="@+id/button_blink"
+                android:onClick="playsound"
+            */
             case R.id.button_jumping:
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
