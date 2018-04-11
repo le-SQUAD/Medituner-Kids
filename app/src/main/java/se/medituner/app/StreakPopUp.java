@@ -32,13 +32,13 @@ public class StreakPopUp extends Activity {
                 //Intent intent=new Intent(StreakPopUp.this,MojoScreen.class);
                 finish();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //cheks the API of the user
-                    StreakPopUp.this.overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                    StreakPopUp.this.overridePendingTransition(R.anim.fade_in, R.anim.slide_down);
                 }
 
                 //intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                // startActivity(intent);
             }
-        }, 2000);
+        }, 2800);
     }
 
 
