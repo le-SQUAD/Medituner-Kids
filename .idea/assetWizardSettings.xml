@@ -33,9 +33,11 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="foregroundImage" value="C:\Users\Agnes\Pictures\IMG_7281.JPG" />
-                                      <entry key="foregroundLayerName" value="jerry" />
+                                      <entry key="backgroundLayerName" value="ic_launcher_background" />
+                                      <entry key="foregroundImage" value="C:\Users\aleks_uuia3ly\Documents\MeditunerProjectCourse\MojoStates\Smiling2.png" />
+                                      <entry key="foregroundLayerName" value="smiling" />
                                       <entry key="legacyIconShape" value="CIRCLE" />
+                                      <entry key="outputName" value="smiling2" />
                                     </map>
                                   </option>
                                 </PersistentState>
