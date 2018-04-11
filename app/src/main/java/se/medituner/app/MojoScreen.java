@@ -11,10 +11,12 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.graphics.drawable.AnimationDrawable;
+import android.widget.TextView;
 
 public class MojoScreen extends AppCompatActivity {
 
     protected Popup questionPopup;
+    int streak = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +26,9 @@ public class MojoScreen extends AppCompatActivity {
         // Set up popup.
         questionPopup = new Popup(this, R.layout.question_popup);
         questionPopup.setAnimationStyle(android.R.style.Animation_Dialog);
+
+        // Load sounds
+        Sounds.getInstance().loadSounds(this);
     }
 
     /**
@@ -40,7 +45,16 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     public void onButtonYes(View view) {
+        // Increase the streak
+        TextView tv = findViewById(R.id.streak_text);
+        streak++;
+        tv.setText(Integer.toString(streak));
+
+        // Play happy sound
+        Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
+
         // TODO: process taking medication
+        // Hide the popup
         questionPopup.dismissPopupWindow();
 
         final TimeInterpolator accelerateInterpolator = new AccelerateInterpolator();
@@ -79,6 +93,10 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     public void onButtonNo(View view) {
+        // Play sad sound
+        Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
+
+        // Hide the popup
         questionPopup.dismissPopupWindow();
     }
 

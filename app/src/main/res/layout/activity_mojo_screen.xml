@@ -5,7 +5,9 @@
     android:id="@+id/activity_mojo_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MojoScreen">
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:layout_editor_absoluteY="81dp">
 
     <Button
         android:id="@+id/button"
@@ -14,6 +16,17 @@
         android:onClick="onButtonShowPopupClick"
         android:text="@string/btn_show_popup"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.100000024" />
+
+    <TextView
+        android:id="@+id/streak_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -45,6 +58,7 @@
         app:layout_constraintHorizontal_bias="0.525"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/smilingBounceMojo" />
+
 
 
 </android.support.constraint.ConstraintLayout>
