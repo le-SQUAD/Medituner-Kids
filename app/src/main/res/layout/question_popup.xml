@@ -5,7 +5,7 @@
 
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@android:color/darker_gray"
+    android:background="@color/popupBackground"
     tools:layout_editor_absoluteY="81dp">
 
     <TextView
@@ -56,12 +56,13 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/medication_image"
         app:layout_constraintVertical_bias="0.692" />
 
     //Placeholder for the image of the asthma med.
+
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/medication_image"
         android:layout_width="68dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
