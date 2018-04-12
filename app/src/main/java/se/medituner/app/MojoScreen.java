@@ -17,6 +17,11 @@ public class MojoScreen extends AppCompatActivity {
 
     protected Popup questionPopup;
     int streak = 0;
+    /*final TimeInterpolator accelerateInterpolator = new AccelerateInterpolator();
+    final TimeInterpolator bounceInterpolator = new BounceInterpolator();
+    final ImageView smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
+    final ImageView smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
+    final ImageView frowningMojo = (ImageView) findViewById(R.id.frowningMojo);*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +55,7 @@ public class MojoScreen extends AppCompatActivity {
         streak++;
         tv.setText(Integer.toString(streak));
 
-        // Play happy sound
+        // Play jump sound
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
 
         // TODO: process taking medication
@@ -61,8 +66,10 @@ public class MojoScreen extends AppCompatActivity {
         final TimeInterpolator bounceInterpolator = new BounceInterpolator();
         final ImageView smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
         final ImageView smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
+        final ImageView frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
 
         //Smiling, jumping Mojo visible
+        frowningMojo.setVisibility(View.INVISIBLE);
         smilingWaveMojo.setVisibility(View.INVISIBLE);
         smilingBounceMojo.setVisibility(View.VISIBLE);
 
@@ -81,11 +88,12 @@ public class MojoScreen extends AppCompatActivity {
                                 smilingWaveMojo.setVisibility(View.VISIBLE);
                                 smilingBounceMojo.setVisibility(View.INVISIBLE);
 
+                                //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
                                 smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
                                 // Get the background, which has been compiled to an AnimationDrawable object.
-                                AnimationDrawable frameAnimation = (AnimationDrawable) smilingWaveMojo.getBackground();
+                                AnimationDrawable waveAnimation = (AnimationDrawable) smilingWaveMojo.getBackground();
                                 // Start the animation, Mojo waves
-                                frameAnimation.start();
+                                waveAnimation.start();
                             }
                         });
                     }
@@ -93,11 +101,30 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     public void onButtonNo(View view) {
-        // Play sad sound
-        Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
 
         // Hide the popup
         questionPopup.dismissPopupWindow();
+
+        final TimeInterpolator accelerateInterpolator = new AccelerateInterpolator();
+        final TimeInterpolator bounceInterpolator = new BounceInterpolator();
+        final ImageView smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
+        final ImageView smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
+        final ImageView frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
+
+        frowningMojo.setVisibility(View.VISIBLE);
+        smilingWaveMojo.setVisibility(View.INVISIBLE);
+        smilingBounceMojo.setVisibility(View.INVISIBLE);
+
+        frowningMojo.setBackgroundResource(R.drawable.frown_animation);
+        AnimationDrawable frownAnimation = (AnimationDrawable) frowningMojo.getBackground();
+        //smilingBounceMojo.setVisibility(View.INVISIBLE);
+        frownAnimation.start();
+
+        //smilingBounceMojo.setVisibility(View.INVISIBLE);
+
+        // Play sad sound
+        Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
+
     }
 
 }
