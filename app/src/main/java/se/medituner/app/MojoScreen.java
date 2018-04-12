@@ -10,10 +10,8 @@ import android.widget.ImageView;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
-import android.widget.ImageView;
 import android.graphics.drawable.AnimationDrawable;
 import android.widget.TextView;
-import android.widget.ImageSwitcher;
 
 public class MojoScreen extends AppCompatActivity {
     
@@ -21,12 +19,9 @@ public class MojoScreen extends AppCompatActivity {
     private int streak = 0;
     private TextView streakView;
     private String streakPrefix;
-    private boolean animationPlayed = false;
-    private TimeInterpolator accelerateInterpolator;
-    private TimeInterpolator bounceInterpolator;
-    private ImageView smilingBounceMojo;
-    private ImageView smilingWaveMojo;
-    private ImageView frowningMojo;
+    private boolean animationPlayed = false, showingAerobecautohaler;
+    private TimeInterpolator accelerateInterpolator, bounceInterpolator;
+    private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +31,8 @@ public class MojoScreen extends AppCompatActivity {
         // Set up popup.
         questionPopup = new Popup(this, R.layout.question_popup);
         questionPopup.setAnimationStyle(android.R.style.Animation_Dialog);
+
+        popupImage = questionPopup.getPopupView().findViewById(R.id.medication_image);
 
         // Load sounds
         Sounds.getInstance().loadSounds(this);
@@ -63,10 +60,10 @@ public class MojoScreen extends AppCompatActivity {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
         // Dynamic image in popup
-        View popupView = questionPopup.getPopupView();
-        ImageView iv = popupView.findViewById(R.id.imageView);
-        // Image of chosen medication
-        iv.setImageResource(R.mipmap.airvirospiromax1);
+        popupImage.setImageResource(showingAerobecautohaler
+                ? R.mipmap.airvirospiromax1
+                : R.mipmap.aerobecautohaler1);
+        showingAerobecautohaler = !showingAerobecautohaler;
 
         questionPopup.showPopupWindow(currentScreen);
     }
