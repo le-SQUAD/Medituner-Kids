@@ -16,9 +16,9 @@ import android.content.Context;
  */
 public class Popup {
 
-    protected PopupWindow popupWindow = null;
-    protected View popupView;
-    protected int animationStyle = -1;
+    private PopupWindow popupWindow = null;
+    private View popupView;
+    private int animationStyle = -1;
 
     /**
      * Create a new QuestionPopup. Will cache a view for ease of use.
