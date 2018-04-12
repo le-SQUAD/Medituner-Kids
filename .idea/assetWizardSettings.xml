@@ -16,26 +16,12 @@
                             <entry key="launcher">
                               <value>
                                 <PersistentState>
-                                  <option name="children">
-                                    <map>
-                                      <entry key="foregroundImage">
-                                        <value>
-                                          <PersistentState>
-                                            <option name="values">
-                                              <map>
-                                                <entry key="scalingPercent" value="118" />
-                                              </map>
-                                            </option>
-                                          </PersistentState>
-                                        </value>
-                                      </entry>
-                                    </map>
-                                  </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="foregroundImage" value="C:\Users\Agnes\Pictures\IMG_7281.JPG" />
-                                      <entry key="foregroundLayerName" value="jerry" />
-                                      <entry key="legacyIconShape" value="CIRCLE" />
+                                      <entry key="backgroundLayerName" value="ic_launcher_background" />
+                                      <entry key="foregroundImage" value="C:\Users\vende\OneDrive\Dokument\MediTuner\Bilder (120x120)_20180208\aerobecautohaler.png" />
+                                      <entry key="foregroundLayerName" value="aerobecautohaler1" />
+                                      <entry key="outputName" value="aerobecautohaler" />
                                     </map>
                                   </option>
                                 </PersistentState>

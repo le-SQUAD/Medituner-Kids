@@ -3,7 +3,9 @@ package se.medituner.app;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ImageSwitcher;
 
 
 public class MojoScreen extends AppCompatActivity {
@@ -33,6 +35,12 @@ public class MojoScreen extends AppCompatActivity {
     public void onButtonShowPopupClick(View view) {
         // Get the reference to an existing layout.
         View currentScreen = findViewById(R.id.activity_mojo_screen);
+
+        // Dynamic image in popup
+        View popupView = questionPopup.getPopupView();
+        ImageView iv = popupView.findViewById(R.id.imageView);
+        // Image of chosen medication
+        iv.setImageResource(R.mipmap.airvirospiromax1);
 
         questionPopup.showPopupWindow(currentScreen);
     }

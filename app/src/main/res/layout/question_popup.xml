@@ -40,7 +40,6 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/btn_popup_yes" />
 
-
     <Button
         android:id="@+id/btn_popup_yes"
         android:layout_width="88dp"
@@ -61,7 +60,6 @@
         app:layout_constraintVertical_bias="0.692" />
 
     //Placeholder for the image of the asthma med.
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="68dp"
@@ -73,7 +71,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
         app:layout_constraintVertical_chainStyle="packed"
-        app:srcCompat="@mipmap/jerry" />
+        app:srcCompat="@mipmap/aerobecautohaler1" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"
