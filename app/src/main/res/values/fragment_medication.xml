@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<InlineModel>
+<id>string</id>
+<name>string</name>
+<drugType>string</drugType>
+<strength>string</strength>
+<maxDose>1</maxDose>
+<route>string</route>
+<image>string</image>
+<isInhalationStereoid>true</isInhalationStereoid>
+<isBronchoDilator>true</isBronchoDilator>
+<isAntiCholinergic>true</isAntiCholinergic>
+<isAntihistamin>true</isAntihistamin>
+<isNasalStereoid>true</isNasalStereoid>
+<isEyes>true</isEyes>
+</InlineModel>
+
+</resources>
