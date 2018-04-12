@@ -19,6 +19,8 @@ public class MojoScreen extends AppCompatActivity {
 
     private Popup questionPopup;
     private int streak = 0;
+    private TextView streakView;
+    private String streakPrefix;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,11 @@ public class MojoScreen extends AppCompatActivity {
 
         // Load sounds
         Sounds.getInstance().loadSounds(this);
+
+        // Set up streaks
+        streakPrefix = getResources().getString(R.string.streak_prefix) + " ";
+        streakView = findViewById(R.id.streak_text);
+        streakView.setText(streakPrefix + Integer.toString(streak));
     }
 
     /**
@@ -54,9 +61,7 @@ public class MojoScreen extends AppCompatActivity {
 
     public void onButtonYes(View view) {
         // Increase the streak
-        TextView tv = findViewById(R.id.streak_text);
-        streak++;
-        tv.setText(Integer.toString(streak));
+        streakView.setText(streakPrefix + Integer.toString(++streak));
 
         // Play happy sound
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
@@ -101,6 +106,9 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     public void onButtonNo(View view) {
+        streak = 0;
+        streakView.setText(streakPrefix + Integer.toString(streak));
+
         // Play sad sound
         Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
 
