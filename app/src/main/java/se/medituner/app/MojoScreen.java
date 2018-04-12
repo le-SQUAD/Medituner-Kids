@@ -14,16 +14,12 @@ import android.graphics.drawable.AnimationDrawable;
 import android.widget.TextView;
 
 public class MojoScreen extends AppCompatActivity {
-
-    /*final TimeInterpolator accelerateInterpolator = new AccelerateInterpolator();
-    final TimeInterpolator bounceInterpolator = new BounceInterpolator();
-    final ImageView smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
-    final ImageView smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
-    final ImageView frowningMojo = (ImageView) findViewById(R.id.frowningMojo);*/
+    
     private Popup questionPopup;
     private int streak = 0;
     private TextView streakView;
     private String streakPrefix;
+    private boolean animationPlayed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,30 +106,36 @@ public class MojoScreen extends AppCompatActivity {
         streakView.setText(streakPrefix + Integer.toString(streak));
 
         // Play sad sound
-        Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
+        //Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
 
         // Hide the popup
         questionPopup.dismissPopupWindow();
 
-        final TimeInterpolator accelerateInterpolator = new AccelerateInterpolator();
-        final TimeInterpolator bounceInterpolator = new BounceInterpolator();
-        final ImageView smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
-        final ImageView smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
-        final ImageView frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
+        TimeInterpolator accelerateInterpolator = new AccelerateInterpolator();
+        TimeInterpolator bounceInterpolator = new BounceInterpolator();
+        ImageView smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
+        ImageView smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
+        ImageView frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
 
         frowningMojo.setVisibility(View.VISIBLE);
         smilingWaveMojo.setVisibility(View.INVISIBLE);
         smilingBounceMojo.setVisibility(View.INVISIBLE);
 
+        //frowningMojo.();
         frowningMojo.setBackgroundResource(R.drawable.frown_animation);
         AnimationDrawable frownAnimation = (AnimationDrawable) frowningMojo.getBackground();
         //smilingBounceMojo.setVisibility(View.INVISIBLE);
-        frownAnimation.start();
 
-        //smilingBounceMojo.setVisibility(View.INVISIBLE);
+        if(animationPlayed){
+            frownAnimation.stop();
+        }
+
+        frownAnimation.start();
 
         // Play sad sound
         Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
+
+        animationPlayed = true;
 
     }
 
