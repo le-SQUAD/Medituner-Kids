@@ -7,7 +7,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-
+/*
+*   A restful Java client, skeleton code from:
+*   https://www.mkyong.com/webservices/jax-rs/restfull-java-client-with-java-net-url/
+ */
 public class getRequest {
 
     //http://asthmatuner-dev-ayond.azurewebsites.net/api/ver1/treatmentplan/{id}
