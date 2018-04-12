@@ -9,6 +9,19 @@
     android:orientation="vertical"
     tools:layout_editor_absoluteY="81dp">
 
+    <ImageView
+        android:id="@+id/frowningMojo"
+        android:layout_width="290dp"
+        android:layout_height="282dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.525"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/smilingBounceMojo" />
+
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
@@ -25,8 +38,8 @@
         android:id="@+id/streak_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
         android:text="Streak"
-        android:textAppearance="@android:style/TextAppearance.Material.Medium"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
