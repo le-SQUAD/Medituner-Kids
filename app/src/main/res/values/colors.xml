@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#aaaaaa</color>
+    <color name="colorPrimary">#8eb3bb</color>
     <color name="colorPrimaryDark">#8eb3bb</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="popupBackground">#aaaaaa</color>
+    <color name="popupBackground">#8eb3bb</color>
     <color name="green05" />
 </resources>
