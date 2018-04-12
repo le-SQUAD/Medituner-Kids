@@ -1,7 +1,6 @@
 package se.medituner.app;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -10,10 +9,12 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.VideoView;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import org.w3c.dom.Text;
+
+import static se.medituner.app.MojoScreen.streak;
 
 public class StreakPopUp extends Activity {
 
@@ -25,7 +26,7 @@ public class StreakPopUp extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         int width = dm.widthPixels;
         int height = dm.heightPixels;
-        getWindow().setLayout((int) (width * .4), (int) (height * .4));
+        getWindow().setLayout((int) (width * .6), (int) (height * .45));
         final Handler handler = new Handler();
 
         //video implementation starts here
@@ -37,14 +38,27 @@ public class StreakPopUp extends Activity {
                 mp.setLooping(true);
             }
         });
-        String uriPath = "android.resource://se.medituner.app/"+R.raw.flowers;
+        String uriPath = "android.resource://se.medituner.app/"+R.raw.flydragonv2;
         Uri uri = Uri.parse(uriPath);
         vv.setVideoURI(uri);
         vv.requestFocus();
         vv.start();
         //video implementation ends here
-        ImageView iv = (ImageView)findViewById(R.id.imageView3);
-        iv.setImageResource(R.drawable.sun);
+
+        TextView tv= (TextView) findViewById(R.id.textView2); //text: Congrats...
+        tv.setText("Current streak:"+streak);
+        ImageView iv1 = (ImageView)findViewById(R.id.imageView1);
+        iv1.setImageResource(R.drawable.sun);
+
+        if(streak>4) {
+            ImageView iv2 = (ImageView) findViewById(R.id.imageView2);
+            iv2.setImageResource(R.drawable.sun);
+        }
+
+        if(streak>5) {
+            ImageView iv3 = (ImageView) findViewById(R.id.imageView3);
+            iv3.setImageResource(R.drawable.sun);
+        }
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -59,7 +73,7 @@ public class StreakPopUp extends Activity {
                 //intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                // startActivity(intent);
             }
-        }, 9800);
+        }, 50000);
     }
 
 

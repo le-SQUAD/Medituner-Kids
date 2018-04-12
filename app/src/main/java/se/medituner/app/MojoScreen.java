@@ -29,6 +29,7 @@ public class MojoScreen extends AppCompatActivity {
 //        });
     }
 
+
     public void onButton(View view) {
         streak++;
         TextView tv = findViewById(R.id.streak_text); //this is a textview for the current streak
