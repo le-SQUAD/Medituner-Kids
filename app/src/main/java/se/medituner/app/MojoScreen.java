@@ -17,8 +17,8 @@ public class MojoScreen extends AppCompatActivity {
     
     private Popup questionPopup;
     private int streak = 0;
-    private TextView streakView;
-    private String streakPrefix;
+    private TextView streakView, questionView;
+    private String streakPrefix, questionPrefix, questionPostfix;
     private boolean animationPlayed = false, showingAerobecautohaler;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
@@ -33,6 +33,10 @@ public class MojoScreen extends AppCompatActivity {
         questionPopup.setAnimationStyle(android.R.style.Animation_Dialog);
 
         popupImage = questionPopup.getPopupView().findViewById(R.id.medication_image);
+        questionView = questionPopup.getPopupView().findViewById(R.id.text_medication_question);
+
+        questionPrefix = getResources().getString(R.string.popup_question_prefix);
+        questionPostfix = getResources().getString(R.string.popup_question_postfix);
 
         // Load sounds
         Sounds.getInstance().loadSounds(this);
@@ -60,12 +64,19 @@ public class MojoScreen extends AppCompatActivity {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
         // Dynamic image in popup
-        popupImage.setImageResource(showingAerobecautohaler
-                ? R.mipmap.airvirospiromax1
-                : R.mipmap.aerobecautohaler1);
+        setPopupMedication(showingAerobecautohaler
+            ? Medication.AEROBEC
+            : Medication.AEROBECAUTOHALER);
         showingAerobecautohaler = !showingAerobecautohaler;
 
         questionPopup.showPopupWindow(currentScreen);
+    }
+
+    public void setPopupMedication(Medication medication) {
+        popupImage.setImageResource(Medication.getImageId(getResources(), getPackageName(), medication));
+        questionView.setText(questionPrefix
+                + Medication.getName(getResources(), getPackageName(), medication)
+                + questionPostfix);
     }
 
     public void onButtonYes(View view) {
