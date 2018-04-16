@@ -5,11 +5,16 @@ import java.util.Calendar;
 //MIN HH:mm
 //public static final LocalTime MIN;
 
-public class SchedulePopup implements IClock{
+public class SchedulePopup{
+
+    private 
+
+    public
 
 
 
-        Calendar time;
+
+       /* Calendar time;
 
         public static boolean isItPopupTime(Calendar time) {
 
@@ -21,7 +26,7 @@ public class SchedulePopup implements IClock{
                 return false;
             }
         }
-          /*  switch(time){
+            switch(time){
                 case 1:
                     time.MIN.equals(09:00);
                     questionPopup.showPopupWindow(currentScreen);
