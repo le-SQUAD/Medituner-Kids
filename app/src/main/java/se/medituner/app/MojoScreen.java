@@ -54,6 +54,9 @@ public class MojoScreen extends AppCompatActivity {
         smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
         smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
         frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
+        smilingBounceMojo.bringToFront();
+        smilingWaveMojo.bringToFront();
+        frowningMojo.bringToFront();
 
         //timer = new Timer();
         timer = new MedPopupTimer();
