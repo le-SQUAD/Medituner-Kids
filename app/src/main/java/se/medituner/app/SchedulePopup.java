@@ -1,4 +1,5 @@
 package se.medituner.app;
+import se.medituner.app.SystemClock;
 
 import java.util.Calendar;
 
@@ -6,26 +7,19 @@ import java.util.Calendar;
 //public static final LocalTime MIN;
 
 public class SchedulePopup{
+    private IClock time;
 
-    private 
+        public static boolean isItPopupTime(IClock time) {
 
-    public
-
-
-
-
-       /* Calendar time;
-
-        public static boolean isItPopupTime(Calendar time) {
-
-            if (time.equals('09:00')){
+            if(time.now().getTime().equals("16:10:00")){
                 return true;
-            }else if (time.equals('08:00')){
+            }else if(time.now().getTime().equals("16:08:00")){
                 return true;
             }else{
                 return false;
             }
-        }
+
+          /*
             switch(time){
                 case 1:
                     time.MIN.equals(09:00);
@@ -38,9 +32,5 @@ public class SchedulePopup{
             }
             */
         }
-
-
-
-
 
 }

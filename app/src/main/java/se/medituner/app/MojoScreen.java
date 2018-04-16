@@ -55,7 +55,10 @@ public class MojoScreen extends AppCompatActivity {
      * @param view
      * @author Grigory Glukhov, Aleksandra Soltan
      */
-    public void onButtonShowPopupClick(View view) {
+    IClock time;
+    public void showPopup(){
+    if(SchedulePopup.isItPopupTime(time)){
+        //public void onButtonShowPopupClick (View view){
         // Get the reference to an existing layout.
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
@@ -66,6 +69,7 @@ public class MojoScreen extends AppCompatActivity {
         showingAerobecautohaler = !showingAerobecautohaler;
 
         questionPopup.showPopupWindow(currentScreen);
+        }
     }
 
     public void onButtonYes(View view) {
