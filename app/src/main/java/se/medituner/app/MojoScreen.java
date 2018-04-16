@@ -58,9 +58,11 @@ public class MojoScreen extends AppCompatActivity {
     public void onButtonShowPopupClick(View view) {
         showPopup();
     }
-    
+
     public void onTimePopUp(IClock time){
-        showPopup();
+        if(SchedulePopup.isItPopupTime(time)) {
+            showPopup();
+        }
     }
 
     public void showPopup() {

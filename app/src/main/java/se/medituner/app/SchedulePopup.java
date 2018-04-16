@@ -11,9 +11,9 @@ public class SchedulePopup{
 
         public static boolean isItPopupTime(IClock time) {
 
-            if(time.now().getTime().equals("16:10:00")){
+            if(time.now().getTime().equals("16:30:00")){
                 return true;
-            }else if(time.now().getTime().equals("16:08:00")){
+            }else if(time.now().getTime().equals("16:35:00")){
                 return true;
             }else{
                 return false;
