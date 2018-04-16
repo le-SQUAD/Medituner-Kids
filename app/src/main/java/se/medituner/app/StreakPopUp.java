@@ -28,37 +28,38 @@ public class StreakPopUp extends Activity {
         int height = dm.heightPixels;
         getWindow().setLayout((int) (width * .6), (int) (height * .45));
         final Handler handler = new Handler();
+//        THIS WAS THE PREVIOUS COLORFUL POPUP
+//        //video implementation starts here
+//        VideoView vv;
+//        vv = (VideoView)findViewById(R.id.videoView);
+//        vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//            @Override
+//            public void onPrepared(MediaPlayer mp) {
+//                mp.setLooping(true);
+//            }
+//        });
+//        String uriPath = "android.resource://se.medituner.app/"+R.raw.flydragonv2;
+//        Uri uri = Uri.parse(uriPath);
+//        vv.setVideoURI(uri);
+//        vv.requestFocus();
+//        vv.start();
+//        //video implementation ends here
+//
+//        TextView tv= (TextView) findViewById(R.id.textView2); //text: Congrats...
+//        tv.setText("Current streak:"+streak);
+//        ImageView iv1 = (ImageView)findViewById(R.id.imageView1);
+//        iv1.setImageResource(R.drawable.sun);
+//
+//        if(streak>4) {
+//            ImageView iv2 = (ImageView) findViewById(R.id.imageView2);
+//            iv2.setImageResource(R.drawable.sun);
+//        }
+//
+//        if(streak>5) {
+//            ImageView iv3 = (ImageView) findViewById(R.id.imageView3);
+//            iv3.setImageResource(R.drawable.sun);
+//        }
 
-        //video implementation starts here
-        VideoView vv;
-        vv = (VideoView)findViewById(R.id.videoView);
-        vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-            }
-        });
-        String uriPath = "android.resource://se.medituner.app/"+R.raw.flydragonv2;
-        Uri uri = Uri.parse(uriPath);
-        vv.setVideoURI(uri);
-        vv.requestFocus();
-        vv.start();
-        //video implementation ends here
-
-        TextView tv= (TextView) findViewById(R.id.textView2); //text: Congrats...
-        tv.setText("Current streak:"+streak);
-        ImageView iv1 = (ImageView)findViewById(R.id.imageView1);
-        iv1.setImageResource(R.drawable.sun);
-
-        if(streak>4) {
-            ImageView iv2 = (ImageView) findViewById(R.id.imageView2);
-            iv2.setImageResource(R.drawable.sun);
-        }
-
-        if(streak>5) {
-            ImageView iv3 = (ImageView) findViewById(R.id.imageView3);
-            iv3.setImageResource(R.drawable.sun);
-        }
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
