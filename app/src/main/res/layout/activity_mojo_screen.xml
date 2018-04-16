@@ -2,44 +2,67 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_mojo_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MojoScreen">
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:layout_editor_absoluteY="81dp">
+
+    <ImageView
+        android:id="@+id/frowningMojo"
+        android:layout_width="290dp"
+        android:layout_height="282dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.525"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/smilingBounceMojo" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onButton"
-        android:text="Button"
+        android:onClick="onButtonShowPopupClick"
+        android:text="@string/btn_show_popup"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.896" />
-
-    <!--<Button-->
-    <!--android:id="@+id/button"-->
-    <!--android:layout_width="88dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="Button"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintTop_toTopOf="parent"-->
-    <!--app:layout_constraintVertical_bias="0.863" />-->
-
+        app:layout_constraintVertical_bias="0.100000024" />
 
     <TextView
         android:id="@+id/streak_text"
         android:layout_width="wrap_content"
-        android:layout_height="15dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/button4"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        android:text="Streak"
+        app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.09" />
+        app:layout_constraintVertical_bias="0.49" />
+
+    <ImageView
+        android:id="@+id/smilingBounceMojo"
+        android:layout_width="378dp"
+        android:layout_height="282dp"
+        android:layout_marginTop="256dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/smiling1" />
+
+    <ImageView
+        android:id="@+id/smilingWaveMojo"
+        android:layout_width="290dp"
+        android:layout_height="282dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/smilingBounceMojo" />
 
 
 </android.support.constraint.ConstraintLayout>

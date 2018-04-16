@@ -1,8 +1,10 @@
 <resources>
-    <string name="app_name">MediTuner</string>
-    <string name="streak_number">Streak Number</string>
-    <string name="yes">YES</string>
-    <string name="no">NO</string>
+    <string name="app_name">Medituner Kids</string>
+    <string name="streak_prefix">Streak: </string>
+    <string name="popup_question">Have you taken your medication?</string>
+    <string name="btn_show_popup">Show Popup</string>
+    <string name="btn_yes">Yes!</string>
+    <string name="btn_no">No.</string>
 
 </resources>
 

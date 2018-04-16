@@ -14,8 +14,6 @@ import android.widget.VideoView;
 
 import org.w3c.dom.Text;
 
-import static se.medituner.app.MojoScreen.streak;
-
 public class StreakPopUp extends Activity {
 
     @Override

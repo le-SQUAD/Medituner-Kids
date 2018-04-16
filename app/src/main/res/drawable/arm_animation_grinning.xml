@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="true">
+    <item android:drawable="@drawable/grinning1" android:duration="50" />
+    <item android:drawable="@drawable/grinning2" android:duration="50" />
+    <item android:drawable="@drawable/grinning3" android:duration="50" />
+    <item android:drawable="@drawable/grinning4" android:duration="50" />
+    <item android:drawable="@drawable/grinning5" android:duration="50" />
+    <item android:drawable="@drawable/grinning6" android:duration="50" />
+    <item android:drawable="@drawable/grinning7" android:duration="50" />
+    <item android:drawable="@drawable/grinning8" android:duration="50" />
+    <item android:drawable="@drawable/grinning9" android:duration="50" />
+    <item android:drawable="@drawable/grinning8" android:duration="50" />
+    <item android:drawable="@drawable/grinning7" android:duration="50" />
+    <item android:drawable="@drawable/grinning6" android:duration="50" />
+    <item android:drawable="@drawable/grinning5" android:duration="50" />
+    <item android:drawable="@drawable/grinning4" android:duration="50" />
+    <item android:drawable="@drawable/grinning3" android:duration="50" />
+    <item android:drawable="@drawable/grinning2" android:duration="50" />
+    <item android:drawable="@drawable/grinning1" android:duration="50" />
+
+    <item android:drawable="@drawable/grinning1" android:duration="50" />
+    <item android:drawable="@drawable/grinning2" android:duration="50" />
+    <item android:drawable="@drawable/grinning3" android:duration="50" />
+    <item android:drawable="@drawable/grinning4" android:duration="50" />
+    <item android:drawable="@drawable/grinning5" android:duration="50" />
+    <item android:drawable="@drawable/grinning6" android:duration="50" />
+    <item android:drawable="@drawable/grinning7" android:duration="50" />
+    <item android:drawable="@drawable/grinning8" android:duration="50" />
+    <item android:drawable="@drawable/grinning9" android:duration="50" />
+    <item android:drawable="@drawable/grinning8" android:duration="50" />
+    <item android:drawable="@drawable/grinning7" android:duration="50" />
+    <item android:drawable="@drawable/grinning6" android:duration="50" />
+    <item android:drawable="@drawable/grinning5" android:duration="50" />
+    <item android:drawable="@drawable/grinning4" android:duration="50" />
+    <item android:drawable="@drawable/grinning3" android:duration="50" />
+    <item android:drawable="@drawable/grinning2" android:duration="50" />
+    <item android:drawable="@drawable/grinning1" android:duration="50" />
+
+    <item android:drawable="@drawable/grinning1" android:duration="50" />
+    <item android:drawable="@drawable/grinning2" android:duration="50" />
+    <item android:drawable="@drawable/grinning3" android:duration="50" />
+    <item android:drawable="@drawable/grinning4" android:duration="50" />
+    <item android:drawable="@drawable/grinning5" android:duration="50" />
+    <item android:drawable="@drawable/grinning6" android:duration="50" />
+    <item android:drawable="@drawable/grinning7" android:duration="50" />
+    <item android:drawable="@drawable/grinning8" android:duration="50" />
+    <item android:drawable="@drawable/grinning9" android:duration="50" />
+    <item android:drawable="@drawable/grinning8" android:duration="50" />
+    <item android:drawable="@drawable/grinning7" android:duration="50" />
+    <item android:drawable="@drawable/grinning6" android:duration="50" />
+    <item android:drawable="@drawable/grinning5" android:duration="50" />
+    <item android:drawable="@drawable/grinning4" android:duration="50" />
+    <item android:drawable="@drawable/grinning3" android:duration="50" />
+    <item android:drawable="@drawable/grinning2" android:duration="50" />
+    <item android:drawable="@drawable/grinning1" android:duration="50" />
+</animation-list>
