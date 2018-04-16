@@ -18,7 +18,9 @@ import java.util.TimerTask;
 
 
 public class MojoScreen extends AppCompatActivity {
-    
+
+    public static final int MS_SNOOZE_DELAY = 5000;
+
     private Popup questionPopup;
     private int streak = 0;
     private TextView streakView;
@@ -27,7 +29,6 @@ public class MojoScreen extends AppCompatActivity {
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
     private MedPopupTimer timer;
-    //private Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,10 @@ public class MojoScreen extends AppCompatActivity {
      * @author Grigory Glukhov, Aleksandra Soltan
      */
     public void onButtonShowPopupClick(View view) {
+        showPopup();
+    }
+
+    public void showPopup() {
         // Get the reference to an existing layout.
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
@@ -75,6 +80,7 @@ public class MojoScreen extends AppCompatActivity {
         showingAerobecautohaler = !showingAerobecautohaler;
 
         questionPopup.showPopupWindow(currentScreen);
+
     }
 
     public void onButtonYes(View view) {
@@ -158,18 +164,9 @@ public class MojoScreen extends AppCompatActivity {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    // Get the reference to an existing layout.
-                    View currentScreen = findViewById(R.id.activity_mojo_screen);
-
-                    // Dynamic image in popup
-                    popupImage.setImageResource(showingAerobecautohaler
-                            ? R.mipmap.airvirospiromax1
-                            : R.mipmap.aerobecautohaler1);
-                    showingAerobecautohaler = !showingAerobecautohaler;
-
-                    questionPopup.showPopupWindow(currentScreen);
+                    showPopup();
                 }
-            }, 1000);
+            }, MS_SNOOZE_DELAY);
         }
     }
 
