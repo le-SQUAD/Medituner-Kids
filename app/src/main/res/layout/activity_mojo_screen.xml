@@ -111,5 +111,4 @@
         app:layout_constraintVertical_bias="0.235"
         app:srcCompat="@drawable/sun" />
 
-
 </android.support.constraint.ConstraintLayout>

@@ -5,4 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="popupBackground">#8eb3bb</color>
     <color name="green05" />
+    <color name="green">#81BCA6</color>
+    <color name="yellow">#f4e8d0</color>
+    <color name="blueg">#DEEFF1</color>
 </resources>

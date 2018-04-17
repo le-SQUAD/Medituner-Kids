@@ -85,7 +85,9 @@ public class Popup {
      * Dismiss the PopupWindow.
      */
     public void dismissPopupWindow() {
-        popupWindow.dismiss();
-        popupWindow = null;
+        if (popupWindow != null) {
+            popupWindow.dismiss();
+            popupWindow = null;
+        }
     }
 }
