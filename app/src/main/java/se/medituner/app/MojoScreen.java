@@ -13,8 +13,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
 import android.graphics.drawable.AnimationDrawable;
 import android.widget.TextView;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 import static android.view.Gravity.CENTER;
@@ -28,7 +26,6 @@ public class MojoScreen extends AppCompatActivity {
     private Popup questionPopup, streakPopup;
     private int streak = 0;
     private TextView streakView, questionView;
-    private String streakPrefix, questionPrefix, questionPostfix;
     private boolean animationPlayed = false, showingAerobecautohaler;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
@@ -53,16 +50,12 @@ public class MojoScreen extends AppCompatActivity {
         popupImage = questionPopup.getPopupView().findViewById(R.id.medication_image);
         questionView = questionPopup.getPopupView().findViewById(R.id.text_medication_question);
 
-        questionPrefix = getResources().getString(R.string.popup_question_prefix);
-        questionPostfix = getResources().getString(R.string.popup_question_postfix);
-
         // Load sounds
         Sounds.getInstance().loadSounds(this);
 
         // Set up streaks
-        streakPrefix = getResources().getString(R.string.streak_prefix) + " ";
         streakView = findViewById(R.id.streak_text);
-        streakView.setText(streakPrefix + Integer.toString(streak));
+        streakView.setText(getResources().getString(R.string.streak, streak));
 
         accelerateInterpolator = new AccelerateInterpolator();
         bounceInterpolator = new BounceInterpolator();
@@ -132,14 +125,13 @@ public class MojoScreen extends AppCompatActivity {
 
     public void setPopupMedication(Medication medication) {
         popupImage.setImageResource(Medication.getImageId(getResources(), getPackageName(), medication));
-        questionView.setText(questionPrefix
-                + Medication.getName(getResources(), getPackageName(), medication)
-                + questionPostfix);
+        questionView.setText(getResources().getString(R.string.popup_question,
+                Medication.getName(getResources(), getPackageName(), medication)));
     }
 
     public void onButtonYes(View view) {
         // Increase the streak
-        streakView.setText(streakPrefix + Integer.toString(++streak));
+        streakView.setText(getResources().getString(R.string.streak, ++streak));
 
         // Play jump sound
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
@@ -184,7 +176,7 @@ public class MojoScreen extends AppCompatActivity {
 
     public void onButtonNo(View view) {
         streak = 0;
-        streakView.setText(streakPrefix + Integer.toString(streak));
+        streakView.setText(getResources().getString(R.string.streak, streak));
 
         // Hide the popup
         questionPopup.dismissPopupWindow();
