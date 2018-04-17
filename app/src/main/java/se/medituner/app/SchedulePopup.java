@@ -7,7 +7,7 @@ import java.util.Calendar;
 //public static final LocalTime MIN;
 
 public class SchedulePopup{
-
+    
         public static boolean isItPopupTime(IClock time) {
 
             if(true){
@@ -18,18 +18,5 @@ public class SchedulePopup{
                 return false;
             }
 
-          /*
-            switch(time){
-                case 1:
-                    time.MIN.equals(09:00);
-                    questionPopup.showPopupWindow(currentScreen);
-                    break;
-                case 2:
-                    time.MIN.equals(10:00);
-                    questionPopup.showPopupWindow(currentScreen);
-                    break;
-            }
-            */
         }
-
 }
