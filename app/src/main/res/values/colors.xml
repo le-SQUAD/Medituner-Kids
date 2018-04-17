@@ -7,4 +7,7 @@
     <color name="dialogButtons">#ffffff</color>
     <color name="dialogText">#000000</color>
     <color name="green05" />
+    <color name="green">#81BCA6</color>
+    <color name="yellow">#f4e8d0</color>
+    <color name="blueg">#DEEFF1</color>
 </resources>

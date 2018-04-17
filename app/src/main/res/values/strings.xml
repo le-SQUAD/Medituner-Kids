@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Medituner Kids</string>
-    <string name="streak_prefix">Streak:\ </string>
-    <string name="popup_question_prefix">Have you taken your\ </string>
-    <string name="popup_question_postfix">\?</string>
+    <string name="streak">Streak: %1$d</string>
+    <string name="popup_question">Have you taken your %1$s?</string>
     <string name="btn_show_popup">Show Popup</string>
     <string name="btn_yes">Yes!</string>
     <string name="btn_no">No.</string>
+
 
     <!-- Medication Names -->
     <string name="aerobec">Aerobec</string>
@@ -64,6 +64,6 @@
     <string name="ventastinnovolizer">Ventast innovolizer</string>
     <string name="ventolinediskus">Ventoline diskus</string>
     <string name="ventolineevohalerblue">Ventoline evohaler blue</string>
-   
+
 </resources>
 
