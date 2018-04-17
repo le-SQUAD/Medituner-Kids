@@ -73,13 +73,15 @@ public class MojoScreen extends AppCompatActivity {
         final IClock now = new SystemClock();
         Calendar cal = now.now();
         Timer timer = new Timer();
-        cal.add(Calendar.HOUR_OF_DAY, 1);
+        //Handler handler = new Handler();
+        cal.add(Calendar.SECOND, 2);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 onTimePopUp(now);
             }
         }, cal.getTime());
+        
     }
 
     /**

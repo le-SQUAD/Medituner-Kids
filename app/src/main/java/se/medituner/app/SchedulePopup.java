@@ -7,13 +7,12 @@ import java.util.Calendar;
 //public static final LocalTime MIN;
 
 public class SchedulePopup{
-    //private IClock time;
 
         public static boolean isItPopupTime(IClock time) {
 
-            if(time.now().getTime().equals("08:46:00")){
+            if(true){
                 return true;
-            }else if(time.now().getTime().equals("16:35:00")){
+            }else if(time.now().getTime().equals("07:15:00")){
                 return true;
             }else{
                 return false;
