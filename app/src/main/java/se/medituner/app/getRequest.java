@@ -16,7 +16,7 @@ public class getRequest {
     //http://asthmatuner-dev-ayond.azurewebsites.net/api/ver1/treatmentplan/{id}
     //http://now.httpbin.org
 
-    //with GET api/ver1/drugs information about the drugs are printed 
+    //with GET api/ver1/drugs information about the drugs are printed
 
     public static void main(String[] args){
         try{
