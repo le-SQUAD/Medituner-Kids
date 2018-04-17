@@ -1,10 +1,69 @@
 <resources>
     <string name="app_name">Medituner Kids</string>
-    <string name="streak_prefix">Streak: </string>
-    <string name="popup_question">Have you taken your medication?</string>
+    <string name="streak_prefix">Streak:\ </string>
+    <string name="popup_question_prefix">Have you taken your\ </string>
+    <string name="popup_question_postfix">\?</string>
     <string name="btn_show_popup">Show Popup</string>
     <string name="btn_yes">Yes!</string>
     <string name="btn_no">No.</string>
 
+    <!-- Medication Names -->
+    <string name="aerobec">Aerobec</string>
+    <string name="aerobecautohaler">Aerobec Autohaler</string>
+    <string name="aerobecspray"> Aerobec Spray</string>
+    <string name="aervirospiromax">Aervirospiromax</string>
+    <string name="airflusalforspiro">Airflusalforspiro</string>
+    <string name="airobecautohaler">Airobecautohaler</string>
+    <string name="airomir">Airomir</string>
+    <string name="airomirautohaler">Airomirautohaler</string>
+    <string name="airsalb">Airsalb</string>
+    <string name="alvesco">Alvesco</string>
+    <string name="anoroellipta">Anorellipta</string>
+    <string name="asmanextwisthaler">Asmanextwisthaler</string>
+    <string name="atrovent">Atrovent</string>
+    <string name="beclometmedium">Beclometmedium</string>
+    <string name="braltuszonda">Bralutszonda</string>
+    <string name="bricanylturbohaler">Bricanylturbohaler</string>
+    <string name="budesonidmedium">Budesonid medium</string>
+    <string name="bufomixmedium">Bufomix medium</string>
+    <string name="buventolmedium">Buvento medium</string>
+    <string name="ciplafluticasone">Ciplafluticasone</string>
+    <string name="ciplaflutisalm">Ciplaflutisalm</string>
+    <string name="dukalirgenuair">Dukalirgenuari</string>
+    <string name="duorespspiromax">Duores spiromax</string>
+    <string name="ekliragenuair">Eklira genuair</string>
+    <string name="eyedrop">Eyedrop</string>
+    <string name="flutide">Flutide</string>
+    <string name="flutidediskusorange">Flutide diskus Orange</string>
+    <string name="flutiform">Flutiform</string>
+    <string name="formatrisnovolizer">Formatris novolizer</string>
+    <string name="handihaler">Handihaler</string>
+    <string name="incruseellipta">Incruseellipta</string>
+    <string name="innovair">Innovair</string>
+    <string name="missing">missing</string>
+    <string name="nosespray">Nose spray</string>
+    <string name="novopulmonnovolizer">Novopulmonnovolizer</string>
+    <string name="onbrezbreezhaler">Onbrez breezhaler</string>
+    <string name="oxisturbohaler">Oxis turbohaler</string>
+    <string name="pill">Pill</string>
+    <string name="pulmicortturbohaler">Pulmicort turbohaler</string>
+    <string name="relanio">Relanio</string>
+    <string name="relvar">Relvar</string>
+    <string name="salmeterolfluticasonecipla">Salmeterolfluticasonecipla</string>
+    <string name="seebribreezhaler">Seebribreez haler</string>
+    <string name="seretide">Seretide</string>
+    <string name="seretidediskuslila">Seretide diskus lila</string>
+    <string name="sereventdiskus">Serevent diskus</string>
+    <string name="sereventevohaler">Sereventevo haler</string>
+    <string name="sereventevohalerorange">Sereventevo haler orange</string>
+    <string name="spioltorespimat">Spioltorespimat</string>
+    <string name="spirivarespimat">Spirivarespimat</string>
+    <string name="striverdirespimat">Striverdirespimat</string>
+    <string name="symbicort">Symbicort</string>
+    <string name="ultibrobreezehaler">Ultibro breezehaler</string>
+    <string name="ventastinnovolizer">Ventast innovolizer</string>
+    <string name="ventolinediskus">Ventoline diskus</string>
+    <string name="ventolineevohalerblue">Ventoline evohaler blue</string>
+   
 </resources>
 

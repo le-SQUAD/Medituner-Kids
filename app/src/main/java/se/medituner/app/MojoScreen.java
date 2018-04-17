@@ -13,23 +13,29 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
 import android.graphics.drawable.AnimationDrawable;
 import android.widget.TextView;
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 import static android.view.Gravity.CENTER;
 
 public class MojoScreen extends AppCompatActivity {
-    
+
+    public static final int MS_SNOOZE_DELAY = 5000;
+    public static final int MS_REWARD_STREAK_ANIMATION_DURATION = 2000;
+    public static final int MS_REWARD_STREAK_HIDE_DELAY = 7000;
+
     private Popup questionPopup, streakPopup;
     private int streak = 0;
-    private TextView streakView;
-    private String streakPrefix;
+    private TextView streakView, questionView;
+    private String streakPrefix, questionPrefix, questionPostfix;
     private boolean animationPlayed = false, showingAerobecautohaler;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
     private View streakPopupView;
-    private boolean showingPopUpStreak;
+
     final Handler handler = new Handler();
-
-
+    private MedPopupTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +51,10 @@ public class MojoScreen extends AppCompatActivity {
         streakPopupView = streakPopup.getPopupView();
 
         popupImage = questionPopup.getPopupView().findViewById(R.id.medication_image);
+        questionView = questionPopup.getPopupView().findViewById(R.id.text_medication_question);
+
+        questionPrefix = getResources().getString(R.string.popup_question_prefix);
+        questionPostfix = getResources().getString(R.string.popup_question_postfix);
 
         // Load sounds
         Sounds.getInstance().loadSounds(this);
@@ -59,6 +69,12 @@ public class MojoScreen extends AppCompatActivity {
         smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
         smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
         frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
+        smilingBounceMojo.bringToFront();
+        smilingWaveMojo.bringToFront();
+        frowningMojo.bringToFront();
+
+        //timer = new Timer();
+        timer = new MedPopupTimer();
     }
 
     /**
@@ -68,53 +84,57 @@ public class MojoScreen extends AppCompatActivity {
      * @author Grigory Glukhov, Aleksandra Soltan, Sasa Lekic
      */
     public void onButtonShowPopupClick(View view) {
+        showPopup();
+    }
+
+    public void showPopup() {
         // Get the reference to an existing layout.
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
         // Dynamic image in popup
-        popupImage.setImageResource(showingAerobecautohaler
-                ? R.mipmap.airvirospiromax1
-                : R.mipmap.aerobecautohaler1);
+        setPopupMedication(showingAerobecautohaler
+            ? Medication.AEROBEC
+            : Medication.AEROBECAUTOHALER);
         showingAerobecautohaler = !showingAerobecautohaler;
 
         // questionPopup.showPopupWindow(currentScreen);
         //streakPopup.showPopupWindow(currentScreen);
-        streak++;
-        if(streak>3) {
-            if (!showingPopUpStreak) {
-                Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
-                streakPopupView.setScaleX(0.0f);
-                streakPopupView.setScaleY(0.0f);
-                streakPopupView.animate()
-                        .scaleX(1.0f)
-                        .scaleY(1.0f)
-                        .setDuration(2000);
-                showingPopUpStreak = true;
-                streakPopup.showPopupWindow(currentScreen, CENTER, 0, -240);
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (showingPopUpStreak) {
-                            Sounds.getInstance().playSound(Sounds.Sound.S_STAR2);
-                            streakPopupView.animate()
-                                    .scaleX(0.0f)
-                                    .scaleY(0.0f)
-                                    .setDuration(2000)
-                                    .setListener(new AnimatorListenerAdapter() {
-                                        @Override
-                                        public void onAnimationEnd(Animator animation) {
-                                            streakPopup.dismissPopupWindow();
-                                        }
-                                    });
-                            showingPopUpStreak = false;
-                        }
-
-                    }
-                }, 7000);
-            }
+        if( ++streak > 3 ) {
+            Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
+            streakPopupView.setScaleX(0.0f);
+            streakPopupView.setScaleY(0.0f);
+            streakPopupView.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION);
+            streakPopup.showPopupWindow(currentScreen, CENTER, 0, -240);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Sounds.getInstance().playSound(Sounds.Sound.S_STAR2);
+                    streakPopupView.animate()
+                            .scaleX(0.0f)
+                            .scaleY(0.0f)
+                            .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    streakPopup.dismissPopupWindow();
+                                }
+                            });
+                }
+            }, MS_REWARD_STREAK_HIDE_DELAY);
         }
 
 
+        questionPopup.showPopupWindow(currentScreen);
+    }
+
+    public void setPopupMedication(Medication medication) {
+        popupImage.setImageResource(Medication.getImageId(getResources(), getPackageName(), medication));
+        questionView.setText(questionPrefix
+                + Medication.getName(getResources(), getPackageName(), medication)
+                + questionPostfix);
     }
 
     public void onButtonYes(View view) {
@@ -188,6 +208,20 @@ public class MojoScreen extends AppCompatActivity {
 
         animationPlayed = true;
 
+        // Set timer to ask if medication taken again
+        timer.setPopupTimer();
+    }
+
+    private class MedPopupTimer{
+        public void setPopupTimer() {
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showPopup();
+                }
+            }, MS_SNOOZE_DELAY);
+        }
     }
 
 
