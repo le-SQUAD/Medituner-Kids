@@ -81,7 +81,7 @@ public class MojoScreen extends AppCompatActivity {
                 onTimePopUp(now);
             }
         }, cal.getTime());
-        
+
     }
 
     /**
