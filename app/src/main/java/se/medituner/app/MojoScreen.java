@@ -3,6 +3,7 @@ package se.medituner.app;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
+import android.os.Debug;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,7 +22,7 @@ public class MojoScreen extends AppCompatActivity {
 
     public static final int MS_SNOOZE_DELAY = 5000;
     public static final int MS_REWARD_STREAK_ANIMATION_DURATION = 2000;
-    public static final int MS_REWARD_STREAK_HIDE_DELAY = 7000;
+    public static final int MS_REWARD_STREAK_HIDE_DELAY = 3000;
 
     private Popup questionPopup, streakPopup;
     private int streak = 0;
@@ -70,17 +71,16 @@ public class MojoScreen extends AppCompatActivity {
         timer = new MedPopupTimer();
     }
 
+    public void onButtonShowPopupClick(View view) {
+        showQuestionPopup();
+    }
+
     /**
      * Show a popup and animated Mojo reaction.
      *
-     * @param view
      * @author Grigory Glukhov, Aleksandra Soltan, Sasa Lekic
      */
-    public void onButtonShowPopupClick(View view) {
-        showPopup();
-    }
-
-    public void showPopup() {
+    public void showQuestionPopup() {
         // Get the reference to an existing layout.
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
@@ -99,19 +99,23 @@ public class MojoScreen extends AppCompatActivity {
         Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
         streakPopupView.setScaleX(0.0f);
         streakPopupView.setScaleY(0.0f);
-        streakPopupView.animate()
-                .scaleX(1.0f)
-                .scaleY(1.0f)
-                .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION);
         streakPopup.showPopupWindow(currentScreen, CENTER, 0, -240);
+        streakPopupView.animate()
+                .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION)
+                .scaleX(1.0f)
+                .scaleY(1.0f).setListener(null);
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                System.out.println("Size:");
+                System.out.print(streakPopupView.getScaleX());
+                System.out.print(" ");
+                System.out.println(streakPopupView.getScaleY());
                 Sounds.getInstance().playSound(Sounds.Sound.S_STAR2);
                 streakPopupView.animate()
+                        .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION)
                         .scaleX(0.0f)
                         .scaleY(0.0f)
-                        .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION)
                         .setListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
@@ -119,7 +123,7 @@ public class MojoScreen extends AppCompatActivity {
                             }
                         });
             }
-        }, MS_REWARD_STREAK_HIDE_DELAY);
+        }, MS_REWARD_STREAK_HIDE_DELAY + MS_REWARD_STREAK_ANIMATION_DURATION);
     }
 
     public void setPopupMedication(Medication medication) {
@@ -213,7 +217,7 @@ public class MojoScreen extends AppCompatActivity {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    showPopup();
+                    showQuestionPopup();
                 }
             }, MS_SNOOZE_DELAY);
         }
