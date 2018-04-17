@@ -21,6 +21,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.view.Gravity.CENTER;
+import static se.medituner.app.MojoScreen.MS_SNOOZE_DELAY;
 
 public class MojoScreen extends AppCompatActivity {
 
@@ -40,7 +41,14 @@ public class MojoScreen extends AppCompatActivity {
     private MedPopupTimer timer;
     private SchedulePopup schedule;
     private Queue<Medication> medQueue;
-    private String typeOfQueue;
+
+    private enum QueueType {
+        QT_MORNING,
+        QT_LUNCH,
+        QT_EVENING
+    }
+
+    private QueueType typeOfQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +118,7 @@ public class MojoScreen extends AppCompatActivity {
         schedule.updateMorningQueue();
         //Queue set to morning queue
         medQueue = new LinkedList<Medication>(schedule.getCurrentQueue());
-        typeOfQueue = "morning";
+        typeOfQueue = QueueType.QT_MORNING;
     }
 
     // Show question popup window on button click
@@ -140,25 +148,29 @@ public class MojoScreen extends AppCompatActivity {
             : Medication.AEROBECAUTOHALER);
         showingAerobecautohaler = !showingAerobecautohaler;*/
 
-        if (!medQueue.isEmpty()) {
-            setPopupMedication(medQueue.element());
-            medQueue.remove();
+        if (medQueue.isEmpty()) {
+            switch (typeOfQueue) {
+                case QT_MORNING:
+                    schedule.updateLunchQueue();
+                    medQueue = schedule.getCurrentQueue();
+                    typeOfQueue = QueueType.QT_LUNCH;
+                    break;
+
+                case QT_EVENING:
+                    schedule.updateEveningQueue();
+                    medQueue = schedule.getCurrentQueue();
+                    typeOfQueue = QueueType.QT_EVENING;
+                    break;
+
+                case QT_LUNCH:
+                    schedule.updateMorningQueue();
+                    medQueue = schedule.getCurrentQueue();
+                    typeOfQueue = QueueType.QT_EVENING;
+                    break;
+            }
         }
-        else if (typeOfQueue == "morning") {
-            schedule.updateLunchQueue();
-            medQueue = schedule.getCurrentQueue();
-            typeOfQueue = "lunch";
-        }
-        else if (typeOfQueue == "lunch") {
-            schedule.updateEveningQueue();
-            medQueue = schedule.getCurrentQueue();
-            typeOfQueue = "evening";
-        }
-        else if (typeOfQueue == "evening") {
-            schedule.updateMorningQueue();
-            medQueue = schedule.getCurrentQueue();
-            typeOfQueue = "morning";
-        }
+
+        setPopupMedication(medQueue.peek());
 
         //setPopupMedication(medQueue.element());
 
@@ -205,6 +217,7 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     public void onButtonYes(View view) {
+
         // Increase the streak
         streakView.setText(getResources().getString(R.string.streak, ++streak));
 
@@ -248,13 +261,14 @@ public class MojoScreen extends AppCompatActivity {
                     }
                 });
 
-        if (streak >= 3) {
-            showStreakPopup();
-        }
+
+        medQueue.remove();
     }
+
 
     public void onButtonNo(View view) {
         streak = 0;
+
         streakView.setText(getResources().getString(R.string.streak, streak));
 
         // Hide the popup
@@ -279,11 +293,11 @@ public class MojoScreen extends AppCompatActivity {
 
         animationPlayed = true;
 
-        // Set timer to ask if medication taken again
-        timer.setPopupTimer();
-    }
 
-    private class MedPopupTimer{
+        }
+
+
+    class MedPopupTimer{
         public void setPopupTimer() {
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -294,6 +308,5 @@ public class MojoScreen extends AppCompatActivity {
             }, MS_SNOOZE_DELAY);
         }
     }
-
 
 }
