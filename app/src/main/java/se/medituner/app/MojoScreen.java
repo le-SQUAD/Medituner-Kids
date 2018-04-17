@@ -248,7 +248,8 @@ public class MojoScreen extends AppCompatActivity {
                     }
                 });
 
-        if (streak >= 3) {
+        //Determine if reward popup star should appear
+        if (streakFunction()) {
             showStreakPopup();
         }
     }
@@ -281,6 +282,15 @@ public class MojoScreen extends AppCompatActivity {
 
         // Set timer to ask if medication taken again
         timer.setPopupTimer();
+    }
+
+    public boolean streakFunction(){
+        if((streak == 3) || (streak % 6 == 0)){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     private class MedPopupTimer{
