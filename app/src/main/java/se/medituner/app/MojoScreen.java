@@ -90,37 +90,36 @@ public class MojoScreen extends AppCompatActivity {
             : Medication.AEROBECAUTOHALER);
         showingAerobecautohaler = !showingAerobecautohaler;
 
-        // questionPopup.showPopupWindow(currentScreen);
-        //streakPopup.showPopupWindow(currentScreen);
-        if( ++streak > 3 ) {
-            Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
-            streakPopupView.setScaleX(0.0f);
-            streakPopupView.setScaleY(0.0f);
-            streakPopupView.animate()
-                    .scaleX(1.0f)
-                    .scaleY(1.0f)
-                    .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION);
-            streakPopup.showPopupWindow(currentScreen, CENTER, 0, -240);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Sounds.getInstance().playSound(Sounds.Sound.S_STAR2);
-                    streakPopupView.animate()
-                            .scaleX(0.0f)
-                            .scaleY(0.0f)
-                            .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    streakPopup.dismissPopupWindow();
-                                }
-                            });
-                }
-            }, MS_REWARD_STREAK_HIDE_DELAY);
-        }
-
-
         questionPopup.showPopupWindow(currentScreen);
+    }
+
+    public void showStreakPopup() {
+        View currentScreen = findViewById(R.id.activity_mojo_screen);
+
+        Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
+        streakPopupView.setScaleX(0.0f);
+        streakPopupView.setScaleY(0.0f);
+        streakPopupView.animate()
+                .scaleX(1.0f)
+                .scaleY(1.0f)
+                .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION);
+        streakPopup.showPopupWindow(currentScreen, CENTER, 0, -240);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Sounds.getInstance().playSound(Sounds.Sound.S_STAR2);
+                streakPopupView.animate()
+                        .scaleX(0.0f)
+                        .scaleY(0.0f)
+                        .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                streakPopup.dismissPopupWindow();
+                            }
+                        });
+            }
+        }, MS_REWARD_STREAK_HIDE_DELAY);
     }
 
     public void setPopupMedication(Medication medication) {
@@ -172,6 +171,10 @@ public class MojoScreen extends AppCompatActivity {
                         });
                     }
                 });
+
+        if (streak >= 3) {
+            showStreakPopup();
+        }
     }
 
     public void onButtonNo(View view) {
