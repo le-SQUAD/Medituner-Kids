@@ -3,18 +3,22 @@ package se.medituner.app;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
-import android.os.Debug;
+import android.graphics.drawable.AnimationDrawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
-import android.graphics.drawable.AnimationDrawable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.view.Gravity.CENTER;
 
@@ -34,6 +38,9 @@ public class MojoScreen extends AppCompatActivity {
 
     final Handler handler = new Handler();
     private MedPopupTimer timer;
+    private SchedulePopup schedule;
+    private Queue<Medication> medQueue;
+    private String typeOfQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +69,7 @@ public class MojoScreen extends AppCompatActivity {
         bounceInterpolator = new BounceInterpolator();
         smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
         smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
+
         frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
         smilingBounceMojo.bringToFront();
         smilingWaveMojo.bringToFront();
@@ -69,10 +77,52 @@ public class MojoScreen extends AppCompatActivity {
 
         //timer = new Timer();
         timer = new MedPopupTimer();
+
+        final IClock now = new SystemClock();
+        Calendar cal = now.now();
+        Timer timer = new Timer();
+        cal.add(Calendar.HOUR_OF_DAY, 1);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                onTimePopUp(now);
+            }
+        }, cal.getTime());
+
+        Queue<Medication> testMorningQueue = new LinkedList<Medication>();
+        Queue<Medication> testLunchQueue = new LinkedList<Medication>();
+        Queue<Medication> testEveningQueue = new LinkedList<Medication>();
+
+        testMorningQueue.add(Medication.AEROBEC);
+        testMorningQueue.add(Medication.AIROMIR);
+        testMorningQueue.add(Medication.ALVESCO);
+
+        testLunchQueue.add(Medication.BRICANYLTURBOHALER);
+        testLunchQueue.add(Medication.SALMETEROLFLUTICASONECIPLA);
+        testLunchQueue.add(Medication.SERETIDEDISKUSLILA);
+
+        testEveningQueue.add(Medication.BUFOMIXMEDIUM);
+        testEveningQueue.add(Medication.EYEDROP);
+        testEveningQueue.add(Medication.SERETIDEDISKUSLILA);
+
+        schedule = new SchedulePopup(testMorningQueue,testLunchQueue,testEveningQueue);
+
+        schedule.updateMorningQueue();
+        //Queue set to morning queue
+        medQueue = new LinkedList<Medication>(schedule.getCurrentQueue());
+        typeOfQueue = "morning";
     }
 
+    // Show question popup window on button click
     public void onButtonShowPopupClick(View view) {
         showQuestionPopup();
+    }
+
+    // Show popup at set time
+    public void onTimePopUp(IClock time){
+        if(SchedulePopup.isItPopupTime(time)) {
+            showQuestionPopup();
+        }
     }
 
     /**
@@ -85,10 +135,32 @@ public class MojoScreen extends AppCompatActivity {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
         // Dynamic image in popup
-        setPopupMedication(showingAerobecautohaler
+        /*setPopupMedication(showingAerobecautohaler
             ? Medication.AEROBEC
             : Medication.AEROBECAUTOHALER);
-        showingAerobecautohaler = !showingAerobecautohaler;
+        showingAerobecautohaler = !showingAerobecautohaler;*/
+
+        if (!medQueue.isEmpty()) {
+            setPopupMedication(medQueue.element());
+            medQueue.remove();
+        }
+        else if (typeOfQueue == "morning") {
+            schedule.updateLunchQueue();
+            medQueue = schedule.getCurrentQueue();
+            typeOfQueue = "lunch";
+        }
+        else if (typeOfQueue == "lunch") {
+            schedule.updateEveningQueue();
+            medQueue = schedule.getCurrentQueue();
+            typeOfQueue = "evening";
+        }
+        else if (typeOfQueue == "evening") {
+            schedule.updateMorningQueue();
+            medQueue = schedule.getCurrentQueue();
+            typeOfQueue = "morning";
+        }
+
+        //setPopupMedication(medQueue.element());
 
         questionPopup.showPopupWindow(currentScreen);
     }

@@ -6,6 +6,7 @@
     <string name="btn_yes">Yes!</string>
     <string name="btn_no">No.</string>
 
+
     <!-- Medication Names -->
     <string name="aerobec">Aerobec</string>
     <string name="aerobecautohaler">Aerobec Autohaler</string>
@@ -63,6 +64,6 @@
     <string name="ventastinnovolizer">Ventast innovolizer</string>
     <string name="ventolinediskus">Ventoline diskus</string>
     <string name="ventolineevohalerblue">Ventoline evohaler blue</string>
-   
+
 </resources>
 
