@@ -72,15 +72,9 @@ public class MojoScreen extends AppCompatActivity {
 
         final IClock now = new SystemClock();
         Calendar cal = now.now();
-        //Timer timer = new Timer();
-        final Handler handler = new Handler();
-        cal.add(Calendar.SECOND, 2);
-        handler.postAtTime(new Runnable() {
-            @Override
-            public void run() {
-                onTimePopUp(now);
-            }
-        }, 50000);
+        Timer timer = new Timer();
+        cal.add(Calendar.SECOND, 5);
+        timer.schedule(new ShowPopupTask(), cal.getTime());
     }
 
     /**
@@ -205,6 +199,18 @@ public class MojoScreen extends AppCompatActivity {
                     showPopup();
                 }
             }, MS_SNOOZE_DELAY);
+        }
+    }
+
+    public class ShowPopupTask extends TimerTask {
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    showPopup();
+                }
+            });
         }
     }
 
