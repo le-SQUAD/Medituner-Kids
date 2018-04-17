@@ -13,6 +13,10 @@ import android.view.animation.BounceInterpolator;
 import android.graphics.drawable.AnimationDrawable;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MojoScreen extends AppCompatActivity {
     
     private Popup questionPopup;
@@ -46,7 +50,17 @@ public class MojoScreen extends AppCompatActivity {
         bounceInterpolator = new BounceInterpolator();
         smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
         smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
-        frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
+
+        final IClock now = new SystemClock();
+        Calendar cal = now.now();
+        Timer timer = new Timer();
+        cal.add(Calendar.HOUR_OF_DAY, 1);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                onTimePopUp(now);
+            }
+        }, cal.getTime());
     }
 
     /**
@@ -55,10 +69,12 @@ public class MojoScreen extends AppCompatActivity {
      * @param view
      * @author Grigory Glukhov, Aleksandra Soltan
      */
+    // Show popup by pressing the button
     public void onButtonShowPopupClick(View view) {
         showPopup();
     }
-
+    IClock time;
+    // Show popup at set time
     public void onTimePopUp(IClock time){
         if(SchedulePopup.isItPopupTime(time)) {
             showPopup();
