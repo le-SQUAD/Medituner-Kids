@@ -14,10 +14,13 @@ import java.net.URL;
 public class getRequest {
 
     //http://asthmatuner-dev-ayond.azurewebsites.net/api/ver1/treatmentplan/{id}
+    //http://now.httpbin.org
+
+    //with GET api/ver1/drugs information about the drugs are printed 
 
     public static void main(String[] args){
         try{
-            URL url = new URL("http://now.httpbin.org");
+            URL url = new URL("http://asthmatuner-dev-ayond.azurewebsites.net/api/ver1/drugs");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept","text/plain");
