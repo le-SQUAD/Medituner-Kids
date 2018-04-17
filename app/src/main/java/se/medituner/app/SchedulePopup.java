@@ -1,14 +1,17 @@
 package se.medituner.app;
 import se.medituner.app.SystemClock;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 //MIN HH:mm
 //public static final LocalTime MIN;
 
 public class SchedulePopup{
-    
+
         public static boolean isItPopupTime(IClock time) {
+            //DateFormat timeFormatted = new SimpleDateFormat("HH:mm:ss");
 
             if(true){
                 return true;
