@@ -3,7 +3,6 @@ package se.medituner.app;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
-import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +26,7 @@ public class MojoScreen extends AppCompatActivity {
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
     private View streakPopupView;
+    private boolean showingPopUpStreak;
     final Handler handler = new Handler();
 
 
@@ -81,30 +81,37 @@ public class MojoScreen extends AppCompatActivity {
         //streakPopup.showPopupWindow(currentScreen);
         streak++;
         if(streak>3) {
-            streakPopupView.setScaleX(0.0f);
-            streakPopupView.setScaleY(0.0f);
-            streakPopupView.animate()
-                    .scaleX(1.0f)
-                    .scaleY(1.0f)
-                    .setDuration(2000);
-            streakPopup.showPopupWindow(currentScreen, CENTER, 0, -370);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    // Do something after 2s = 2000ms
-                    streakPopupView.animate()
-                            .scaleX(0.0f)
-                            .scaleY(0.0f)
-                            .setDuration(2000)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    streakPopup.dismissPopupWindow();
-                                }
-                            });
+            if (!showingPopUpStreak) {
+                Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
+                streakPopupView.setScaleX(0.0f);
+                streakPopupView.setScaleY(0.0f);
+                streakPopupView.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(2000);
+                showingPopUpStreak = true;
+                streakPopup.showPopupWindow(currentScreen, CENTER, 0, -240);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (showingPopUpStreak) {
+                            Sounds.getInstance().playSound(Sounds.Sound.S_STAR2);
+                            streakPopupView.animate()
+                                    .scaleX(0.0f)
+                                    .scaleY(0.0f)
+                                    .setDuration(2000)
+                                    .setListener(new AnimatorListenerAdapter() {
+                                        @Override
+                                        public void onAnimationEnd(Animator animation) {
+                                            streakPopup.dismissPopupWindow();
+                                        }
+                                    });
+                            showingPopUpStreak = false;
+                        }
 
-                }
-            }, 3000);
+                    }
+                }, 7000);
+            }
         }
 
 
