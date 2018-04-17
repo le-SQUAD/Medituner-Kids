@@ -13,6 +13,8 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
 import android.graphics.drawable.AnimationDrawable;
 import android.widget.TextView;
+
+import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -20,6 +22,7 @@ import java.util.TimerTask;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Queue;
 
 public class MojoScreen extends AppCompatActivity {
 
@@ -33,6 +36,9 @@ public class MojoScreen extends AppCompatActivity {
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
     private MedPopupTimer timer;
+    private SchedulePopup schedule;
+    private Queue<Medication> medQueue;
+    private String typeOfQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +86,29 @@ public class MojoScreen extends AppCompatActivity {
                 onTimePopUp(now);
             }
         }, cal.getTime());
+
+        Queue<Medication> testMorningQueue = new LinkedList<Medication>();
+        Queue<Medication> testLunchQueue = new LinkedList<Medication>();
+        Queue<Medication> testEveningQueue = new LinkedList<Medication>();
+
+        testMorningQueue.add(Medication.AEROBEC);
+        testMorningQueue.add(Medication.AIROMIR);
+        testMorningQueue.add(Medication.ALVESCO);
+
+        testLunchQueue.add(Medication.BRICANYLTURBOHALER);
+        testLunchQueue.add(Medication.SALMETEROLFLUTICASONECIPLA);
+        testLunchQueue.add(Medication.SERETIDEDISKUSLILA);
+
+        testEveningQueue.add(Medication.BUFOMIXMEDIUM);
+        testEveningQueue.add(Medication.EYEDROP);
+        testEveningQueue.add(Medication.SERETIDEDISKUSLILA);
+
+        schedule = new SchedulePopup(testMorningQueue,testLunchQueue,testEveningQueue);
+
+        schedule.updateMorningQueue();
+        //Queue set to morning queue
+        medQueue = new LinkedList<Medication>(schedule.getCurrentQueue());
+        typeOfQueue = "morning";
     }
 
     /**
@@ -104,10 +133,32 @@ public class MojoScreen extends AppCompatActivity {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
         // Dynamic image in popup
-        setPopupMedication(showingAerobecautohaler
+        /*setPopupMedication(showingAerobecautohaler
             ? Medication.AEROBEC
             : Medication.AEROBECAUTOHALER);
-        showingAerobecautohaler = !showingAerobecautohaler;
+        showingAerobecautohaler = !showingAerobecautohaler;*/
+
+        if(!medQueue.isEmpty()){
+            setPopupMedication(medQueue.element());
+            medQueue.remove();
+        }
+        else if(typeOfQueue == "morning"){
+            schedule.updateLunchQueue();
+            medQueue = schedule.getCurrentQueue();
+            typeOfQueue = "lunch";
+        }
+        else if(typeOfQueue == "lunch"){
+            schedule.updateEveningQueue();
+            medQueue = schedule.getCurrentQueue();
+            typeOfQueue = "evening";
+        }
+        else if(typeOfQueue == "evening"){
+            schedule.updateMorningQueue();
+            medQueue = schedule.getCurrentQueue();
+            typeOfQueue = "morning";
+        }
+
+        //setPopupMedication(medQueue.element());
 
         questionPopup.showPopupWindow(currentScreen);
     }

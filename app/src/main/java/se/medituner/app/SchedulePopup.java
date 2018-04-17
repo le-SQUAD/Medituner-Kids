@@ -2,12 +2,25 @@ package se.medituner.app;
 import se.medituner.app.SystemClock;
 
 import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.Queue;
 
 //MIN HH:mm
 //public static final LocalTime MIN;
 
 public class SchedulePopup{
     //private IClock time;
+        final Queue<Medication> morning;
+        final Queue<Medication> lunch;
+        final Queue<Medication> evening;
+        Queue<Medication> activeQueue;
+
+        public SchedulePopup(Queue<Medication> morningQueue, Queue<Medication> lunchQueue, Queue<Medication> eveningQueue){
+            morning = morningQueue;
+            lunch = lunchQueue;
+            evening = eveningQueue;
+            activeQueue = new LinkedList<Medication>();
+        }
 
         public static boolean isItPopupTime(IClock time) {
 
@@ -33,4 +46,19 @@ public class SchedulePopup{
             */
         }
 
+        public Queue getCurrentQueue(){
+              return activeQueue;
+        }
+
+        public void updateMorningQueue(){
+            activeQueue = new LinkedList<>(morning);
+        }
+
+        public void updateLunchQueue(){
+            activeQueue = new LinkedList<>(lunch);
+        }
+
+        public void updateEveningQueue(){
+            activeQueue = new LinkedList<>(evening);
+        }
 }
