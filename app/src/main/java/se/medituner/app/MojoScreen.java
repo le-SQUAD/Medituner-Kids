@@ -285,7 +285,7 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     public boolean streakFunction(){
-        if((streak == 3) || (streak % 6 == 0)){
+        if(((streak == 3) || (streak % 6 == 0)) && streak != 0){
             return true;
         }
         else{
