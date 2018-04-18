@@ -44,6 +44,7 @@ public class MojoScreen extends AppCompatActivity {
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
     private View streakPopupView;
+    private Persistence persistence;
 
     final Handler handler = new Handler();
     private MedPopupTimer timer;
@@ -51,70 +52,12 @@ public class MojoScreen extends AppCompatActivity {
     private Queue<Medication> medQueue;
     private String typeOfQueue;
 
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.w("STOE", "mysg");
-
-        try {
-            saveQueue(medQueue);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        try {
-            getQueue();
-            Log.w("STOE", "mysg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //public FileOutputStream fos = openFileOutput("Hello", Context.MODE_PRIVATE);
-
-
-    public void saveQueue(Queue<Medication> currentState) throws IOException {
-        // write object to file
-        FileOutputStream fos = openFileOutput("medQueue", 0);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(currentState);
-        oos.close();
-
-    }
-
-    //File getFilesDir();
-    public void getQueue() throws IOException, ClassNotFoundException {
-
-        // read object from file
-        FileInputStream fis = openFileInput("medQueue");
-        ObjectInputStream ois = new ObjectInputStream(fis);
-        medQueue = (Queue<Medication>) ois.readObject();
-        ois.close();
-    }
-
-
-    //public MojoScreen() throws FileNotFoundException {}
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            getQueue();
-            Log.w("STOE", "mysg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         setContentView(R.layout.activity_mojo_screen);
+
+        persistence = new Persistence(this);
 
         // Set up popup.
         questionPopup = new Popup(this, R.layout.question_popup);
