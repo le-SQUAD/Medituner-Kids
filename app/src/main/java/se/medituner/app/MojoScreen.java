@@ -74,7 +74,9 @@ public class MojoScreen extends AppCompatActivity {
         Calendar cal = now.now();
         Timer timer = new Timer();
         cal.add(Calendar.SECOND, 5);
-        timer.schedule(new ShowPopupTask(), cal.getTime());
+        if(SchedulePopup.isItPopupTime(now)) {
+            timer.schedule(new ShowPopupTask(), cal.getTime());
+        }
     }
 
     /**
@@ -89,11 +91,11 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     // Show popup at set time
-    public void onTimePopUp(IClock time){
+    /*public void onTimePopUp(IClock time){
         if(SchedulePopup.isItPopupTime(time)) {
             showPopup();
         }
-    }
+    }*/
     public void showPopup() {
         // Get the reference to an existing layout.
         View currentScreen = findViewById(R.id.activity_mojo_screen);
