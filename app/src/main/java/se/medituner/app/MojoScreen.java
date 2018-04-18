@@ -21,6 +21,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.view.Gravity.CENTER;
+import static se.medituner.app.MojoScreen.MS_SNOOZE_DELAY;
 
 public class MojoScreen extends AppCompatActivity {
 
@@ -31,7 +32,7 @@ public class MojoScreen extends AppCompatActivity {
     private Popup questionPopup, streakPopup;
     private int streak = 0;
     private TextView streakView, questionView;
-    private boolean animationPlayed = false, showingAerobecautohaler;
+    private boolean animationPlayed = false;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
     private View streakPopupView;
@@ -40,8 +41,22 @@ public class MojoScreen extends AppCompatActivity {
     private MedPopupTimer timer;
     private Schedule schedule;
     private Queue<Medication> medQueue;
-    private String typeOfQueue;
 
+    private enum QueueType {
+        QT_MORNING,
+        QT_LUNCH,
+        QT_EVENING
+    }
+
+    private QueueType typeOfQueue;
+
+    /**
+     * The first thing to be called on app startup.
+     * Most of the initialization happens here.
+     *
+     * @param savedInstanceState Android chaching
+     * @author Grigory Glukhov, Aleksandra Soltan, Sasa Lekic, Julia Danek, Agnes Petajavaara, Vendela Vlk
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +104,7 @@ public class MojoScreen extends AppCompatActivity {
             }
         }, cal.getTime());
 
+        // Set up Schedule
         schedule = new Schedule(new SystemClock());
 
         schedule.addMedToMorningPool(Medication.AEROBEC);
@@ -103,11 +119,8 @@ public class MojoScreen extends AppCompatActivity {
         schedule.addMedToEveningPool(Medication.EYEDROP);
         schedule.addMedToEveningPool(Medication.SERETIDEDISKUSLILA);
 
-
         schedule.validateQueue();
-        //Queue set to morning queue
         medQueue = schedule.getActiveQueue();
-        typeOfQueue = "morning";
     }
 
     // Show question popup window on button click
@@ -136,18 +149,17 @@ public class MojoScreen extends AppCompatActivity {
     public void showQuestionPopup() {
         // Get the reference to an existing layout.
         View currentScreen = findViewById(R.id.activity_mojo_screen);
-
-        // Dynamic image in popup
-        /*setPopupMedication(showingAerobecautohaler
-            ? Medication.AEROBEC
-            : Medication.AEROBECAUTOHALER);
-        showingAerobecautohaler = !showingAerobecautohaler;*/
-
+        // Set the dynamic image and name
         setPopupMedication(medQueue.element());
-
+        // Show popup
         questionPopup.showPopupWindow(currentScreen);
     }
 
+    /**
+     * Show reward streak popup.
+     *
+     * @author Sasa Lekic
+     */
     public void showStreakPopup() {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
@@ -181,6 +193,12 @@ public class MojoScreen extends AppCompatActivity {
         }, MS_REWARD_STREAK_HIDE_DELAY + MS_REWARD_STREAK_ANIMATION_DURATION);
     }
 
+    /**
+     * Set the name and the image for a given medication in the question popup.
+     *
+     * @param medication The medication to show.
+     * @author Grigory Glukhov, Julia Danek
+     */
     public void setPopupMedication(Medication medication) {
         popupImage.setImageResource(Medication.getImageId(getResources(), getPackageName(), medication));
         questionView.setText(getResources().getString(R.string.popup_question,
@@ -188,6 +206,7 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     public void onButtonYes(View view) {
+
         // Increase the streak
         streakView.setText(getResources().getString(R.string.streak, ++streak));
 
@@ -238,8 +257,10 @@ public class MojoScreen extends AppCompatActivity {
         }
     }
 
+
     public void onButtonNo(View view) {
         streak = 0;
+
         streakView.setText(getResources().getString(R.string.streak, streak));
 
         // Hide the popup
@@ -264,20 +285,26 @@ public class MojoScreen extends AppCompatActivity {
 
         animationPlayed = true;
 
-        // Set timer to ask if medication taken again
-        timer.setPopupTimer();
+
     }
 
-    public boolean streakFunction(){
-        if(((streak == 3) || (streak % 6 == 0)) && streak != 0){
+    
+    /**
+     * Determine if its time to show the streak popup.
+     *
+     * @return True if the reward popup should be shown.
+     * @author Aleksandra Soltan
+     */
+    public boolean streakFunction() {
+        if (((streak == 3) || (streak % 6 == 0)) && streak != 0) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
-    private class MedPopupTimer{
+
+    private class MedPopupTimer {
         public void setPopupTimer() {
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -288,6 +315,5 @@ public class MojoScreen extends AppCompatActivity {
             }, MS_SNOOZE_DELAY);
         }
     }
-
 
 }
