@@ -112,7 +112,13 @@ public class MojoScreen extends AppCompatActivity {
 
     // Show question popup window on button click
     public void onButtonShowPopupClick(View view) {
-        showQuestionPopup();
+        schedule.validateQueue();
+        medQueue = schedule.getActiveQueue();
+        if (medQueue.isEmpty()) {
+            showStreakPopup();
+        } else {
+            showQuestionPopup();
+        }
     }
 
     // Show popup at set time
@@ -137,8 +143,6 @@ public class MojoScreen extends AppCompatActivity {
             : Medication.AEROBECAUTOHALER);
         showingAerobecautohaler = !showingAerobecautohaler;*/
 
-        schedule.validateQueue();
-        medQueue = schedule.getActiveQueue();
         setPopupMedication(medQueue.element());
 
         questionPopup.showPopupWindow(currentScreen);
