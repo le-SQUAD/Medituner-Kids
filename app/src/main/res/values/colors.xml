@@ -3,7 +3,9 @@
     <color name="colorPrimary">#8eb3bb</color>
     <color name="colorPrimaryDark">#8eb3bb</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="popupBackground">#8eb3bb</color>
+    <color name="popupBackground">#ffffff</color>
+    <color name="dialogButtons">#ffffff</color>
+    <color name="dialogText">#000000</color>
     <color name="green05" />
     <color name="green">#81BCA6</color>
     <color name="yellow">#f4e8d0</color>

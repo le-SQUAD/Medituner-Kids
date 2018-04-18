@@ -21,7 +21,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.view.Gravity.CENTER;
-import static se.medituner.app.MojoScreen.MS_SNOOZE_DELAY;
 
 public class MojoScreen extends AppCompatActivity {
 
@@ -32,7 +31,7 @@ public class MojoScreen extends AppCompatActivity {
     private Popup questionPopup, streakPopup;
     private int streak = 0;
     private TextView streakView, questionView;
-    private boolean animationPlayed = false, showingAerobecautohaler;
+    private boolean animationPlayed = false;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
     private View streakPopupView;
@@ -50,6 +49,13 @@ public class MojoScreen extends AppCompatActivity {
 
     private QueueType typeOfQueue;
 
+    /**
+     * The first thing to be called on app startup.
+     * Most of the initialization happens here.
+     *
+     * @param savedInstanceState Android chaching
+     * @author Grigory Glukhov, Aleksandra Soltan, Sasa Lekic, Julia Danek, Agnes Petajavaara, Vendela Vlk
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,7 +119,7 @@ public class MojoScreen extends AppCompatActivity {
         testEveningQueue.add(Medication.EYEDROP);
         testEveningQueue.add(Medication.SERETIDEDISKUSLILA);
 
-        schedule = new SchedulePopup(testMorningQueue,testLunchQueue,testEveningQueue);
+        schedule = new SchedulePopup(testMorningQueue, testLunchQueue, testEveningQueue);
 
         schedule.updateMorningQueue();
         //Queue set to morning queue
@@ -127,11 +133,12 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     // Show popup at set time
-    public void onTimePopUp(IClock time){
-        if(SchedulePopup.isItPopupTime(time)) {
+    public void onTimePopUp(IClock time) {
+        if (SchedulePopup.isItPopupTime(time)) {
             showQuestionPopup();
         }
     }
+
 
     /**
      * Show a popup and animated Mojo reaction.
@@ -177,6 +184,12 @@ public class MojoScreen extends AppCompatActivity {
         questionPopup.showPopupWindow(currentScreen);
     }
 
+
+    /**
+     * Show reward streak popup.
+     *
+     * @author Sasa Lekic
+     */
     public void showStreakPopup() {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
@@ -210,16 +223,26 @@ public class MojoScreen extends AppCompatActivity {
         }, MS_REWARD_STREAK_HIDE_DELAY + MS_REWARD_STREAK_ANIMATION_DURATION);
     }
 
+    /**
+     * Set the name and the image for a given medication in the question popup.
+     *
+     * @param medication The medication to show.
+     * @author Grigory Glukhov, Julia Danek
+     */
     public void setPopupMedication(Medication medication) {
         popupImage.setImageResource(Medication.getImageId(getResources(), getPackageName(), medication));
         questionView.setText(getResources().getString(R.string.popup_question,
                 Medication.getName(getResources(), getPackageName(), medication)));
     }
 
+    /**
+     * Called when user answers 'yes' on the question popup.
+     * Initiates happy Mojo animations and sounds.
+     *
+     * @param view Android button that was pressed.
+     */
     public void onButtonYes(View view) {
-
-        // Increase the streak
-        streakView.setText(getResources().getString(R.string.streak, ++streak));
+        incrementStreak();
 
         // Play jump sound
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
@@ -261,15 +284,22 @@ public class MojoScreen extends AppCompatActivity {
                     }
                 });
 
-
         medQueue.remove();
+        //Determine if reward popup star should appear
+        if (streakFunction()) {
+            showStreakPopup();
+        }
     }
 
 
+    /**
+     * Called when the user presses 'no' on the popup question.
+     * Dismisses the window, sets off sad Mojo animations and sounds.
+     *
+     * @param view Android button that was pressed.
+     */
     public void onButtonNo(View view) {
-        streakDecrease();
-
-        streakView.setText(getResources().getString(R.string.streak, streak));
+        resetStreak();
 
         // Hide the popup
         questionPopup.dismissPopupWindow();
@@ -282,7 +312,7 @@ public class MojoScreen extends AppCompatActivity {
         frowningMojo.setBackgroundResource(R.drawable.frown_animation);
         AnimationDrawable frownAnimation = (AnimationDrawable) frowningMojo.getBackground();
 
-        if(animationPlayed){
+        if (animationPlayed) {
             frownAnimation.stop();
         }
 
@@ -292,31 +322,42 @@ public class MojoScreen extends AppCompatActivity {
         Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
 
         animationPlayed = true;
+    }
 
 
+    /**
+     * Determine if its time to show the streak popup.
+     *
+     * @return True if the reward popup should be shown.
+     * @author Aleksandra Soltan
+     */
+    public boolean streakFunction() {
+        if (((streak == 3) || (streak % 6 == 0)) && streak != 0) {
+            return true;
+        } else {
+            return false;
         }
+    }
 
-        // method for setting streak = 0
-        private void streakIncrease(){
-            streak ++;
+    private void incrementStreak() {
+        streakView.setText(getResources().getString(R.string.streak, ++streak));
+    }
+
+    private void resetStreak() {
+        streak = 0;
+        streakView.setText(getResources().getString(R.string.streak, streak));
+    }
+
+    class MedPopupTimer {
+        public void setPopupTimer() {
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showQuestionPopup();
+                }
+            }, MS_SNOOZE_DELAY);
         }
-
-        // method for increasing streak with 1
-        private void streakDecrease(){
-            streak = 0;
-        }
-
-        class MedPopupTimer{
-            public void setPopupTimer() {
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showQuestionPopup();
-                    }
-                }, MS_SNOOZE_DELAY);
-            }
-        }
-
+    }
 
 }
