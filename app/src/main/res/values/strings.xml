@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Medituner Kids</string>
     <string name="streak">Streak: %1$d</string>
+    <string name="streak_popup">GREAT JOB!\n%1$d in a row!</string>
     <string name="popup_question">Have you taken your %1$s?</string>
     <string name="btn_show_popup">Show Popup</string>
     <string name="btn_yes">Yes!</string>

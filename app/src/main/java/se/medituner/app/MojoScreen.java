@@ -33,7 +33,7 @@ public class MojoScreen extends AppCompatActivity {
 
     private Popup questionPopup, streakPopup;
     private int streak = 0;
-    private TextView streakView, questionTextView;
+    private TextView streakView, questionTextView, rewardStreakTextView;
     private boolean animationPlayed = false;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, questionImageView;
@@ -61,8 +61,9 @@ public class MojoScreen extends AppCompatActivity {
         questionImageView = questionPopup.getPopupView().findViewById(R.id.medication_image);
         questionTextView = questionPopup.getPopupView().findViewById(R.id.text_medication_question);
 
-        streakPopup = new Popup(this, R.layout.popupstreak_object_orient);
+        streakPopup = new Popup(this, R.layout.streak_popup);
         streakPopupView = streakPopup.getPopupView();
+        rewardStreakTextView = streakPopupView.findViewById(R.id.text_reward_streak);
 
         // Load sounds
         Sounds.getInstance().loadSounds(this);
@@ -192,6 +193,7 @@ public class MojoScreen extends AppCompatActivity {
      */
     public void showStreakPopup() {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
+        rewardStreakTextView.setText(getResources().getString(R.string.streak_popup, streak));
 
         Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
         streakPopupView.setScaleX(0.0f);
