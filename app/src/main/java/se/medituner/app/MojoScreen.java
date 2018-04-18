@@ -89,27 +89,24 @@ public class MojoScreen extends AppCompatActivity {
             }
         }, cal.getTime());
 
-        Queue<Medication> testMorningQueue = new LinkedList<Medication>();
-        Queue<Medication> testLunchQueue = new LinkedList<Medication>();
-        Queue<Medication> testEveningQueue = new LinkedList<Medication>();
+        schedule = new Schedule(new SystemClock());
 
-        testMorningQueue.add(Medication.AEROBEC);
-        testMorningQueue.add(Medication.AIROMIR);
-        testMorningQueue.add(Medication.ALVESCO);
+        schedule.addMedToMorningPool(Medication.AEROBEC);
+        schedule.addMedToMorningPool(Medication.AIROMIR);
+        schedule.addMedToMorningPool(Medication.ALVESCO);
 
-        testLunchQueue.add(Medication.BRICANYLTURBOHALER);
-        testLunchQueue.add(Medication.SALMETEROLFLUTICASONECIPLA);
-        testLunchQueue.add(Medication.SERETIDEDISKUSLILA);
+        schedule.addMedToLunchPool(Medication.BRICANYLTURBOHALER);
+        schedule.addMedToLunchPool(Medication.SALMETEROLFLUTICASONECIPLA);
+        schedule.addMedToLunchPool(Medication.SERETIDEDISKUSLILA);
 
-        testEveningQueue.add(Medication.BUFOMIXMEDIUM);
-        testEveningQueue.add(Medication.EYEDROP);
-        testEveningQueue.add(Medication.SERETIDEDISKUSLILA);
+        schedule.addMedToEveningPool(Medication.BUFOMIXMEDIUM);
+        schedule.addMedToEveningPool(Medication.EYEDROP);
+        schedule.addMedToEveningPool(Medication.SERETIDEDISKUSLILA);
 
-        schedule = new Schedule(testMorningQueue,testLunchQueue,testEveningQueue);
 
-        schedule.updateMorningQueue();
+        schedule.validateQueue();
         //Queue set to morning queue
-        medQueue = new LinkedList<Medication>(schedule.getCurrentQueue());
+        medQueue = schedule.getActiveQueue();
         typeOfQueue = "morning";
     }
 
@@ -140,27 +137,9 @@ public class MojoScreen extends AppCompatActivity {
             : Medication.AEROBECAUTOHALER);
         showingAerobecautohaler = !showingAerobecautohaler;*/
 
-        if (!medQueue.isEmpty()) {
-            setPopupMedication(medQueue.element());
-            medQueue.remove();
-        }
-        else if (typeOfQueue == "morning") {
-            schedule.updateLunchQueue();
-            medQueue = schedule.getCurrentQueue();
-            typeOfQueue = "lunch";
-        }
-        else if (typeOfQueue == "lunch") {
-            schedule.updateEveningQueue();
-            medQueue = schedule.getCurrentQueue();
-            typeOfQueue = "evening";
-        }
-        else if (typeOfQueue == "evening") {
-            schedule.updateMorningQueue();
-            medQueue = schedule.getCurrentQueue();
-            typeOfQueue = "morning";
-        }
-
-        //setPopupMedication(medQueue.element());
+        schedule.validateQueue();
+        medQueue = schedule.getActiveQueue();
+        setPopupMedication(medQueue.element());
 
         questionPopup.showPopupWindow(currentScreen);
     }
@@ -211,7 +190,6 @@ public class MojoScreen extends AppCompatActivity {
         // Play jump sound
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
 
-        // TODO: process taking medication
         // Hide the popup
         questionPopup.dismissPopupWindow();
 
@@ -247,6 +225,8 @@ public class MojoScreen extends AppCompatActivity {
                         });
                     }
                 });
+
+        medQueue.remove();
 
         //Determine if reward popup star should appear
         if (streakFunction()) {

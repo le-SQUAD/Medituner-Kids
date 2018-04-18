@@ -1,5 +1,4 @@
 package se.medituner.app;
-import se.medituner.app.SystemClock;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -20,19 +19,32 @@ public class Schedule {
     private IClock time;
 
     // Schedule pools
-    private final Queue<Medication> morning;
-    private final Queue<Medication> lunch;
-    private final Queue<Medication> evening;
+    private final Queue<Medication> morningPool;
+    private final Queue<Medication> lunchPool;
+    private final Queue<Medication> eveningPool;
 
     // Schedule active queue.
     private Date queueCreationTime;
     private Queue<Medication> activeQueue;
 
     public Schedule(Queue<Medication> morningQueue, Queue<Medication> lunchQueue, Queue<Medication> eveningQueue){
-        morning = morningQueue;
-        lunch = lunchQueue;
-        evening = eveningQueue;
+        morningPool = morningQueue;
+        lunchPool = lunchQueue;
+        eveningPool = eveningQueue;
         activeQueue = new LinkedList<Medication>();
+    }
+
+    public Schedule(IClock time){
+        this.time = time;
+        morningPool = new LinkedList<>();
+        lunchPool = new LinkedList<>();
+        eveningPool = new LinkedList<>();
+        activeQueue = new LinkedList<>();
+
+        Calendar queueFakeTime = time.now();
+        queueFakeTime.setTime(getBeginningOfCurrentPeriod(time));
+        queueFakeTime.add(Calendar.MINUTE, -10);
+        queueCreationTime = queueFakeTime.getTime();
     }
 
     public static boolean isItPopupTime(IClock time) {
@@ -64,30 +76,45 @@ public class Schedule {
      * Switches active queue to the correct pool
      */
     private void updateQueue() {
-        queueCreationTime = getBeginningOfCurrentPeriod(time);
+        Date periodBeginning = getBeginningOfCurrentPeriod(time);
+        queueCreationTime = time.now().getTime();
         Calendar cal = time.now();
-        cal.setTime(queueCreationTime);
+        cal.setTime(periodBeginning);
         switch (cal.get(Calendar.HOUR_OF_DAY)) {
             case 5:
-                activeQueue = new LinkedList<>(morning);
+                activeQueue = new LinkedList<>(morningPool);
                 break;
 
             case 11:
-                activeQueue = new LinkedList<>(lunch);
+                activeQueue = new LinkedList<>(lunchPool);
                 break;
 
             default:
-                activeQueue = new LinkedList<>(evening);
+                activeQueue = new LinkedList<>(eveningPool);
                 break;
         }
     }
 
+    /**
+     * Checks if the current queue is valid, and updates accordingly
+     */
     public void validateQueue() {
+
+        if(queueCreationTime.before(getBeginningOfCurrentPeriod(time))){
+            if(activeQueue.isEmpty()) {
+                //TODO: Check if any periods skipped
+                //TODO: Reset streak if YES, increase streak if NO
+                updateQueue();
+            } else {
+                //TODO: Reset streak
+            }
+        }
 
     }
 
+
     /**
-     * Get the beginning of the current period (morning, lunch or evening).
+     * Get the beginning of the current period (morningPool, lunchPool or eveningPool).
      * The returned date is back in time relative to time.now()
      *
      * @param time IClock interface for now() method.
@@ -153,7 +180,37 @@ public class Schedule {
         }
     }
 
-    public Queue getCurrentQueue(){
+    public Queue getActiveQueue(){
           return activeQueue;
+    }
+
+    public void purgeMorningPool() {
+        while(!morningPool.isEmpty()) {
+            morningPool.remove();
+        }
+    }
+
+    public void purgeLunchPool() {
+        while(!lunchPool.isEmpty()) {
+            lunchPool.remove();
+        }
+    }
+
+    public void purgeEveningPool() {
+        while(!eveningPool.isEmpty()) {
+            eveningPool.remove();
+        }
+    }
+
+    public void addMedToMorningPool(Medication med) {
+        morningPool.add(med);
+    }
+
+    public void addMedToLunchPool(Medication med) {
+        lunchPool.add(med);
+    }
+
+    public void addMedToEveningPool(Medication med) {
+        eveningPool.add(med);
     }
 }
