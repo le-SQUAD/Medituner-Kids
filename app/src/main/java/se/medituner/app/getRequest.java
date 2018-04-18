@@ -8,27 +8,29 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 /*
-*   A restful Java client, skeleton code from:
-*   https://www.mkyong.com/webservices/jax-rs/restfull-java-client-with-java-net-url/
+ *  @auth agnes
+ *  A restful Java client, skeleton code from  https://www.mkyong.com/webservices/jax-rs/restfull-java-client-with-java-net-url/
  */
 public class getRequest {
 
-    //http://asthmatuner-dev-ayond.azurewebsites.net/api/ver1/treatmentplan/{id}
-    //http://now.httpbin.org
-
-    //with GET api/ver1/drugs information about the drugs are printed
-
     public static void main(String[] args){
+        String access_token = "pf73ImOQj2Hw0pSu6n3CdnB6p1bpC15ivO9IN-kEqtgLe6pDs6wUrmf0n0A2_EuqR4R47JSiwfa_3YUt2uFWoOFjh7AE0_mFY-lIiGd13VlEs0uRxsxC-6Ydo9r96lkuHdX-D2dRmHZ69GaFGnwfDr_NrTDWaaLhY2otrcgqdjW_9ZYRgiNM0nMjIvl7_zkZdeeSmtI86R2NccD5LtgzV9OANRSOJZOq3KYowhVYVOil_B7_x4fZEimp_iEsCmGmeQINVeMhKT67RknQXs2RcQRvOOduRJT2VNQoGjsdboo_4shXptNbI744h6JoeJS5FbzdPi-lQv1NdPY6BcX76RLUeCnSgg7WNdR4cLw9Te5WrKLmWwWl6wAGAcYgbrPAEqbW1hKHBPHXBIT45A6Vfvh-06_01K52IormiaLt9hzCF5AK4Gj8IGcYxhBuLjfMlIXboLi9Gaf36qcSzN-QVg";
+        String patientId = "c1954920-1bc6-4c01-be6d-aa3059e21aee";
+        String userId = "98578477-2dff-49a6-9f47-78fef33363f9";
+        String API_treatmentplan = "/api/ver1/treatmentplan/";
+
+        // URL example : http://example.com/resource?x=y&bearer_token=vF9dft4qmT
         try{
-            URL url = new URL("http://asthmatuner-dev-ayond.azurewebsites.net/api/ver1/drugs");
+            URL url = new URL( "http://asthmatunerprod.azurewebsites.net" + API_treatmentplan + patientId +"&bearer_token=" + access_token);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept","text/plain");
+            connection.setRequestProperty("Accept","application/json");
 
             if(connection.getResponseCode() != 200){
                 throw new RuntimeException("\t\n" +
-                        "Errorcode=8000 , drug not found.\r\n" + connection.getResponseCode());
+                        "ERROR CODE:\r\n" + connection.getResponseCode());
             }
+
             BufferedReader reader = new BufferedReader(new
                     InputStreamReader(connection.getInputStream()));
 
