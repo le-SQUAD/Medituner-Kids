@@ -267,7 +267,7 @@ public class MojoScreen extends AppCompatActivity {
 
 
     public void onButtonNo(View view) {
-        streak = 0;
+        streakDecrease();
 
         streakView.setText(getResources().getString(R.string.streak, streak));
 
@@ -296,17 +296,27 @@ public class MojoScreen extends AppCompatActivity {
 
         }
 
-
-    class MedPopupTimer{
-        public void setPopupTimer() {
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    showQuestionPopup();
-                }
-            }, MS_SNOOZE_DELAY);
+        // method for setting streak = 0
+        private void streakIncrease(){
+            streak ++;
         }
-    }
+
+        // method for increasing streak with 1
+        private void streakDecrease(){
+            streak = 0;
+        }
+
+        class MedPopupTimer{
+            public void setPopupTimer() {
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showQuestionPopup();
+                    }
+                }, MS_SNOOZE_DELAY);
+            }
+        }
+
 
 }
