@@ -32,7 +32,7 @@ public class MojoScreen extends AppCompatActivity {
     private Popup questionPopup, streakPopup;
     private int streak = 0;
     private TextView streakView, questionView;
-    private boolean animationPlayed = false, showingAerobecautohaler;
+    private boolean animationPlayed = false;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, popupImage;
     private View streakPopupView;
@@ -50,6 +50,13 @@ public class MojoScreen extends AppCompatActivity {
 
     private QueueType typeOfQueue;
 
+    /**
+     * The first thing to be called on app startup.
+     * Most of the initialization happens here.
+     *
+     * @param savedInstanceState Android chaching
+     * @author Grigory Glukhov, Aleksandra Soltan, Sasa Lekic, Julia Danek, Agnes Petajavaara, Vendela Vlk
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,6 +184,11 @@ public class MojoScreen extends AppCompatActivity {
         questionPopup.showPopupWindow(currentScreen);
     }
 
+    /**
+     * Show reward streak popup.
+     *
+     * @author Sasa Lekic
+     */
     public void showStreakPopup() {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
 
@@ -210,6 +222,12 @@ public class MojoScreen extends AppCompatActivity {
         }, MS_REWARD_STREAK_HIDE_DELAY + MS_REWARD_STREAK_ANIMATION_DURATION);
     }
 
+    /**
+     * Set the name and the image for a given medication in the question popup.
+     *
+     * @param medication The medication to show.
+     * @author Grigory Glukhov, Julia Danek
+     */
     public void setPopupMedication(Medication medication) {
         popupImage.setImageResource(Medication.getImageId(getResources(), getPackageName(), medication));
         questionView.setText(getResources().getString(R.string.popup_question,
@@ -261,8 +279,11 @@ public class MojoScreen extends AppCompatActivity {
                     }
                 });
 
-
         medQueue.remove();
+        //Determine if reward popup star should appear
+        if (streakFunction()) {
+            showStreakPopup();
+        }
     }
 
 
@@ -294,10 +315,26 @@ public class MojoScreen extends AppCompatActivity {
         animationPlayed = true;
 
 
+    }
+
+    
+    /**
+     * Determine if its time to show the streak popup.
+     *
+     * @return True if the reward popup should be shown.
+     * @author Aleksandra Soltan
+     */
+    public boolean streakFunction() {
+        if(((streak == 3) || (streak % 6 == 0)) && streak != 0){
+            return true;
         }
+        else{
+            return false;
+        }
+    }
 
 
-    class MedPopupTimer{
+    private class MedPopupTimer{
         public void setPopupTimer() {
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
