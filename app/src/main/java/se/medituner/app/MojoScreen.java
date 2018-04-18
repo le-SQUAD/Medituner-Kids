@@ -38,7 +38,7 @@ public class MojoScreen extends AppCompatActivity {
 
     final Handler handler = new Handler();
     private MedPopupTimer timer;
-    private SchedulePopup schedule;
+    private Schedule schedule;
     private Queue<Medication> medQueue;
     private String typeOfQueue;
 
@@ -105,7 +105,7 @@ public class MojoScreen extends AppCompatActivity {
         testEveningQueue.add(Medication.EYEDROP);
         testEveningQueue.add(Medication.SERETIDEDISKUSLILA);
 
-        schedule = new SchedulePopup(testMorningQueue,testLunchQueue,testEveningQueue);
+        schedule = new Schedule(testMorningQueue,testLunchQueue,testEveningQueue);
 
         schedule.updateMorningQueue();
         //Queue set to morning queue
@@ -120,7 +120,7 @@ public class MojoScreen extends AppCompatActivity {
 
     // Show popup at set time
     public void onTimePopUp(IClock time){
-        if(SchedulePopup.isItPopupTime(time)) {
+        if(Schedule.isItPopupTime(time)) {
             showQuestionPopup();
         }
     }
