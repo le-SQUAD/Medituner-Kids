@@ -3,6 +3,7 @@ package se.medituner.app;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
+import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +15,13 @@ import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -41,6 +49,41 @@ public class MojoScreen extends AppCompatActivity {
     private SchedulePopup schedule;
     private Queue<Medication> medQueue;
     private String typeOfQueue;
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            saveQueue(medQueue);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //public FileOutputStream fos = openFileOutput("Hello", Context.MODE_PRIVATE);
+    public void saveQueue(Queue<Medication> currentState) throws IOException {
+        // write object to file
+        FileOutputStream fos = openFileOutput("medQueue", 0);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(currentState);
+        oos.close();
+
+    }
+
+    //File getFilesDir();
+    public void getQueue() throws IOException, ClassNotFoundException {
+
+        // read object from file
+        FileInputStream fis = new FileInputStream("medQueue");
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        medQueue = (Queue<Medication>) ois.readObject();
+        ois.close();
+    }
+
+
+    //public MojoScreen() throws FileNotFoundException {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
