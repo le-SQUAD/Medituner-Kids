@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/text_medication_question"
-        android:layout_width="0dp"
+        android:layout_width="197dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginEnd="16dp"
@@ -19,7 +19,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:gravity="center"
-        android:text="Medication Question"
+        android:text="Have you taken your Salmeterolfuticasonecipla?"
         android:textAlignment="gravity"
         android:textColor="@color/dialogText"
         android:textSize="22sp"
@@ -30,14 +30,14 @@
 
     <Button
         android:id="@+id/btn_popup_no"
-        android:layout_width="88dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:background="@drawable/blue_background"
         android:onClick="onButtonNo"
@@ -46,20 +46,18 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/btn_popup_yes"
         app:layout_constraintTop_toBottomOf="@+id/medication_image" />
 
     <Button
         android:id="@+id/btn_popup_yes"
-        android:layout_width="88dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
         android:layout_weight="1"
         android:background="@drawable/blue_background"
         android:onClick="onButtonYes"
@@ -68,17 +66,13 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_popup_no"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/medication_image"
-        app:layout_constraintVertical_bias="0.692" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     //Placeholder for the image of the asthma med.
 
     <ImageView
         android:id="@+id/medication_image"
-        android:layout_width="68dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:contentDescription="TODO"
@@ -87,13 +81,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_medication_question"
         app:layout_constraintVertical_chainStyle="packed"
-        app:srcCompat="@mipmap/aerobecautohaler1" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.056179777" />
+        app:srcCompat="@drawable/salmeterolfluticasonecipla" />
 
 </android.support.constraint.ConstraintLayout>
