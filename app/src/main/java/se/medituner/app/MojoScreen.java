@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
 import android.graphics.drawable.AnimationDrawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -36,7 +37,7 @@ public class MojoScreen extends AppCompatActivity {
     private TextView streakView, questionTextView, rewardStreakTextView;
     private boolean animationPlayed = false;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
-    private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, questionImageView;
+    private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, grinningBounceMojo, questionImageView;
     private View streakPopupView;
     private Timer scheduler = new Timer(true);
 
@@ -77,10 +78,13 @@ public class MojoScreen extends AppCompatActivity {
         bounceInterpolator = new BounceInterpolator();
         smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
         smilingWaveMojo = (ImageView) findViewById(R.id.smilingWaveMojo);
+        grinningBounceMojo = (ImageView) findViewById(R.id.grinningBounceMojo);
         frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
+
         smilingBounceMojo.bringToFront();
         smilingWaveMojo.bringToFront();
         frowningMojo.bringToFront();
+        grinningBounceMojo.bringToFront();
 
         // Set up schedule
         initializeSchedule();
@@ -224,6 +228,43 @@ public class MojoScreen extends AppCompatActivity {
                         });
             }
         }, MS_REWARD_STREAK_HIDE_DELAY + MS_REWARD_STREAK_SHOW_DURATION);
+
+        Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
+
+        frowningMojo.setVisibility(View.INVISIBLE);
+        smilingWaveMojo.setVisibility(View.INVISIBLE);
+        smilingBounceMojo.setVisibility(View.INVISIBLE);
+        grinningBounceMojo.setVisibility(View.VISIBLE);
+
+        ViewPropertyAnimator viewPropertyAnimator = grinningBounceMojo.animate()
+                .translationY(-500).setInterpolator(accelerateInterpolator).setDuration(500).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        //Mojo falls and bounces
+                        grinningBounceMojo.animate()
+                                .translationY(0)
+                                .setInterpolator(bounceInterpolator).setDuration(1000).setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                //Smiling, waving Mojo visible
+                                smilingWaveMojo.setVisibility(View.VISIBLE);
+                                smilingBounceMojo.setVisibility(View.INVISIBLE);
+                                grinningBounceMojo.setVisibility(View.INVISIBLE);
+
+                                //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation_grinning);
+                                // Get the background, which has been compiled to an AnimationDrawable object.
+                                AnimationDrawable waveAnimation = (AnimationDrawable) smilingWaveMojo.getBackground();
+                                // Start the animation, Mojo waves
+                                waveAnimation.start();
+
+                                Sounds.getInstance().playSound(Sounds.Sound.S_HAPPY);
+                            }
+                        });
+                    }
+                });
+
     }
 
     /**
@@ -246,6 +287,8 @@ public class MojoScreen extends AppCompatActivity {
      */
     public void onButtonYes(View view) {
         incrementStreak();
+        //final Integer resid;
+        //final ImageView mojoBounceExpression;
 
         // Play jump sound
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
@@ -256,15 +299,58 @@ public class MojoScreen extends AppCompatActivity {
         //Smiling, jumping Mojo visible
         frowningMojo.setVisibility(View.INVISIBLE);
         smilingWaveMojo.setVisibility(View.INVISIBLE);
-        smilingBounceMojo.setVisibility(View.VISIBLE);
+        //smilingBounceMojo.setVisibility(View.VISIBLE);
+
+        if (streakFunction()) {
+            smilingBounceMojo.setVisibility(View.INVISIBLE);
+            grinningBounceMojo.setVisibility(View.VISIBLE);
+            //resid = R.drawable.arm_animation_grinning;
+            //mojoBounceExpression = grinningBounceMojo;
+            showStreakPopup();
+        }
+        else{
+            smilingBounceMojo.setVisibility(View.VISIBLE);
+            grinningBounceMojo.setVisibility(View.INVISIBLE);
+            //mojoBounceExpression = smilingBounceMojo;
+            //resid = R.drawable.arm_animation;
+            ViewPropertyAnimator viewPropertyAnimator = smilingBounceMojo.animate()
+                    .translationY(-500).setInterpolator(accelerateInterpolator).setDuration(500).setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            //Mojo falls and bounces
+                            smilingBounceMojo.animate()
+                                    .translationY(0)
+                                    .setInterpolator(bounceInterpolator).setDuration(1000).setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    //Smiling, waving Mojo visible
+                                    smilingWaveMojo.setVisibility(View.VISIBLE);
+                                    smilingBounceMojo.setVisibility(View.INVISIBLE);
+                                    grinningBounceMojo.setVisibility(View.INVISIBLE);
+
+                                    //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                    //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                    smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                    // Get the background, which has been compiled to an AnimationDrawable object.
+                                    AnimationDrawable waveAnimation = (AnimationDrawable) smilingWaveMojo.getBackground();
+                                    // Start the animation, Mojo waves
+                                    waveAnimation.start();
+
+                                    Sounds.getInstance().playSound(Sounds.Sound.S_HAPPY);
+                                }
+                            });
+                        }
+                    });
+
+        }
 
         //Mojo jumps
-        ViewPropertyAnimator viewPropertyAnimator = smilingBounceMojo.animate()
+        /*ViewPropertyAnimator viewPropertyAnimator = mojoBounceExpression.animate()
                 .translationY(-500).setInterpolator(accelerateInterpolator).setDuration(500).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         //Mojo falls and bounces
-                        smilingBounceMojo.animate()
+                       mojoBounceExpression.animate()
                                 .translationY(0)
                                 .setInterpolator(bounceInterpolator).setDuration(1000).setListener(new AnimatorListenerAdapter() {
                             @Override
@@ -272,9 +358,11 @@ public class MojoScreen extends AppCompatActivity {
                                 //Smiling, waving Mojo visible
                                 smilingWaveMojo.setVisibility(View.VISIBLE);
                                 smilingBounceMojo.setVisibility(View.INVISIBLE);
+                                grinningBounceMojo.setVisibility(View.INVISIBLE);
 
                                 //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
-                                smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                smilingWaveMojo.setBackgroundResource(resid);
                                 // Get the background, which has been compiled to an AnimationDrawable object.
                                 AnimationDrawable waveAnimation = (AnimationDrawable) smilingWaveMojo.getBackground();
                                 // Start the animation, Mojo waves
@@ -284,7 +372,7 @@ public class MojoScreen extends AppCompatActivity {
                             }
                         });
                     }
-                });
+                });*/
 
         medicationQueue.remove();
         scheduler.schedule(new TimerTask() {
@@ -312,6 +400,7 @@ public class MojoScreen extends AppCompatActivity {
         frowningMojo.setVisibility(View.VISIBLE);
         smilingWaveMojo.setVisibility(View.INVISIBLE);
         smilingBounceMojo.setVisibility(View.INVISIBLE);
+        grinningBounceMojo.setVisibility(View.INVISIBLE);
 
         frowningMojo.setBackgroundResource(R.drawable.frown_animation);
         AnimationDrawable frownAnimation = (AnimationDrawable) frowningMojo.getBackground();
