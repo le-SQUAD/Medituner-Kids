@@ -21,13 +21,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.view.Gravity.CENTER;
-import static se.medituner.app.MojoScreen.MS_SNOOZE_DELAY;
 
 public class MojoScreen extends AppCompatActivity {
 
     public static final int MS_SNOOZE_DELAY = 5000;
-    public static final int MS_REWARD_STREAK_ANIMATION_DURATION = 2000;
-    public static final int MS_REWARD_STREAK_HIDE_DELAY = 3000;
+    public static final int MS_REWARD_STREAK_SHOW_DURATION = 1600;
+    public static final int MS_REWARD_STREAK_HIDE_DURATION = 1200;
+    public static final int MS_REWARD_STREAK_HIDE_DELAY = 2000;
 
     private Popup questionPopup, streakPopup;
     private int streak = 0;
@@ -42,19 +42,11 @@ public class MojoScreen extends AppCompatActivity {
     private Schedule schedule;
     private Queue<Medication> medQueue;
 
-    private enum QueueType {
-        QT_MORNING,
-        QT_LUNCH,
-        QT_EVENING
-    }
-
-    private QueueType typeOfQueue;
-
     /**
      * The first thing to be called on app startup.
      * Most of the initialization happens here.
      *
-     * @param savedInstanceState Android chaching
+     * @param savedInstanceState Android caching
      * @author Grigory Glukhov, Aleksandra Soltan, Sasa Lekic, Julia Danek, Agnes Petajavaara, Vendela Vlk
      */
     @Override
@@ -141,6 +133,7 @@ public class MojoScreen extends AppCompatActivity {
         }
     }
 
+
     /**
      * Show a popup and animated Mojo reaction.
      *
@@ -155,6 +148,7 @@ public class MojoScreen extends AppCompatActivity {
         questionPopup.showPopupWindow(currentScreen);
     }
 
+
     /**
      * Show reward streak popup.
      *
@@ -166,11 +160,14 @@ public class MojoScreen extends AppCompatActivity {
         Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
         streakPopupView.setScaleX(0.0f);
         streakPopupView.setScaleY(0.0f);
+        streakPopupView.setRotation(-180.0f);
         streakPopup.showPopupWindow(currentScreen, CENTER, 0, -240);
         streakPopupView.animate()
-                .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION)
+                .setDuration(MS_REWARD_STREAK_SHOW_DURATION)
                 .scaleX(1.0f)
-                .scaleY(1.0f).setListener(null);
+                .scaleY(1.0f)
+                .rotation(0.0f)
+                .setListener(null);
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -180,7 +177,7 @@ public class MojoScreen extends AppCompatActivity {
                 System.out.println(streakPopupView.getScaleY());
                 Sounds.getInstance().playSound(Sounds.Sound.S_STAR2);
                 streakPopupView.animate()
-                        .setDuration(MS_REWARD_STREAK_ANIMATION_DURATION)
+                        .setDuration(MS_REWARD_STREAK_HIDE_DURATION)
                         .scaleX(0.0f)
                         .scaleY(0.0f)
                         .setListener(new AnimatorListenerAdapter() {
@@ -190,7 +187,7 @@ public class MojoScreen extends AppCompatActivity {
                             }
                         });
             }
-        }, MS_REWARD_STREAK_HIDE_DELAY + MS_REWARD_STREAK_ANIMATION_DURATION);
+        }, MS_REWARD_STREAK_HIDE_DELAY + MS_REWARD_STREAK_SHOW_DURATION);
     }
 
     /**
@@ -205,10 +202,14 @@ public class MojoScreen extends AppCompatActivity {
                 Medication.getName(getResources(), getPackageName(), medication)));
     }
 
+    /**
+     * Called when user answers 'yes' on the question popup.
+     * Initiates happy Mojo animations and sounds.
+     *
+     * @param view Android button that was pressed.
+     */
     public void onButtonYes(View view) {
-
-        // Increase the streak
-        streakView.setText(getResources().getString(R.string.streak, ++streak));
+        incrementStreak();
 
         // Play jump sound
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
@@ -250,18 +251,17 @@ public class MojoScreen extends AppCompatActivity {
                 });
 
         medQueue.remove();
-
-        //Determine if reward popup star should appear
-        if (streakFunction()) {
-            showStreakPopup();
-        }
     }
 
 
+    /**
+     * Called when the user presses 'no' on the popup question.
+     * Dismisses the window, sets off sad Mojo animations and sounds.
+     *
+     * @param view Android button that was pressed.
+     */
     public void onButtonNo(View view) {
-        streak = 0;
-
-        streakView.setText(getResources().getString(R.string.streak, streak));
+        resetStreak();
 
         // Hide the popup
         questionPopup.dismissPopupWindow();
@@ -274,7 +274,7 @@ public class MojoScreen extends AppCompatActivity {
         frowningMojo.setBackgroundResource(R.drawable.frown_animation);
         AnimationDrawable frownAnimation = (AnimationDrawable) frowningMojo.getBackground();
 
-        if(animationPlayed){
+        if (animationPlayed) {
             frownAnimation.stop();
         }
 
@@ -284,11 +284,9 @@ public class MojoScreen extends AppCompatActivity {
         Sounds.getInstance().playSound(Sounds.Sound.S_SAD);
 
         animationPlayed = true;
-
-
     }
 
-    
+
     /**
      * Determine if its time to show the streak popup.
      *
@@ -303,6 +301,26 @@ public class MojoScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * Increments the streak counter, updates corresponding text and shows reward popup if required.
+     *
+     * @autor Sasa Lekic, Julia Danek
+     */
+    private void incrementStreak() {
+        streakView.setText(getResources().getString(R.string.streak, ++streak));
+        if (streakFunction())
+            showStreakPopup();
+    }
+
+    /**
+     * Resets the streak counter to 0 and updates corresponding text.
+     *
+     * @autor Sasa Lekic, Julia Danek
+     */
+    private void resetStreak() {
+        streak = 0;
+        streakView.setText(getResources().getString(R.string.streak, streak));
+    }
 
     private class MedPopupTimer {
         public void setPopupTimer() {
@@ -315,5 +333,4 @@ public class MojoScreen extends AppCompatActivity {
             }, MS_SNOOZE_DELAY);
         }
     }
-
 }
