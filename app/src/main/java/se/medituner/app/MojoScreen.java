@@ -39,7 +39,7 @@ public class MojoScreen extends AppCompatActivity {
 
     final Handler handler = new Handler();
     private MedPopupTimer timer;
-    private SchedulePopup schedule;
+    private Schedule schedule;
     private Queue<Medication> medQueue;
 
     private enum QueueType {
@@ -104,38 +104,39 @@ public class MojoScreen extends AppCompatActivity {
             }
         }, cal.getTime());
 
-        Queue<Medication> testMorningQueue = new LinkedList<Medication>();
-        Queue<Medication> testLunchQueue = new LinkedList<Medication>();
-        Queue<Medication> testEveningQueue = new LinkedList<Medication>();
+        // Set up Schedule
+        schedule = new Schedule(new SystemClock());
 
-        testMorningQueue.add(Medication.AEROBEC);
-        testMorningQueue.add(Medication.AIROMIR);
-        testMorningQueue.add(Medication.ALVESCO);
+        schedule.addMedToMorningPool(Medication.AEROBEC);
+        schedule.addMedToMorningPool(Medication.AIROMIR);
+        schedule.addMedToMorningPool(Medication.ALVESCO);
 
-        testLunchQueue.add(Medication.BRICANYLTURBOHALER);
-        testLunchQueue.add(Medication.SALMETEROLFLUTICASONECIPLA);
-        testLunchQueue.add(Medication.SERETIDEDISKUSLILA);
+        schedule.addMedToLunchPool(Medication.BRICANYLTURBOHALER);
+        schedule.addMedToLunchPool(Medication.SALMETEROLFLUTICASONECIPLA);
+        schedule.addMedToLunchPool(Medication.SERETIDEDISKUSLILA);
 
-        testEveningQueue.add(Medication.BUFOMIXMEDIUM);
-        testEveningQueue.add(Medication.EYEDROP);
-        testEveningQueue.add(Medication.SERETIDEDISKUSLILA);
+        schedule.addMedToEveningPool(Medication.BUFOMIXMEDIUM);
+        schedule.addMedToEveningPool(Medication.EYEDROP);
+        schedule.addMedToEveningPool(Medication.SERETIDEDISKUSLILA);
 
-        schedule = new SchedulePopup(testMorningQueue,testLunchQueue,testEveningQueue);
-
-        schedule.updateMorningQueue();
-        //Queue set to morning queue
-        medQueue = new LinkedList<Medication>(schedule.getCurrentQueue());
-        typeOfQueue = QueueType.QT_MORNING;
+        schedule.validateQueue();
+        medQueue = schedule.getActiveQueue();
     }
 
     // Show question popup window on button click
     public void onButtonShowPopupClick(View view) {
-        showQuestionPopup();
+        schedule.validateQueue();
+        medQueue = schedule.getActiveQueue();
+        if (medQueue.isEmpty()) {
+            showStreakPopup();
+        } else {
+            showQuestionPopup();
+        }
     }
 
     // Show popup at set time
     public void onTimePopUp(IClock time){
-        if(SchedulePopup.isItPopupTime(time)) {
+        if(Schedule.isItPopupTime(time)) {
             showQuestionPopup();
         }
     }
@@ -148,39 +149,9 @@ public class MojoScreen extends AppCompatActivity {
     public void showQuestionPopup() {
         // Get the reference to an existing layout.
         View currentScreen = findViewById(R.id.activity_mojo_screen);
-
-        // Dynamic image in popup
-        /*setPopupMedication(showingAerobecautohaler
-            ? Medication.AEROBEC
-            : Medication.AEROBECAUTOHALER);
-        showingAerobecautohaler = !showingAerobecautohaler;*/
-
-        if (medQueue.isEmpty()) {
-            switch (typeOfQueue) {
-                case QT_MORNING:
-                    schedule.updateLunchQueue();
-                    medQueue = schedule.getCurrentQueue();
-                    typeOfQueue = QueueType.QT_LUNCH;
-                    break;
-
-                case QT_EVENING:
-                    schedule.updateEveningQueue();
-                    medQueue = schedule.getCurrentQueue();
-                    typeOfQueue = QueueType.QT_EVENING;
-                    break;
-
-                case QT_LUNCH:
-                    schedule.updateMorningQueue();
-                    medQueue = schedule.getCurrentQueue();
-                    typeOfQueue = QueueType.QT_EVENING;
-                    break;
-            }
-        }
-
-        setPopupMedication(medQueue.peek());
-
-        //setPopupMedication(medQueue.element());
-
+        // Set the dynamic image and name
+        setPopupMedication(medQueue.element());
+        // Show popup
         questionPopup.showPopupWindow(currentScreen);
     }
 
@@ -242,7 +213,6 @@ public class MojoScreen extends AppCompatActivity {
         // Play jump sound
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
 
-        // TODO: process taking medication
         // Hide the popup
         questionPopup.dismissPopupWindow();
 
@@ -280,6 +250,7 @@ public class MojoScreen extends AppCompatActivity {
                 });
 
         medQueue.remove();
+
         //Determine if reward popup star should appear
         if (streakFunction()) {
             showStreakPopup();
@@ -325,16 +296,15 @@ public class MojoScreen extends AppCompatActivity {
      * @author Aleksandra Soltan
      */
     public boolean streakFunction() {
-        if(((streak == 3) || (streak % 6 == 0)) && streak != 0){
+        if (((streak == 3) || (streak % 6 == 0)) && streak != 0) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
 
-    private class MedPopupTimer{
+    private class MedPopupTimer {
         public void setPopupTimer() {
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
