@@ -27,6 +27,7 @@ public class getRequest {
             connection.setRequestMethod("GET");                                         //Specifying a GET request
             connection.setRequestProperty("Accept","application/json");                 //Accept data in JSON
 
+            connection.
             //Print out error info if Status != 200 OK
             if(connection.getResponseCode() != 200){
                 throw new RuntimeException("\nERROR CODE: " + connection.getResponseCode() +
