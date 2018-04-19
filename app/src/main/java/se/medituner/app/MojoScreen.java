@@ -152,6 +152,11 @@ public class MojoScreen extends AppCompatActivity {
             System.out.println("Schedule not found. Creating new one.");
             e.printStackTrace();
             schedule = Schedule.generate(time);
+            try {
+                persistence.saveObject(schedule, SCHEDULE_FILENAME);
+            } catch (IOException e1) {
+                e.printStackTrace();
+            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             finish();
