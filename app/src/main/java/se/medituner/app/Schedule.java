@@ -20,6 +20,10 @@ public class Schedule implements Serializable {
     public static final int GENERATOR_MIN_POOL_SIZE = 2;
     public static final int GENERATOR_MAX_POOL_SIZE = 5;
 
+    public static final int PERIOD_BEGINNING_MORNING = 5;
+    public static final int PERIOD_BEGINNING_LUNCH = 11;
+    public static final int PERIOD_BEGINNING_EVENING = 17;
+
     // Dependency injection
     private IClock time;
     private transient Streak streak;
@@ -41,7 +45,7 @@ public class Schedule implements Serializable {
         eveningPool = new LinkedList<>();
         activeQueue = new LinkedList<>();
 
-        Calendar queueFakeTime = time.now();
+        Calendar queueFakeTime = Calendar.getInstance();
         queueFakeTime.setTime(getBeginningOfCurrentPeriod(time));
         queueFakeTime.add(Calendar.MINUTE, -10);
         queueCreationTime = queueFakeTime.getTime();
@@ -57,15 +61,15 @@ public class Schedule implements Serializable {
      */
     private void updateQueue() {
         Date periodBeginning = getBeginningOfCurrentPeriod(time);
-        queueCreationTime = time.now().getTime();
-        Calendar cal = time.now();
+        queueCreationTime = time.now();
+        Calendar cal = Calendar.getInstance();
         cal.setTime(periodBeginning);
         switch (cal.get(Calendar.HOUR_OF_DAY)) {
-            case 5:
+            case PERIOD_BEGINNING_MORNING:
                 activeQueue = new LinkedList<>(morningPool);
                 break;
 
-            case 11:
+            case PERIOD_BEGINNING_LUNCH:
                 activeQueue = new LinkedList<>(lunchPool);
                 break;
 
@@ -83,12 +87,7 @@ public class Schedule implements Serializable {
      */
     public void validateQueue(boolean updateStreak) {
         if (queueCreationTime.before(getBeginningOfCurrentPeriod(time))) {
-            System.out.println("Updating queue");
-            System.out.print(streak);
-            System.out.print(" ");
-            System.out.println(updateStreak);
             if (updateStreak && streak != null) {
-                System.out.println("Checking for reset");
                 if (!activeQueue.isEmpty() || getBeginningOfLastPeriod(time).after(queueCreationTime)) {
                     streak.reset();
                 }
@@ -96,7 +95,7 @@ public class Schedule implements Serializable {
             updateQueue();
             streakUpdated = false;
         } else {
-            if (activeQueue.isEmpty() && !streakUpdated) {
+            if (activeQueue.isEmpty() && !streakUpdated && streak != null) {
                 // Queue is empty, it doesn't need to update,
                 // However we want to reward the player immediately
                 streakUpdated = true;
@@ -116,24 +115,27 @@ public class Schedule implements Serializable {
      * @author Aleksandra Soltan, Grigory Glukhov
      */
     public static Date getBeginningOfCurrentPeriod(IClock time) {
-        Calendar now = time.now();
-        Calendar comparison = time.now();
+        Calendar now = Calendar.getInstance();
+        now.setTime(time.now());
+        Calendar comparison = Calendar.getInstance();
+        comparison.setTime(time.now());
+
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);
 
-        comparison.set(Calendar.HOUR_OF_DAY, 5);
+        comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
         if (now.getTime().before(comparison.getTime())) {
-            comparison.add(Calendar.HOUR_OF_DAY, -12);
+            comparison.add(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING - PERIOD_BEGINNING_EVENING);
             return comparison.getTime();
         } else {
-            comparison.set(Calendar.HOUR_OF_DAY, 11);
+            comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_LUNCH);
             if (now.getTime().before(comparison.getTime())) {
-                comparison.set(Calendar.HOUR_OF_DAY, 5);
+                comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
                 return comparison.getTime();
             } else {
-                comparison.set(Calendar.HOUR_OF_DAY, 17);
+                comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_EVENING);
                 if (now.getTime().before(comparison.getTime())) {
-                    comparison.set(Calendar.HOUR_OF_DAY, 11);
+                    comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_LUNCH);
                     return comparison.getTime();
                 } else {
                     return comparison.getTime();
@@ -150,19 +152,19 @@ public class Schedule implements Serializable {
      * @author Grigory Glukhov
      */
     public static Date getBeginningOfLastPeriod(IClock time) {
-        Calendar calendar = time.now();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(getBeginningOfCurrentPeriod(time));
         switch (calendar.get(Calendar.HOUR_OF_DAY)) {
-            case 5:
-                calendar.add(Calendar.HOUR_OF_DAY, -12);
+            case PERIOD_BEGINNING_MORNING:
+                calendar.add(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING - PERIOD_BEGINNING_EVENING);
                 break;
 
             case 11:
-                calendar.set(Calendar.HOUR_OF_DAY, 5);
+                calendar.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
                 break;
 
             default:
-                calendar.set(Calendar.HOUR_OF_DAY, 17);
+                calendar.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_LUNCH);
                 break;
         }
         return calendar.getTime();
@@ -176,24 +178,27 @@ public class Schedule implements Serializable {
      * @return Date corresponding to the beginning of the next period (future).
      */
     public static Date getBeginningOfNextPeriod(IClock time) {
-        Calendar now = time.now();
-        Calendar comparison = time.now();
+        Calendar now = Calendar.getInstance();
+        now.setTime(time.now());
+        Calendar comparison = Calendar.getInstance();
+        comparison.setTime(time.now());
+
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);
 
-        comparison.set(Calendar.HOUR_OF_DAY, 5);
+        comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
         if (now.getTime().before(comparison.getTime())) {
             return comparison.getTime();
         } else {
-            comparison.set(Calendar.HOUR_OF_DAY, 11);
+            comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_LUNCH);
             if (now.getTime().before(comparison.getTime())) {
                 return comparison.getTime();
             } else {
-                comparison.set(Calendar.HOUR_OF_DAY, 17);
+                comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_EVENING);
                 if (now.getTime().before(comparison.getTime())) {
                     return comparison.getTime();
                 } else {
-                    comparison.add(Calendar.HOUR_OF_DAY, 12);
+                    comparison.add(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_EVENING - PERIOD_BEGINNING_MORNING);
                     return comparison.getTime();
                 }
             }
@@ -241,7 +246,8 @@ public class Schedule implements Serializable {
      * This is not functional behavior for the class and the method should only be used for testing!
      */
     public void resetQueue() {
-        Calendar calendar = time.now();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time.now());
         calendar.add(Calendar.DATE, -1);
         queueCreationTime = calendar.getTime();
         validateQueue(false);
