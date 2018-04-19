@@ -1,5 +1,6 @@
 package se.medituner.app;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -14,7 +15,7 @@ import java.util.Random;
  *
  * @author Aleksandra Soltan, Julia Danek, Grigory Glukhov
  */
-public class Schedule {
+public class Schedule implements Serializable {
 
     public static final int GENERATOR_MIN_POOL_SIZE = 2;
     public static final int GENERATOR_MAX_POOL_SIZE = 5;
@@ -31,14 +32,7 @@ public class Schedule {
     private Date queueCreationTime;
     private Queue<Medication> activeQueue;
 
-    public Schedule(Queue<Medication> morningQueue, Queue<Medication> lunchQueue, Queue<Medication> eveningQueue){
-        morningPool = morningQueue;
-        lunchPool = lunchQueue;
-        eveningPool = eveningQueue;
-        activeQueue = new LinkedList<Medication>();
-    }
-
-    public Schedule(IClock time){
+    public Schedule(IClock time) {
         this.time = time;
         morningPool = new LinkedList<>();
         lunchPool = new LinkedList<>();

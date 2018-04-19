@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
 import android.graphics.drawable.AnimationDrawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +14,7 @@ import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,6 +30,8 @@ public class MojoScreen extends AppCompatActivity {
     public static final int MS_REWARD_STREAK_HIDE_DURATION = 1200;  // Duration of the streak popup disappearing animation
     public static final int MS_REWARD_STREAK_HIDE_DELAY = 1800;     // Delay between the streak popup appearing and disappearing.
 
+    public static final String SCHEDULE_FILENAME = "schedule";
+
     private IClock time = new SystemClock();
 
     private Popup questionPopup, streakPopup;
@@ -39,6 +41,7 @@ public class MojoScreen extends AppCompatActivity {
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
     private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, grinningBounceMojo, questionImageView;
     private View streakPopupView;
+    private Persistence persistence;
     private Timer scheduler = new Timer(true);
 
     private Schedule schedule;
@@ -55,6 +58,8 @@ public class MojoScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mojo_screen);
+
+        persistence = new Persistence(this);
 
         // Set up popups
         questionPopup = new Popup(this, R.layout.question_popup);
@@ -139,20 +144,30 @@ public class MojoScreen extends AppCompatActivity {
      * @author Grigory Glukhov, Aleksandra Soltan
      */
     private void initializeSchedule() {
-        // Set up Schedule
-        schedule = new Schedule(time);
+        try {
+            System.out.println("Attempting to load schedule.");
+            schedule = (Schedule) persistence.loadObject(SCHEDULE_FILENAME);
+        } catch (IOException e) {
+            System.out.println("Schedule not found. Creating new one.");
+            e.printStackTrace();
+            // Set up Schedule
+            schedule = new Schedule(time);
 
-        schedule.addMedToMorningPool(Medication.AEROBEC);
-        schedule.addMedToMorningPool(Medication.AIROMIR);
-        schedule.addMedToMorningPool(Medication.ALVESCO);
+            schedule.addMedToMorningPool(Medication.AEROBEC);
+            schedule.addMedToMorningPool(Medication.AIROMIR);
+            schedule.addMedToMorningPool(Medication.ALVESCO);
 
-        schedule.addMedToLunchPool(Medication.BRICANYLTURBOHALER);
-        schedule.addMedToLunchPool(Medication.SALMETEROLFLUTICASONECIPLA);
-        schedule.addMedToLunchPool(Medication.SERETIDEDISKUSLILA);
+            schedule.addMedToLunchPool(Medication.BRICANYLTURBOHALER);
+            schedule.addMedToLunchPool(Medication.SALMETEROLFLUTICASONECIPLA);
+            schedule.addMedToLunchPool(Medication.SERETIDEDISKUSLILA);
 
-        schedule.addMedToEveningPool(Medication.BUFOMIXMEDIUM);
-        schedule.addMedToEveningPool(Medication.EYEDROP);
-        schedule.addMedToEveningPool(Medication.SERETIDEDISKUSLILA);
+            schedule.addMedToEveningPool(Medication.BUFOMIXMEDIUM);
+            schedule.addMedToEveningPool(Medication.EYEDROP);
+            schedule.addMedToEveningPool(Medication.SERETIDEDISKUSLILA);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            finish();
+        }
 
         schedule.validateQueue();
     }
@@ -391,6 +406,11 @@ public class MojoScreen extends AppCompatActivity {
                 });*/
 
         medicationQueue.remove();
+        try {
+            persistence.saveObject(schedule, SCHEDULE_FILENAME);
+        } catch (IOException e) {
+            System.err.println(e);
+        }
         scheduler.schedule(new TimerTask() {
             @Override
             public void run() {
