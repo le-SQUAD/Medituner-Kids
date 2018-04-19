@@ -128,7 +128,7 @@ public class MojoScreen extends AppCompatActivity {
                 public void run() {
                     checkMedication();
                 }
-            }, Schedule.getBeginningOfNextPeriod(time).getTime());
+            }, Schedule.getBeginningOfNextPeriod(time));
         } else {
             runOnUiThread(new Runnable() {
                 @Override
@@ -272,8 +272,8 @@ public class MojoScreen extends AppCompatActivity {
                                 grinningBounceMojo.setVisibility(View.INVISIBLE);
 
                                 //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
-                                //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
-                                smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation_grinning);
+                                smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                //smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation_grinning);
                                 // Get the background, which has been compiled to an AnimationDrawable object.
                                 AnimationDrawable waveAnimation = (AnimationDrawable) smilingWaveMojo.getBackground();
                                 // Start the animation, Mojo waves
