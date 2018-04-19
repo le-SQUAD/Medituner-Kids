@@ -13,4 +13,4 @@ A built-in feature for Asthmatuner application for kids of age 6-13, by
 >
 >[Vendela Vlk](https://github.com/vcvlk "Github account")
 
-![logo](/app/src/main/res/drawable-xxxhdpi/grinning1.png)
+![logo](/app/src/main/res/drawable-xhdpi/grinning1.png)
