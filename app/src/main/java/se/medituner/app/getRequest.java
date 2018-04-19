@@ -23,7 +23,7 @@ public class getRequest {
 
         try{   // URL example : http://example.com/resource?x=y&bearer_token=vF9dft4qmT
             URL url = new URL( "https://asthmatunerprod.azurewebsites.net" +
-                    API_treatmentplan + treatment_plan_ID);// +"?bearer_token=" + access_token);
+                    API_treatmentplan + treatment_plan_ID +"?bearer_token=" + access_token);
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();    //Opening connection
             connection.setRequestMethod("GET");                                         //Specifying a GET request
