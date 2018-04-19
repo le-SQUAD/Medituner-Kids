@@ -29,6 +29,7 @@ public class MojoScreen extends AppCompatActivity {
     public static final int MS_REWARD_STREAK_SHOW_DURATION = 1600;  // Duration of the streak popup appearing animation
     public static final int MS_REWARD_STREAK_HIDE_DURATION = 1200;  // Duration of the streak popup disappearing animation
     public static final int MS_REWARD_STREAK_HIDE_DELAY = 1800;     // Delay between the streak popup appearing and disappearing.
+    public static final int MS_REWARD_STREAK_SHOW_DELAY = 800;      // A delay before the streak increasing and the reward popup appearing. Should not be 0 for technical reasons
 
     public static final String SCHEDULE_FILENAME = "schedule";
     public static final String STREAK_FILENAME= "streak";
@@ -90,6 +91,15 @@ public class MojoScreen extends AppCompatActivity {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             finish();
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            System.err.println("Resetting streak");
+            streak = new Streak();
+            try {
+                persistence.saveObject(streak, STREAK_FILENAME);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
         streak.setListener(new StreakListener());
         streakView.setText(getResources().getString(R.string.streak, streak.getValue()));
@@ -131,19 +141,12 @@ public class MojoScreen extends AppCompatActivity {
         medicationQueue = schedule.getActiveQueue();
 
         if (medicationQueue.isEmpty()) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-//                    showStreakPopup();
-                }
-            });
-
             scheduler.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     checkMedication();
                 }
-            }, Schedule.getBeginningOfNextPeriod(time).getTime());
+            }, Schedule.getBeginningOfNextPeriod(time));
         } else {
             runOnUiThread(new Runnable() {
                 @Override
@@ -152,6 +155,8 @@ public class MojoScreen extends AppCompatActivity {
                 }
             });
         }
+
+        schedule.validateQueue(true);
     }
 
     /**
@@ -166,43 +171,54 @@ public class MojoScreen extends AppCompatActivity {
         } catch (IOException e) {
             System.out.println("Schedule not found. Creating new one.");
             e.printStackTrace();
-            // Set up Schedule
-            schedule = new Schedule(time);
-
-            schedule.addMedToMorningPool(Medication.AEROBEC);
-            schedule.addMedToMorningPool(Medication.AIROMIR);
-            schedule.addMedToMorningPool(Medication.ALVESCO);
-
-            schedule.addMedToLunchPool(Medication.BRICANYLTURBOHALER);
-            schedule.addMedToLunchPool(Medication.SALMETEROLFLUTICASONECIPLA);
-            schedule.addMedToLunchPool(Medication.SERETIDEDISKUSLILA);
-
-            schedule.addMedToEveningPool(Medication.BUFOMIXMEDIUM);
-            schedule.addMedToEveningPool(Medication.EYEDROP);
-            schedule.addMedToEveningPool(Medication.SERETIDEDISKUSLILA);
+            schedule = Schedule.generate(time);
+            try {
+                persistence.saveObject(schedule, SCHEDULE_FILENAME);
+            } catch (IOException e1) {
+                e.printStackTrace();
+            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             finish();
         }
 
         schedule.connectStreak(streak);
-        schedule.validateQueue(false);
+        schedule.validateQueue(true);
     }
 
     /**
-     * Temporary button that shows the popup immediately.
+     * Called when 'generate schedule' button is pressed.
      *
-     * @param view Android button that was pressed.
-     * @author Grigory Glukhov
+     * Generates a new schedule, saves it, updates medication queue and finally shows the medication popup.
+     *
+     * @param view Android button view that was pressed.
      */
-    public void onButtonShowPopupClick(View view) {
-        schedule.validateQueue(false);
-        medicationQueue = schedule.getActiveQueue();
-        if (medicationQueue.isEmpty()) {
-            showStreakPopup();
-        } else {
-            showQuestionPopup();
+    public void onButtonGenerateSchedule(View view) {
+        schedule = Schedule.generate(time);
+        try {
+            persistence.saveObject(schedule, SCHEDULE_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        schedule.connectStreak(streak);
+        checkMedication();
+    }
+
+    /**
+     * Called when 'reset queue' button is pressed.
+     *
+     * Resets the current queue.
+     *
+     * @param view Android button view that was pressed.
+     */
+    public void onButtonResetQueue(View view) {
+        schedule.resetQueue();
+        try {
+            persistence.saveObject(schedule, SCHEDULE_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        checkMedication();
     }
 
 
@@ -228,7 +244,7 @@ public class MojoScreen extends AppCompatActivity {
      */
     public void showStreakPopup() {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
-        rewardStreakTextView.setText(getResources().getString(R.string.streak_popup, streak));
+        rewardStreakTextView.setText(getResources().getString(R.string.streak_popup, streak.getValue()));
 
         Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
         streakPopupView.setScaleX(0.0f);
@@ -282,7 +298,8 @@ public class MojoScreen extends AppCompatActivity {
                                 smilingBounceMojo.setVisibility(View.INVISIBLE);
                                 grinningBounceMojo.setVisibility(View.INVISIBLE);
 
-                                smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation_grinning);
+                                smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                
                                 // Get the background, which has been compiled to an AnimationDrawable object.
                                 AnimationDrawable waveAnimation = (AnimationDrawable) smilingWaveMojo.getBackground();
                                 // Start the animation, Mojo waves
@@ -328,9 +345,7 @@ public class MojoScreen extends AppCompatActivity {
         if (streakFunction()) {
             smilingBounceMojo.setVisibility(View.INVISIBLE);
             grinningBounceMojo.setVisibility(View.VISIBLE);
-            showStreakPopup();
-        }
-        else{
+        } else {
             smilingBounceMojo.setVisibility(View.VISIBLE);
             grinningBounceMojo.setVisibility(View.INVISIBLE);
             ViewPropertyAnimator viewPropertyAnimator = smilingBounceMojo.animate()
@@ -366,7 +381,7 @@ public class MojoScreen extends AppCompatActivity {
         try {
             persistence.saveObject(schedule, SCHEDULE_FILENAME);
         } catch (IOException e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
         scheduler.schedule(new TimerTask() {
             @Override
@@ -450,14 +465,19 @@ public class MojoScreen extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            runOnUiThread(new Runnable() {
+            scheduler.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    streakView.setText(getResources().getString(R.string.streak, newStreak));
-                    if (streakFunction())
-                        showStreakPopup();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            streakView.setText(getResources().getString(R.string.streak, newStreak));
+                            if (streakFunction())
+                                showStreakPopup();
+                        }
+                    });
                 }
-            });
+            }, MS_REWARD_STREAK_SHOW_DELAY);
         }
     }
 }
