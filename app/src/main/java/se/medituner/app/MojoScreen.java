@@ -191,6 +191,11 @@ public class MojoScreen extends AppCompatActivity {
      */
     public void onButtonResetQueue(View view) {
         schedule.resetQueue();
+        try {
+            persistence.saveObject(schedule, SCHEDULE_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         checkMedication();
     }
 
