@@ -23,11 +23,12 @@ public class getRequest {
 
         try{   // URL example : http://example.com/resource?x=y&bearer_token=vF9dft4qmT
             URL url = new URL( "https://asthmatunerprod.azurewebsites.net" +
-                    API_treatmentplan + treatment_plan_ID +"?bearer_token=" + access_token);
+                    API_treatmentplan + treatment_plan_ID);
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();    //Opening connection
             connection.setRequestMethod("GET");                                         //Specifying a GET request
             connection.setRequestProperty("Accept","application/json");                 //Accept data in JSON
+            connection.setRequestProperty("Authorization", "Bearer " + access_token );
 
             //Print out error info if Status != 200 OK
             if(connection.getResponseCode() != 200){
