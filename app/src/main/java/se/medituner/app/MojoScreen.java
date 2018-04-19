@@ -121,7 +121,6 @@ public class MojoScreen extends AppCompatActivity {
      * @author Grigory Glukhov
      */
     public void checkMedication() {
-        // TODO: update the actual schedule
         schedule.validateQueue();
         medicationQueue = schedule.getActiveQueue();
 
@@ -129,7 +128,8 @@ public class MojoScreen extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-//                    showStreakPopup();
+                    if (!streakFunction())
+                        showStreakPopup();
                 }
             });
 
@@ -138,7 +138,7 @@ public class MojoScreen extends AppCompatActivity {
                 public void run() {
                     checkMedication();
                 }
-            }, Schedule.getBeginningOfNextPeriod(time).getTime());
+            }, Schedule.getBeginningOfNextPeriod(time));
         } else {
             runOnUiThread(new Runnable() {
                 @Override
@@ -163,20 +163,12 @@ public class MojoScreen extends AppCompatActivity {
         } catch (IOException e) {
             System.out.println("Schedule not found. Creating new one.");
             e.printStackTrace();
-            // Set up Schedule
-            schedule = new Schedule(time);
-
-            schedule.addMedToMorningPool(Medication.AEROBEC);
-            schedule.addMedToMorningPool(Medication.AIROMIR);
-            schedule.addMedToMorningPool(Medication.ALVESCO);
-
-            schedule.addMedToLunchPool(Medication.BRICANYLTURBOHALER);
-            schedule.addMedToLunchPool(Medication.SALMETEROLFLUTICASONECIPLA);
-            schedule.addMedToLunchPool(Medication.SERETIDEDISKUSLILA);
-
-            schedule.addMedToEveningPool(Medication.BUFOMIXMEDIUM);
-            schedule.addMedToEveningPool(Medication.EYEDROP);
-            schedule.addMedToEveningPool(Medication.SERETIDEDISKUSLILA);
+            schedule = Schedule.generate(time);
+            try {
+                persistence.saveObject(schedule, SCHEDULE_FILENAME);
+            } catch (IOException e1) {
+                e.printStackTrace();
+            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             finish();
@@ -186,19 +178,37 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     /**
-     * Temporary button that shows the popup immediately.
+     * Called when 'generate schedule' button is pressed.
      *
-     * @param view Android button that was pressed.
-     * @author Grigory Glukhov
+     * Generates a new schedule, saves it, updates medication queue and finally shows the medication popup.
+     *
+     * @param view Android button view that was pressed.
      */
-    public void onButtonShowPopupClick(View view) {
-        schedule.validateQueue();
-        medicationQueue = schedule.getActiveQueue();
-        if (medicationQueue.isEmpty()) {
-            showStreakPopup();
-        } else {
-            showQuestionPopup();
+    public void onButtonGenerateSchedule(View view) {
+        schedule = Schedule.generate(time);
+        try {
+            persistence.saveObject(schedule, SCHEDULE_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        checkMedication();
+    }
+
+    /**
+     * Callend when 'reset queue' button is pressed.
+     *
+     * Resets the current queue.
+     *
+     * @param view
+     */
+    public void onButtonResetQueue(View view) {
+        schedule.resetQueue();
+        try {
+            persistence.saveObject(schedule, SCHEDULE_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        checkMedication();
     }
 
 
@@ -278,7 +288,8 @@ public class MojoScreen extends AppCompatActivity {
                                 smilingBounceMojo.setVisibility(View.INVISIBLE);
                                 grinningBounceMojo.setVisibility(View.INVISIBLE);
 
-                                smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation_grinning);
+                                smilingWaveMojo.setBackgroundResource(R.drawable.arm_animation);
+                                
                                 // Get the background, which has been compiled to an AnimationDrawable object.
                                 AnimationDrawable waveAnimation = (AnimationDrawable) smilingWaveMojo.getBackground();
                                 // Start the animation, Mojo waves
@@ -327,8 +338,7 @@ public class MojoScreen extends AppCompatActivity {
             smilingBounceMojo.setVisibility(View.INVISIBLE);
             grinningBounceMojo.setVisibility(View.VISIBLE);
             showStreakPopup();
-        }
-        else{
+        } else {
             smilingBounceMojo.setVisibility(View.VISIBLE);
             grinningBounceMojo.setVisibility(View.INVISIBLE);
             ViewPropertyAnimator viewPropertyAnimator = smilingBounceMojo.animate()
@@ -364,7 +374,7 @@ public class MojoScreen extends AppCompatActivity {
         try {
             persistence.saveObject(schedule, SCHEDULE_FILENAME);
         } catch (IOException e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
         scheduler.schedule(new TimerTask() {
             @Override
