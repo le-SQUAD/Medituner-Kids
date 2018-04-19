@@ -106,7 +106,6 @@ public class MojoScreen extends AppCompatActivity {
      * @author Grigory Glukhov
      */
     public void checkMedication() {
-        // TODO: update the actual schedule
         schedule.validateQueue();
         medicationQueue = schedule.getActiveQueue();
 
@@ -172,6 +171,23 @@ public class MojoScreen extends AppCompatActivity {
         } else {
             showQuestionPopup();
         }
+    }
+
+    /**
+     * Called when 'generate schedule' button is pressed.
+     *
+     * Generates a new schedule, saves it, updates medication queue and finally shows the medication popup.
+     *
+     * @param view Android button view that was pressed.
+     */
+    public void onButtonGenerateSchedule(View view) {
+        schedule = Schedule.generate(time);
+
+        checkMedication();
+    }
+
+    public void onButtonResetQueue(View view) {
+
     }
 
 

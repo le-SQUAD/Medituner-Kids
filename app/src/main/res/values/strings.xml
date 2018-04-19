@@ -3,7 +3,8 @@
     <string name="streak">Streak: %1$d</string>
     <string name="streak_popup">GREAT JOB!\n%1$d in a row!</string>
     <string name="popup_question">Have you taken your %1$s?</string>
-    <string name="btn_show_popup">Show Popup</string>
+    <string name="btn_generate_schedule">Generate Schedule</string>
+    <string name="btn_reset_queue">Reset Queue</string>
     <string name="btn_yes">Yes!</string>
     <string name="btn_no">No.</string>
 

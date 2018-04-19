@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 
 //MIN HH:mm
 //public static final LocalTime MIN;
@@ -14,6 +15,9 @@ import java.util.Queue;
  * @author Aleksandra Soltan, Julia Danek, Grigory Glukhov
  */
 public class Schedule {
+
+    public static final int GENERATOR_MIN_POOL_SIZE = 2;
+    public static final int GENERATOR_MAX_POOL_SIZE = 5;
 
     // Dependency injection
     private IClock time;
@@ -212,5 +216,57 @@ public class Schedule {
 
     public void addMedToEveningPool(Medication med) {
         eveningPool.add(med);
+    }
+
+    /**
+     *
+     */
+    public void resetQueue() {
+
+    }
+
+    /**
+     * Generate a new schedule.
+     * The new schedule generated will have between GENERATOR_MIN_POOL and GENERATOR_MAX_POOL non missing items in each pool
+     *
+     * @param time The time class to be used in the new schedule.
+     * @return A newly generated schedule.
+     */
+    public static Schedule generate(IClock time) {
+        Schedule schedule = new Schedule(time);
+
+        Random rng = new Random();
+
+        int bound = GENERATOR_MAX_POOL_SIZE - GENERATOR_MIN_POOL_SIZE;
+        int queueSize = GENERATOR_MIN_POOL_SIZE + rng.nextInt(bound);
+
+        Medication meds[] = Medication.values();
+
+        for (int i = 0; i < queueSize; i++) {
+            Medication med = Medication.MISSING;
+            while (med == Medication.MISSING) {
+                med = meds[rng.nextInt(meds.length)];
+            }
+            schedule.addMedToMorningPool(med);
+        }
+
+        queueSize = GENERATOR_MIN_POOL_SIZE + rng.nextInt(bound);
+        for (int i = 0; i < queueSize; i++) {
+            Medication med = Medication.MISSING;
+            while (med == Medication.MISSING)
+                med = meds[rng.nextInt(meds.length)];
+            schedule.addMedToLunchPool(med);
+        }
+
+        queueSize = GENERATOR_MIN_POOL_SIZE + rng.nextInt(bound);
+        for (int i = 0; i < queueSize; i++) {
+            Medication med = Medication.MISSING;
+            while (med == Medication.MISSING)
+                med = meds[rng.nextInt(meds.length)];
+            schedule.addMedToEveningPool(med);
+        }
+
+        schedule.validateQueue();
+        return schedule;
     }
 }
