@@ -29,14 +29,15 @@ public class MojoScreen extends AppCompatActivity {
     public static final int MS_REWARD_STREAK_SHOW_DURATION = 1600;  // Duration of the streak popup appearing animation
     public static final int MS_REWARD_STREAK_HIDE_DURATION = 1200;  // Duration of the streak popup disappearing animation
     public static final int MS_REWARD_STREAK_HIDE_DELAY = 1800;     // Delay between the streak popup appearing and disappearing.
+    public static final int MS_REWARD_STREAK_SHOW_DELAY = 800;      // A delay before the streak increasing and the reward popup appearing. Should not be 0 for technical reasons
 
-    public static final String SCHEDULE_FILENAME = "schedulem";
+    public static final String SCHEDULE_FILENAME = "schedule";
     public static final String STREAK_FILENAME= "streak";
 
     private IClock time = new SystemClock();
 
     private Popup questionPopup, streakPopup;
-    private Integer streak;
+    private Streak streak;
     private TextView streakView, questionTextView, rewardStreakTextView;
     private boolean animationPlayed = false;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
@@ -78,15 +79,30 @@ public class MojoScreen extends AppCompatActivity {
         // Set up streaks
         streakView = findViewById(R.id.streak_text);
         try {
-            streak = (Integer)persistence.loadObject(STREAK_FILENAME);
+            streak = (Streak) persistence.loadObject(STREAK_FILENAME);
         } catch (IOException e) {
             System.err.println("Could not load streak, resetting it.");
-            resetStreak();
+            streak = new Streak();
+            try {
+                persistence.saveObject(streak, STREAK_FILENAME);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             finish();
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            System.err.println("Resetting streak");
+            streak = new Streak();
+            try {
+                persistence.saveObject(streak, STREAK_FILENAME);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
-        streakView.setText(getResources().getString(R.string.streak, streak.intValue()));
+        streak.setListener(new StreakListener());
+        streakView.setText(getResources().getString(R.string.streak, streak.getValue()));
 
         // Set up animations
         accelerateInterpolator = new AccelerateInterpolator();
@@ -121,18 +137,10 @@ public class MojoScreen extends AppCompatActivity {
      * @author Grigory Glukhov
      */
     public void checkMedication() {
-        schedule.validateQueue();
+        schedule.validateQueue(true);
         medicationQueue = schedule.getActiveQueue();
 
         if (medicationQueue.isEmpty()) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (!streakFunction())
-                        showStreakPopup();
-                }
-            });
-
             scheduler.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -147,6 +155,8 @@ public class MojoScreen extends AppCompatActivity {
                 }
             });
         }
+
+        schedule.validateQueue(true);
     }
 
     /**
@@ -158,8 +168,6 @@ public class MojoScreen extends AppCompatActivity {
         try {
             System.out.println("Attempting to load schedule.");
             schedule = (Schedule) persistence.loadObject(SCHEDULE_FILENAME);
-            System.out.println("Attempting to load streak object.");
-            streak=(Integer) persistence.loadObject(STREAK_FILENAME);
         } catch (IOException e) {
             System.out.println("Schedule not found. Creating new one.");
             e.printStackTrace();
@@ -174,7 +182,8 @@ public class MojoScreen extends AppCompatActivity {
             finish();
         }
 
-        schedule.validateQueue();
+        schedule.connectStreak(streak);
+        schedule.validateQueue(true);
     }
 
     /**
@@ -191,15 +200,16 @@ public class MojoScreen extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        schedule.connectStreak(streak);
         checkMedication();
     }
 
     /**
-     * Callend when 'reset queue' button is pressed.
+     * Called when 'reset queue' button is pressed.
      *
      * Resets the current queue.
      *
-     * @param view
+     * @param view Android button view that was pressed.
      */
     public void onButtonResetQueue(View view) {
         schedule.resetQueue();
@@ -234,7 +244,7 @@ public class MojoScreen extends AppCompatActivity {
      */
     public void showStreakPopup() {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
-        rewardStreakTextView.setText(getResources().getString(R.string.streak_popup, streak));
+        rewardStreakTextView.setText(getResources().getString(R.string.streak_popup, streak.getValue()));
 
         Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
         streakPopupView.setScaleX(0.0f);
@@ -322,8 +332,6 @@ public class MojoScreen extends AppCompatActivity {
      * @param view Android button that was pressed.
      */
     public void onButtonYes(View view) {
-        incrementStreak();
-
         // Play jump sound
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
 
@@ -337,7 +345,6 @@ public class MojoScreen extends AppCompatActivity {
         if (streakFunction()) {
             smilingBounceMojo.setVisibility(View.INVISIBLE);
             grinningBounceMojo.setVisibility(View.VISIBLE);
-            showStreakPopup();
         } else {
             smilingBounceMojo.setVisibility(View.VISIBLE);
             grinningBounceMojo.setVisibility(View.INVISIBLE);
@@ -392,8 +399,6 @@ public class MojoScreen extends AppCompatActivity {
      * @param view Android button that was pressed.
      */
     public void onButtonNo(View view) {
-        resetStreak();
-
         // Hide the popup
         questionPopup.dismissPopupWindow();
 
@@ -428,43 +433,11 @@ public class MojoScreen extends AppCompatActivity {
      * @author Aleksandra Soltan
      */
     public boolean streakFunction() {
-        if (((streak.intValue() == 3) || (streak.intValue() % 6 == 0)) && streak.intValue() != 0) {
+        if (((streak.getValue() == 3) || (streak.getValue() % 6 == 0)) && streak.getValue() != 0) {
             return true;
         } else {
             return false;
         }
-    }
-
-    /**
-     * Increments the streak counter, updates corresponding text and shows reward popup if required.
-     *
-     * @autor Sasa Lekic, Julia Danek
-     */
-    private void incrementStreak() {
-        streak= new Integer(streak.intValue() + 1);
-        try {
-            persistence.saveObject(streak, STREAK_FILENAME);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        streakView.setText(getResources().getString(R.string.streak, streak.intValue()));
-        if (streakFunction())
-            showStreakPopup();
-    }
-
-    /**
-     * Resets the streak counter to 0 and updates corresponding text.
-     *
-     * @autor Sasa Lekic, Julia Danek
-     */
-    private void resetStreak() {
-        streak= new Integer(0);
-        try {
-            persistence.saveObject(streak, STREAK_FILENAME);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        streakView.setText(getResources().getString(R.string.streak, streak));
     }
 
     /**
@@ -480,5 +453,31 @@ public class MojoScreen extends AppCompatActivity {
                 checkMedication();
             }
         }, delay);
+    }
+
+    private class StreakListener implements Streak.ChangeListener {
+
+        @Override
+        public void onStreakChanged(final int newStreak) {
+            try {
+                persistence.saveObject(streak, STREAK_FILENAME);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            scheduler.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            streakView.setText(getResources().getString(R.string.streak, newStreak));
+                            if (streakFunction())
+                                showStreakPopup();
+                        }
+                    });
+                }
+            }, MS_REWARD_STREAK_SHOW_DELAY);
+        }
     }
 }

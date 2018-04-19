@@ -22,6 +22,7 @@ public class Schedule implements Serializable {
 
     // Dependency injection
     private IClock time;
+    private transient Streak streak;
 
     // Schedule pools
     private final Queue<Medication> morningPool;
@@ -31,6 +32,7 @@ public class Schedule implements Serializable {
     // Schedule active queue.
     private Date queueCreationTime;
     private Queue<Medication> activeQueue;
+    private boolean streakUpdated = false;
 
     public Schedule(IClock time) {
         this.time = time;
@@ -45,28 +47,8 @@ public class Schedule implements Serializable {
         queueCreationTime = queueFakeTime.getTime();
     }
 
-    public static boolean isItPopupTime(IClock time) {
-
-        if (time.now().getTime().equals("08:46:00")){
-            return true;
-        } else if(time.now().getTime().equals("16:35:00")){
-            return true;
-        } else{
-            return false;
-        }
-
-      /*
-        switch(time){
-            case 1:
-                time.MIN.equals(09:00);
-                questionPopup.showPopupWindow(currentScreen);
-                break;
-            case 2:
-                time.MIN.equals(10:00);
-                questionPopup.showPopupWindow(currentScreen);
-                break;
-        }
-        */
+    public void connectStreak(Streak streak) {
+        this.streak = streak;
     }
 
 
@@ -94,17 +76,31 @@ public class Schedule implements Serializable {
     }
 
     /**
-     * Checks if the current queue is valid, and updates accordingly
+     * Checks if the current queue is valid, and updates accordingly.
+     *
+     * @param updateStreak Should the streak be updated? (incremented or reset)
+     * @author Aleksandra Soltan, Grigory Glukhov
      */
-    public void validateQueue() {
-
-        if(queueCreationTime.before(getBeginningOfCurrentPeriod(time))){
-            if(activeQueue.isEmpty()) {
-                //TODO: Check if any periods skipped
-                //TODO: Reset streak if YES, increase streak if NO
-                updateQueue();
-            } else {
-                //TODO: Reset streak
+    public void validateQueue(boolean updateStreak) {
+        if (queueCreationTime.before(getBeginningOfCurrentPeriod(time))) {
+            System.out.println("Updating queue");
+            System.out.print(streak);
+            System.out.print(" ");
+            System.out.println(updateStreak);
+            if (updateStreak && streak != null) {
+                System.out.println("Checking for reset");
+                if (!activeQueue.isEmpty() || getBeginningOfLastPeriod(time).after(queueCreationTime)) {
+                    streak.reset();
+                }
+            }
+            updateQueue();
+            streakUpdated = false;
+        } else {
+            if (activeQueue.isEmpty() && !streakUpdated) {
+                // Queue is empty, it doesn't need to update,
+                // However we want to reward the player immediately
+                streakUpdated = true;
+                streak.increment();
             }
         }
 
@@ -144,6 +140,32 @@ public class Schedule implements Serializable {
                 }
             }
         }
+    }
+
+    /**
+     * Get the beginning of the previous period (in the past, before current period beginning).
+     *
+     * @param time IClock interface for now() method.
+     * @return The Date of the beginning of the previous period.
+     * @author Grigory Glukhov
+     */
+    public static Date getBeginningOfLastPeriod(IClock time) {
+        Calendar calendar = time.now();
+        calendar.setTime(getBeginningOfCurrentPeriod(time));
+        switch (calendar.get(Calendar.HOUR_OF_DAY)) {
+            case 5:
+                calendar.add(Calendar.HOUR_OF_DAY, -12);
+                break;
+
+            case 11:
+                calendar.set(Calendar.HOUR_OF_DAY, 5);
+                break;
+
+            default:
+                calendar.set(Calendar.HOUR_OF_DAY, 17);
+                break;
+        }
+        return calendar.getTime();
     }
 
 
@@ -222,7 +244,7 @@ public class Schedule implements Serializable {
         Calendar calendar = time.now();
         calendar.add(Calendar.DATE, -1);
         queueCreationTime = calendar.getTime();
-        validateQueue();
+        validateQueue(false);
     }
 
     /**
@@ -266,7 +288,7 @@ public class Schedule implements Serializable {
             schedule.addMedToEveningPool(med);
         }
 
-        schedule.validateQueue();
+        schedule.validateQueue(false);
         return schedule;
     }
 }
