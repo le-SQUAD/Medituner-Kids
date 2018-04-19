@@ -141,6 +141,11 @@ public class MojoScreen extends AppCompatActivity {
         medicationQueue = schedule.getActiveQueue();
 
         if (medicationQueue.isEmpty()) {
+            try {
+                persistence.saveObject(schedule, SCHEDULE_FILENAME);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             scheduler.schedule(new TimerTask() {
                 @Override
                 public void run() {
