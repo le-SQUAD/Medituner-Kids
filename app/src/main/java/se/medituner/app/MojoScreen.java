@@ -30,12 +30,13 @@ public class MojoScreen extends AppCompatActivity {
     public static final int MS_REWARD_STREAK_HIDE_DURATION = 1200;  // Duration of the streak popup disappearing animation
     public static final int MS_REWARD_STREAK_HIDE_DELAY = 1800;     // Delay between the streak popup appearing and disappearing.
 
-    public static final String SCHEDULE_FILENAME = "schedule";
+    public static final String SCHEDULE_FILENAME = "schedulem";
+    public static final String STREAK_FILENAME= "streak";
 
     private IClock time = new SystemClock();
 
     private Popup questionPopup, streakPopup;
-    private int streak = 0;
+    private Integer streak;
     private TextView streakView, questionTextView, rewardStreakTextView;
     private boolean animationPlayed = false;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
@@ -76,7 +77,16 @@ public class MojoScreen extends AppCompatActivity {
 
         // Set up streaks
         streakView = findViewById(R.id.streak_text);
-        resetStreak();
+        try {
+            streak = (Integer)persistence.loadObject(STREAK_FILENAME);
+        } catch (IOException e) {
+            System.err.println("Could not load streak, resetting it.");
+            resetStreak();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            finish();
+        }
+        streakView.setText(getResources().getString(R.string.streak, streak.intValue()));
 
         // Set up animations
         accelerateInterpolator = new AccelerateInterpolator();
@@ -148,6 +158,8 @@ public class MojoScreen extends AppCompatActivity {
         try {
             System.out.println("Attempting to load schedule.");
             schedule = (Schedule) persistence.loadObject(SCHEDULE_FILENAME);
+            System.out.println("Attempting to load streak object.");
+            streak=(Integer) persistence.loadObject(STREAK_FILENAME);
         } catch (IOException e) {
             System.out.println("Schedule not found. Creating new one.");
             e.printStackTrace();
@@ -406,7 +418,7 @@ public class MojoScreen extends AppCompatActivity {
      * @author Aleksandra Soltan
      */
     public boolean streakFunction() {
-        if (((streak == 3) || (streak % 6 == 0)) && streak != 0) {
+        if (((streak.intValue() == 3) || (streak.intValue() % 6 == 0)) && streak.intValue() != 0) {
             return true;
         } else {
             return false;
@@ -419,7 +431,13 @@ public class MojoScreen extends AppCompatActivity {
      * @autor Sasa Lekic, Julia Danek
      */
     private void incrementStreak() {
-        streakView.setText(getResources().getString(R.string.streak, ++streak));
+        streak= new Integer(streak.intValue() + 1);
+        try {
+            persistence.saveObject(streak, STREAK_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        streakView.setText(getResources().getString(R.string.streak, streak.intValue()));
         if (streakFunction())
             showStreakPopup();
     }
@@ -430,7 +448,12 @@ public class MojoScreen extends AppCompatActivity {
      * @autor Sasa Lekic, Julia Danek
      */
     private void resetStreak() {
-        streak = 0;
+        streak= new Integer(0);
+        try {
+            persistence.saveObject(streak, STREAK_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         streakView.setText(getResources().getString(R.string.streak, streak));
     }
 
