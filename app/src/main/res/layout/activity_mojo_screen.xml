@@ -11,7 +11,7 @@
 
     <ImageView
         android:id="@+id/frowningMojo"
-        android:layout_width="290dp"
+        android:layout_width="278dp"
         android:layout_height="282dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
@@ -23,24 +23,29 @@
         app:layout_constraintTop_toTopOf="@+id/smilingBounceMojo" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btn_generate_schedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onButtonShowPopupClick"
-        android:text="@string/btn_show_popup"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:onClick="onButtonGenerateSchedule"
+        android:text="@string/btn_generate_schedule"
+        app:layout_constraintBottom_toTopOf="@+id/sun"
+        app:layout_constraintEnd_toStartOf="@+id/btn_reset_queue"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.100000024" />
+        app:layout_constraintTop_toBottomOf="@+id/streak_text" />
 
     <TextView
         android:id="@+id/streak_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
         android:text="Streak"
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        app:layout_constraintBottom_toTopOf="@+id/btn_generate_schedule"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -48,7 +53,7 @@
 
     <ImageView
         android:id="@+id/smilingBounceMojo"
-        android:layout_width="378dp"
+        android:layout_width="278dp"
         android:layout_height="282dp"
         android:layout_marginTop="256dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,12 +63,80 @@
 
     <ImageView
         android:id="@+id/smilingWaveMojo"
-        android:layout_width="290dp"
+        android:layout_width="278dp"
         android:layout_height="282dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/smilingBounceMojo" />
 
+    <ImageView
+        android:id="@+id/tree"
+        android:layout_width="318dp"
+        android:layout_height="472dp"
+        android:layout_marginLeft="168dp"
+        android:layout_marginStart="168dp"
+        android:layout_marginTop="52dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/tree" />
 
+    <ImageView
+        android:id="@+id/sunflower"
+        android:layout_width="170dp"
+        android:layout_height="252dp"
+        android:layout_marginEnd="236dp"
+        android:layout_marginRight="236dp"
+        android:layout_marginTop="292dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/sunflower" />
+
+    <ImageView
+        android:id="@+id/sun"
+        android:layout_width="134dp"
+        android:layout_height="197dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.235"
+        app:srcCompat="@drawable/sun" />
+
+    <ImageView
+        android:id="@+id/grinningBounceMojo"
+        android:layout_width="278dp"
+        android:layout_height="282dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="256dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/grinning1" />
+
+    <Button
+        android:id="@+id/btn_reset_queue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="8dp"
+        android:onClick="onButtonResetQueue"
+        android:text="@string/btn_reset_queue"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_generate_schedule"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_generate_schedule"
+        app:layout_constraintTop_toTopOf="@+id/btn_generate_schedule" />
 
 </android.support.constraint.ConstraintLayout>
