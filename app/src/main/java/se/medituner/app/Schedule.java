@@ -213,10 +213,16 @@ public class Schedule implements Serializable {
     }
 
     /**
+     * Reset the active queue to the current period pool.
      *
+     * WARNING!
+     * This is not functional behavior for the class and the method should only be used for testing!
      */
     public void resetQueue() {
-
+        Calendar calendar = time.now();
+        calendar.add(Calendar.DATE, -1);
+        queueCreationTime = calendar.getTime();
+        validateQueue();
     }
 
     /**

@@ -118,7 +118,8 @@ public class MojoScreen extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-//                    showStreakPopup();
+                    if (!streakFunction())
+                        showStreakPopup();
                 }
             });
 
@@ -150,42 +151,13 @@ public class MojoScreen extends AppCompatActivity {
         } catch (IOException e) {
             System.out.println("Schedule not found. Creating new one.");
             e.printStackTrace();
-            // Set up Schedule
-            schedule = new Schedule(time);
-
-            schedule.addMedToMorningPool(Medication.AEROBEC);
-            schedule.addMedToMorningPool(Medication.AIROMIR);
-            schedule.addMedToMorningPool(Medication.ALVESCO);
-
-            schedule.addMedToLunchPool(Medication.BRICANYLTURBOHALER);
-            schedule.addMedToLunchPool(Medication.SALMETEROLFLUTICASONECIPLA);
-            schedule.addMedToLunchPool(Medication.SERETIDEDISKUSLILA);
-
-            schedule.addMedToEveningPool(Medication.BUFOMIXMEDIUM);
-            schedule.addMedToEveningPool(Medication.EYEDROP);
-            schedule.addMedToEveningPool(Medication.SERETIDEDISKUSLILA);
+            schedule = Schedule.generate(time);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             finish();
         }
 
         schedule.validateQueue();
-    }
-
-    /**
-     * Temporary button that shows the popup immediately.
-     *
-     * @param view Android button that was pressed.
-     * @author Grigory Glukhov
-     */
-    public void onButtonShowPopupClick(View view) {
-        schedule.validateQueue();
-        medicationQueue = schedule.getActiveQueue();
-        if (medicationQueue.isEmpty()) {
-            showStreakPopup();
-        } else {
-            showQuestionPopup();
-        }
     }
 
     /**
@@ -197,12 +169,24 @@ public class MojoScreen extends AppCompatActivity {
      */
     public void onButtonGenerateSchedule(View view) {
         schedule = Schedule.generate(time);
-
+        try {
+            persistence.saveObject(schedule, SCHEDULE_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         checkMedication();
     }
 
+    /**
+     * Callend when 'reset queue' button is pressed.
+     *
+     * Resets the current queue.
+     *
+     * @param view
+     */
     public void onButtonResetQueue(View view) {
-
+        schedule.resetQueue();
+        checkMedication();
     }
 
 
@@ -338,8 +322,7 @@ public class MojoScreen extends AppCompatActivity {
             //resid = R.drawable.arm_animation_grinning;
             //mojoBounceExpression = grinningBounceMojo;
             showStreakPopup();
-        }
-        else{
+        } else {
             smilingBounceMojo.setVisibility(View.VISIBLE);
             grinningBounceMojo.setVisibility(View.INVISIBLE);
             //mojoBounceExpression = smilingBounceMojo;
@@ -409,7 +392,7 @@ public class MojoScreen extends AppCompatActivity {
         try {
             persistence.saveObject(schedule, SCHEDULE_FILENAME);
         } catch (IOException e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
         scheduler.schedule(new TimerTask() {
             @Override
