@@ -3,6 +3,7 @@ package se.medituner.app;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -207,6 +208,18 @@ public class MojoScreen extends AppCompatActivity {
         }
         schedule.connectStreak(streak);
         checkMedication();
+    }
+
+    /**
+     * Called when 'play' button is pressed.
+     *
+     * Switches to the game activity.
+     *
+     * @param view Android button view that was pressed.
+     */
+    public void onButtonPlay(View view) {
+        Intent intent = new Intent(this, GameScreen.class);
+        startActivity(intent);
     }
 
     /**
