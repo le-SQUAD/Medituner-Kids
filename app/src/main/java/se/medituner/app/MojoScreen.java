@@ -23,7 +23,7 @@ import static android.view.Gravity.CENTER;
 
 public class MojoScreen extends AppCompatActivity {
 
-    public static final int MS_SNOOZE_DELAY = 5000;                 // Snooze time after answering 'no'
+    public static final int MS_SNOOZE_DELAY = 60000;                // Snooze time after answering 'no'
     public static final int MS_FIRST_POPUP_DELAY = 1000;            // Delay between the start of the app and the first question popup appearing
     public static final int MS_POPUP_DELAY = 1500;                  // Delay between stacked popups appearing
     public static final int MS_REWARD_STREAK_SHOW_DURATION = 1600;  // Duration of the streak popup appearing animation
