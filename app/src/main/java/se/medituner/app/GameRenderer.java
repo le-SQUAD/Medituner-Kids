@@ -5,37 +5,38 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class GameRenderer implements GLSurfaceView.Renderer {
 
-    private FloatBuffer vertexBuffer;
-    private ShortBuffer drawListBuffer;
+    private static long MS_ANIMATION_PERIOD = 4000l;
+    private static double ANIMATION_SCALE_POWER = 4.0;
 
-    private int program;
-
-    private static long MS_HALF_ANIMATION_PERIOD = 1500l;
-
-    static final int COORDS_PER_VERTEX = 3;
-    static final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
-    static final float SQUARE_VERTICIES[] = {
-            -0.5f, 0.5f, 0.0f,  // top left
-            -0.5f, -0.5f, 0.0f, // bottom left
-            0.5f, -0.5f, 0.0f,  // bottom right
-            0.5f, 0.5f, 0.0f,   // top right
-    };
-    static final short SQUARE_DRAW_LIST[] = {0, 1, 2, 0, 2, 3};
-    static final int VERTEX_COUNT = SQUARE_VERTICIES.length / COORDS_PER_VERTEX;
-    static final float COLOR[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
+    // A drawable shape reference
+    private Shape exampleShape;
+    // Transformation matrix for rendering
     private float transformationMatrix[] = new float[16];
+    // Shader program handle.
+    private int hProgram;
 
+    // Stored array to avoid creating additional variables
+    private long times[];
+
+    /*
+    The array of colors that are taken by the shapes.
+    The outside array can be arbitrary large, however
+    The inside array should always be [4] long (or more, but the other numbers won't be used)
+    */
+    private float colors[][] = {
+            { 0.0f, 0.0f, 1.0f, 1.0f },
+            { 0.0f, 1.0f, 0.0f, 1.0f },
+            { 0.0f, 1.0f, 1.0f, 1.0f },
+            { 1.0f, 0.0f, 0.0f, 1.0f },
+            { 1.0f, 0.0f, 1.0f, 1.0f },
+            { 1.0f, 1.0f, 0.0f, 1.0f },
+            { 1.0f, 1.0f, 1.0f, 1.0f }
+    };
 
     /**
      * Called once when the surface is created during initialization.
@@ -49,28 +50,29 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        ByteBuffer bb = ByteBuffer.allocateDirect(SQUARE_VERTICIES.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(SQUARE_VERTICIES);
-        vertexBuffer.position(0);
+        int vertexShader = Shaders.loadShader(GLES20.GL_VERTEX_SHADER, Shaders.SHAPE_VERTEX);
+        int fragmentShader = Shaders.loadShader(GLES20.GL_FRAGMENT_SHADER, Shaders.SHAPE_FRAGMENT);
 
-        bb = ByteBuffer.allocateDirect(SQUARE_DRAW_LIST.length * 2);
-        bb.order(ByteOrder.nativeOrder());
-        drawListBuffer = bb.asShortBuffer();
-        drawListBuffer.put(SQUARE_DRAW_LIST);
-        drawListBuffer.position(0);
+        // Create a new shader program
+        hProgram = GLES20.glCreateProgram();
 
-        int vertexShader = Shaders.loadShader(GLES20.GL_VERTEX_SHADER, Shaders.VERTEX);
-        int fragmentShader = Shaders.loadShader(GLES20.GL_FRAGMENT_SHADER, Shaders.FRAGMENT);
+        // Attach shaders to the program
+        GLES20.glAttachShader(hProgram, vertexShader);
+        GLES20.glAttachShader(hProgram, fragmentShader);
 
-        program = GLES20.glCreateProgram();
+        // Compile the shader program
+        GLES20.glLinkProgram(hProgram);
 
-        GLES20.glAttachShader(program, vertexShader);
-        GLES20.glAttachShader(program, fragmentShader);
-        GLES20.glLinkProgram(program);
+        // Activate the shader program for rendering.
+        GLES20.glUseProgram(hProgram);
 
-        GLES20.glUseProgram(program);
+        exampleShape = Shape.generateSquare(hProgram);
+
+        GLES20.glDepthMask(false);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
+        times = new long[colors.length];
     }
 
     /**
@@ -95,35 +97,18 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         // Clear the surface
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-        int posHandle = GLES20.glGetAttribLocation(program, "vPosition");
-        GLES20.glEnableVertexAttribArray(posHandle);
-        GLES20.glVertexAttribPointer(posHandle, COORDS_PER_VERTEX,
-                GLES20.GL_FLOAT, false,
-                VERTEX_STRIDE, vertexBuffer);
+        times[0] = SystemClock.uptimeMillis() % MS_ANIMATION_PERIOD;
+        for (int i = 1; i < times.length; i++) {
+            times[i] = (times[0] + (MS_ANIMATION_PERIOD / times.length) * i) % MS_ANIMATION_PERIOD;
+        }
 
-
-        long time = SystemClock.uptimeMillis() % (2 * MS_HALF_ANIMATION_PERIOD);
-        float scale = time / (float) MS_HALF_ANIMATION_PERIOD;
-        Matrix.setIdentityM(transformationMatrix, 0);
-        Matrix.scaleM(transformationMatrix, 0, scale, scale, scale);
-
-        int matrixHandle = GLES20.glGetUniformLocation(program, "transformMatrix");
-        GLES20.glUniformMatrix4fv(matrixHandle, 1, false, transformationMatrix, 0);
-
-        scale = time >= MS_HALF_ANIMATION_PERIOD ? 2.0f - scale : scale;
-
-        float color[] = { scale, scale, scale, 1.0f};
-        // Set color for drawing the triangle
-        int colorHandle = GLES20.glGetUniformLocation(program, "vColor");
-        GLES20.glUniform4fv(colorHandle, 1, color, 0);
-
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES,
-                SQUARE_DRAW_LIST.length,
-                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
-        GLES20.glDisableVertexAttribArray(posHandle);
-
-
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, SQUARE_DRAW_LIST.length,
-                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+        for (int i = 0; i < times.length; i++) {
+            float time = times[i] / (float) MS_ANIMATION_PERIOD;
+            float scale = (float) Math.pow(time, ANIMATION_SCALE_POWER);
+            Matrix.setIdentityM(transformationMatrix, 0);
+            Matrix.scaleM(transformationMatrix, 0, scale, scale, scale);
+            colors[i][3] = 1.0f - scale;
+            exampleShape.draw(colors[i], transformationMatrix);
+        }
     }
 }

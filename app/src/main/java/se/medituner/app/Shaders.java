@@ -4,16 +4,20 @@ import android.opengl.GLES20;
 
 public class Shaders {
 
-    static final String VERTEX =
-            "uniform mat4 transformMatrix;" +
-            "attribute vec4 vPosition;" +
+    public static final String POSITION_NAME = "vPosition";
+    public static final String TRANSFORM_MATRIX_NAME = "transformMatrix";
+    public static final String COLOR_NAME = "vColor";
+
+    static final String SHAPE_VERTEX =
+            "uniform mat4 " + TRANSFORM_MATRIX_NAME + ";" +
+            "attribute vec4 " + POSITION_NAME + ";" +
             "void main() {" +
             "   gl_Position = vPosition * transformMatrix;" +
             "}";
 
-    static final String FRAGMENT =
+    static final String SHAPE_FRAGMENT =
             "precision mediump float;" +
-            "uniform vec4 vColor;" +
+            "uniform vec4 " + COLOR_NAME + ";" +
             "void main() {" +
             "  gl_FragColor = vColor;" +
             "}";
