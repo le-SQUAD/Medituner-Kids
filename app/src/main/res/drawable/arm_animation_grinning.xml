@@ -54,4 +54,5 @@
     <item android:drawable="@drawable/grinning3" android:duration="50" />
     <item android:drawable="@drawable/grinning2" android:duration="50" />
     <item android:drawable="@drawable/grinning1" android:duration="50" />
+    <item android:drawable="@drawable/smiling1" android:duration="50" />
 </animation-list>
