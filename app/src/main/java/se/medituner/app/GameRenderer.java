@@ -17,6 +17,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private Shape exampleShape;
     // Transformation matrix for rendering
     private float transformationMatrix[] = new float[16];
+    private float ratio;
     // Shader program handle.
     private int hProgram;
 
@@ -85,6 +86,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
+        ratio = width / (float) height;
     }
 
     /**
@@ -106,7 +108,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
             float time = times[i] / (float) MS_ANIMATION_PERIOD;
             float scale = (float) Math.pow(time, ANIMATION_SCALE_POWER);
             Matrix.setIdentityM(transformationMatrix, 0);
-            Matrix.scaleM(transformationMatrix, 0, scale, scale, scale);
+            Matrix.scaleM(transformationMatrix, 0, scale, scale * ratio, scale);
             colors[i][3] = 1.0f - scale;
             exampleShape.draw(colors[i], transformationMatrix);
         }

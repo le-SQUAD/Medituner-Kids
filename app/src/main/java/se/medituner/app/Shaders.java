@@ -10,9 +10,9 @@ public class Shaders {
 
     static final String SHAPE_VERTEX =
             "uniform mat4 " + TRANSFORM_MATRIX_NAME + ";" +
-            "attribute vec4 " + POSITION_NAME + ";" +
+            "attribute vec3 " + POSITION_NAME + ";" +
             "void main() {" +
-            "   gl_Position = " + TRANSFORM_MATRIX_NAME + " * " + POSITION_NAME + ";" +
+            "   gl_Position = " + TRANSFORM_MATRIX_NAME + " * vec4(" + POSITION_NAME + ", 1);" +
             "}";
 
     static final String SHAPE_FRAGMENT =
