@@ -36,7 +36,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private Random rng;
 
     // Shader program handle.
-    private int hProgram;
+    private int hShapeProgram;
+    private int hBackgroundProgram;
 
     // Stored array to avoid creating additional variables
     private long times[];
@@ -72,19 +73,25 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         int fragmentShader = Shaders.loadShader(GLES20.GL_FRAGMENT_SHADER, Shaders.SHAPE_FRAGMENT);
 
         // Create a new shader program
-        hProgram = GLES20.glCreateProgram();
+        hShapeProgram = GLES20.glCreateProgram();
 
         // Attach shaders to the program
-        GLES20.glAttachShader(hProgram, vertexShader);
-        GLES20.glAttachShader(hProgram, fragmentShader);
+        GLES20.glAttachShader(hShapeProgram, vertexShader);
+        GLES20.glAttachShader(hShapeProgram, fragmentShader);
 
         // Compile the shader program
-        GLES20.glLinkProgram(hProgram);
+        GLES20.glLinkProgram(hShapeProgram);
 
         // Activate the shader program for rendering.
-        GLES20.glUseProgram(hProgram);
+        GLES20.glUseProgram(hShapeProgram);
 
-        exampleShape = Shape.generateQuad(hProgram);
+        exampleShape = Shape.generateQuad(hShapeProgram);
+
+        hBackgroundProgram = GLES20.glCreateProgram();
+        GLES20.glAttachShader(hBackgroundProgram, Shaders.loadShader(GLES20.GL_VERTEX_SHADER, Shaders.BACKGROUND_VERTEX));
+        GLES20.glAttachShader(hBackgroundProgram, Shaders.loadShader(GLES20.GL_FRAGMENT_SHADER, Shaders.BACKGROUND_FRAGMENT));
+
+        GLES20.glLinkProgram(hBackgroundProgram);
 
         GLES20.glDepthMask(false);
         GLES20.glEnable(GLES20.GL_BLEND);
@@ -107,6 +114,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
         ratio = width / (float) height;
+        Background.getInstance(hBackgroundProgram).resize(width, height);
     }
 
     /**
@@ -116,43 +124,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
      */
     @Override
     public void onDrawFrame(GL10 gl) {
-        // Clear the surface
-        gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-
-        float time = (SystemClock.uptimeMillis() % MS_ANIMATION_PERIOD) / (float) MS_ANIMATION_PERIOD;
-        //float scale = (float) Math.pow(time, ANIMATION_SCALE_POWER);
-        float scale = time * time * time;
-
-        if (time < lastTime) {
-            for (int i = 0; i < angles.length; i++) {
-                angles[i] = rng.nextFloat() * (float) Math.PI * 2.0f;
-                orbits[i] = MIN_ORBIT + rng.nextFloat() * (MAX_ORBIT - MIN_ORBIT);
-                scales[i] = MIN_PLANET_SCALE + rng.nextFloat() * (MAX_PLANET_SCALE - MIN_PLANET_SCALE);
-            }
-            scales[6] = MIN_SUN_SCALE + rng.nextFloat() * (MAX_SUN_SCALE - MIN_SUN_SCALE);
-        }
-        lastTime = time;
-        float alpha = (float) Math.sin(time * (float) Math.PI);
-
-        Matrix.setIdentityM(transformationMatrix, 0);
-        Matrix.scaleM(transformationMatrix, 0,
-                ANIMATION_SCALE * scale * scales[6], ANIMATION_SCALE * scale * scales[6] * ratio, 1.0f);
-        colors[6][3] = alpha;
-        exampleShape.draw(colors[6], transformationMatrix);
-
-        for (int i = 0; i < angles.length; i++) {
-            Matrix.setIdentityM(scaleMatrix, 0);
-            Matrix.setIdentityM(translateMatrix, 0);
-            Matrix.scaleM(scaleMatrix, 0,
-                    ANIMATION_SCALE * scale * scales[i] , ANIMATION_SCALE * scale * scales[i] * ratio, 1.0f);
-            Matrix.translateM(translateMatrix, 0,
-                    scale * (float) Math.cos(angles[i]) * orbits[i],
-                    scale * (float) Math.sin(angles[i]) * orbits[i] * ratio, 0.0f);
-            Matrix.multiplyMM(transformationMatrix, 0,
-                    translateMatrix, 0,
-                    scaleMatrix, 0);
-            colors[i][3] = alpha;
-            exampleShape.draw(colors[i], transformationMatrix);
-        }
+        Background background = Background.getInstance(hBackgroundProgram);
+        GLES20.glUseProgram(hBackgroundProgram);
+        float time = SystemClock.uptimeMillis() % MS_ANIMATION_PERIOD / (float) MS_ANIMATION_PERIOD;
+        background.draw(colors[0], colors[5], time * (float) Math.PI * 2.0f);
     }
 }
