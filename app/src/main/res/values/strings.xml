@@ -7,6 +7,7 @@
     <string name="btn_reset_queue">Reset Queue</string>
     <string name="btn_yes">Yes!</string>
     <string name="btn_no">No.</string>
+    <string name="btn_play">Play!</string>
 
 
     <!-- Medication Names -->
