@@ -7,19 +7,29 @@ public class Shaders {
     public static final String POSITION_NAME = "vPosition";
     public static final String TRANSFORM_MATRIX_NAME = "transformMatrix";
     public static final String COLOR_NAME = "vColor";
+    public static final String UV_NAME = "vUV";
 
     static final String SHAPE_VERTEX =
             "uniform mat4 " + TRANSFORM_MATRIX_NAME + ";" +
-            "attribute vec3 " + POSITION_NAME + ";" +
+            "attribute vec2 " + POSITION_NAME + ";" +
+            "attribute vec2 " + UV_NAME + ";" +
+
+            "varying vec2 texUV;" +
             "void main() {" +
-            "   gl_Position = " + TRANSFORM_MATRIX_NAME + " * vec4(" + POSITION_NAME + ", 1);" +
+                "texUV = " + UV_NAME + ";" +
+                "gl_Position = " + TRANSFORM_MATRIX_NAME + " * vec4(" + POSITION_NAME + ", 0, 1);" +
             "}";
 
     static final String SHAPE_FRAGMENT =
             "precision mediump float;" +
+            //"uniform "
             "uniform vec4 " + COLOR_NAME + ";" +
+            "varying vec2 texUV;" +
             "void main() {" +
-            "  gl_FragColor = vColor;" +
+                "vec2 pos = (texUV - vec2(0.5, 0.5)) * vec2(2, 2);" +
+                "float radius = 1.0 - sqrt(pos.x * pos.x + pos.y * pos.y);" +
+                "gl_FragColor = radius * " + COLOR_NAME + ";" +
+                //"gl_FragColor = " + COLOR_NAME + ";" +
             "}";
 
     public static int loadShader(int type, String shaderCode) {
