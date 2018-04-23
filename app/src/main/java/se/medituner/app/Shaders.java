@@ -12,7 +12,7 @@ public class Shaders {
             "uniform mat4 " + TRANSFORM_MATRIX_NAME + ";" +
             "attribute vec4 " + POSITION_NAME + ";" +
             "void main() {" +
-            "   gl_Position = vPosition * transformMatrix;" +
+            "   gl_Position = " + TRANSFORM_MATRIX_NAME + " * " + POSITION_NAME + ";" +
             "}";
 
     static final String SHAPE_FRAGMENT =
