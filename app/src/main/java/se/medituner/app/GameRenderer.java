@@ -17,6 +17,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private Shape exampleShape;
     // Transformation matrix for rendering
     private float transformationMatrix[] = new float[16];
+    private float scaleMatrix[] = new float[16];
+    private float translateMatrix[] = new float[16];
     private float ratio;
     // Shader program handle.
     private int hProgram;
@@ -99,18 +101,21 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         // Clear the surface
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-        times[0] = SystemClock.uptimeMillis() % MS_ANIMATION_PERIOD;
-        for (int i = 1; i < times.length; i++) {
-            times[i] = (times[0] + (MS_ANIMATION_PERIOD / times.length) * i) % MS_ANIMATION_PERIOD;
-        }
+        float time = (SystemClock.uptimeMillis() % MS_ANIMATION_PERIOD) / (float) MS_ANIMATION_PERIOD;
+        //float scale = (float) Math.pow(time, ANIMATION_SCALE_POWER);
+        float scale = time * time * time;
 
-        for (int i = 0; i < times.length; i++) {
-            float time = times[i] / (float) MS_ANIMATION_PERIOD;
-            float scale = (float) Math.pow(time, ANIMATION_SCALE_POWER);
-            Matrix.setIdentityM(transformationMatrix, 0);
-            Matrix.scaleM(transformationMatrix, 0, scale, scale * ratio, scale);
-            colors[i][3] = 1.0f - scale;
-            exampleShape.draw(colors[i], transformationMatrix);
-        }
+        Matrix.setIdentityM(transformationMatrix, 0);
+        Matrix.scaleM(transformationMatrix, 0, scale, scale * ratio, 1.0f);
+        exampleShape.draw(colors[6], transformationMatrix);
+
+        Matrix.setIdentityM(scaleMatrix, 0);
+        Matrix.setIdentityM(translateMatrix, 0);
+        Matrix.scaleM(scaleMatrix, 0, 0.2f * scale, 0.2f * scale * ratio, 1.0f);
+        Matrix.translateM(translateMatrix, 0, 0.0f, -scale * ratio, 0.0f);
+        Matrix.multiplyMM(transformationMatrix, 0,
+                translateMatrix, 0,
+                scaleMatrix, 0);
+        exampleShape.draw(colors[3], transformationMatrix);
     }
 }
