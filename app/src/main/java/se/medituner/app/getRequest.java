@@ -40,7 +40,7 @@ public class getRequest {
             StringBuilder sb = new StringBuilder();
             String data;
             while ((data = in.readLine()) != null) {
-                sb.append(data);
+                sb.append(data + "\n");
             }
             connection.disconnect();
             String treatmentPlan = sb.toString();
@@ -51,7 +51,7 @@ public class getRequest {
             e.printStackTrace();
         }catch (ProtocolException e){
             e.printStackTrace();
-        }catch (IOException e){
+        }catch (IOException e) {
             e.printStackTrace();
         }
         return null;

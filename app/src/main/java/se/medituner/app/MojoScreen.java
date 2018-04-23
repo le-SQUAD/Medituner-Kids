@@ -60,7 +60,6 @@ public class MojoScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mojo_screen);
-
         persistence = new Persistence(this);
 
         // Set up popups
@@ -129,6 +128,9 @@ public class MojoScreen extends AppCompatActivity {
                     checkMedication();
                 }
             }, MS_FIRST_POPUP_DELAY);
+
+        // Parse treatmentplan
+        new ParseResponse().execute();
     }
 
     /**
