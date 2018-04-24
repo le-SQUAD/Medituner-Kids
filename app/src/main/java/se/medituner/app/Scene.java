@@ -24,14 +24,23 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private int hBackgroundProgram;
 
     private static final long MS_ANIMATION_TIME = 2000l;
-    private static final float COLOR_STRIP[] = { 0.1f, 0.0f, 0.0f, 1.0f };
-    private static final short OBSTACLE_COUNT = 20;
+    private static final float COLOR_INNER[] = { 0.4431372549f, 0.04705882352f, 0.0156862745f, 1.0f };
+    private static final float COLOR_STRIP[] = { 0.37647058823f, 0.0431372549f, 0.0156862745f, 1.0f };
+    private static final float COLOR_OUTER[] = { 0.55f, 0.052f, 0.006f, 1.0f };
+    /*
+    { 0.37647058823f, 0.0431372549f, 0.0156862745f, 1.0f }
+    { 0.4431372549f, 0.04705882352f, 0.0156862745f, 1.0f };
+    { 0.98823529411f, 0.29803921568f, 0.30588235294f, 1.0f };
+    { 0.6f, 0.05882352941f, 0.00784313725f, 1.0f };
+    */
+    private static final short OBSTACLE_COUNT = 0;
     private float color_inner[] = new float[4];
     private float color_outer[] = new float[4];
     private float color_model[][];
     private double lastAngle = 0.0;
     private double rotationRate = -0.2;
     private long creationTimes[];
+    private float lastTime = 2.0f;
     private float ratio;
     private float cachedSin[], cachedCos[];
     private float scaleMatrix[] = new float[16], translateMatrix[] = new float[16], transformMatrix[] = new float[16];
@@ -62,8 +71,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         model = new Quad(hQuadProgram,1.0f, 1.0f);
 
         rng = new Random();
-        color_inner = new float[] {0.2f, 0.0f, 0.1f, 1.0f};
-        color_outer = new float[] {0.3f, 0.0f, 0.0f, 1.0f};
+        color_inner = COLOR_INNER;
+        color_outer = COLOR_OUTER;
         color_model = new float[OBSTACLE_COUNT][4];
         cachedCos = new float[OBSTACLE_COUNT];
         cachedSin = new float[OBSTACLE_COUNT];
@@ -93,10 +102,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             }
         }
 
-        GLES20.glUseProgram(hBackgroundProgram);
-        background.draw(color_inner, COLOR_STRIP, color_outer,
-                SystemClock.uptimeMillis() % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME);
+        {
+            float time = SystemClock.uptimeMillis() % MS_ANIMATION_TIME / 1000.0f;
+            GLES20.glUseProgram(hBackgroundProgram);
+            background.draw(color_inner, COLOR_STRIP, color_outer,
+                    time);
 
+        }
         GLES20.glUseProgram(hQuadProgram);
         for (int i = 0; i < OBSTACLE_COUNT; i++) {
             float time = (SystemClock.uptimeMillis() - creationTimes[i]) / (float) MS_ANIMATION_TIME;
