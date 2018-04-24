@@ -17,6 +17,7 @@ public class GameScreen extends AppCompatActivity {
        // setContentView(glSurfaceView);
         setContentView(R.layout.highscore_view);
 
+        //Set the "test"placeholder for high score in front
         glSurfaceView = findViewById(R.id.glSurfaceViewID);
         TextView text = (TextView) findViewById(R.id.textView2);
         text.bringToFront();
