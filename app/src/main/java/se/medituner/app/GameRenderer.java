@@ -127,6 +127,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         Background background = Background.getInstance(hBackgroundProgram);
         GLES20.glUseProgram(hBackgroundProgram);
         float time = SystemClock.uptimeMillis() % MS_ANIMATION_PERIOD / (float) MS_ANIMATION_PERIOD;
-        background.draw(colors[0], colors[5], time * (float) Math.PI * 2.0f);
+        background.draw(colors[0], colors[5], time);
     }
 }

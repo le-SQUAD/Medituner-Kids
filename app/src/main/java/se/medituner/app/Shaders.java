@@ -62,8 +62,10 @@ public class Shaders {
             "}" +
             */
 
+            "const float PI = 3.1415926535897932384626433832795;" +
+
             "float pingPong(float x) {" +
-                "return (1.0 + sin(x)) / 2.0;" +
+                "return (1.0 + cos(x * PI * 2.0)) / 2.0;" +
             "}" +
 
             "void main() {" +
