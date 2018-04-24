@@ -9,7 +9,7 @@ public class Shaders {
     public static final String COLOR_NAME = "vColor";
     public static final String UV_NAME = "vUV";
 
-    static final String SHAPE_VERTEX =
+    static final String QUAD_VERTEX =
             "uniform mat4 " + TRANSFORM_MATRIX_NAME + ";" +
             "attribute vec2 " + POSITION_NAME + ";" +
             "attribute vec2 " + UV_NAME + ";" +
@@ -20,7 +20,7 @@ public class Shaders {
                 "gl_Position = " + TRANSFORM_MATRIX_NAME + " * vec4(" + POSITION_NAME + ", 0, 1);" +
             "}";
 
-    static final String SHAPE_FRAGMENT =
+    static final String QUAD_FRAGMENT =
             "precision mediump float;" +
             //"uniform "
             "uniform vec4 " + COLOR_NAME + ";" +
@@ -63,16 +63,22 @@ public class Shaders {
             */
 
             "const float PI = 3.1415926535897932384626433832795;" +
+            "const float PI_32 = 0.09817477042;" +
 
-            "float pingPong(float x) {" +
-                "return (1.0 + cos(x * PI * 2.0)) / 2.0;" +
+            "float mixValue(float x) {" +
+                //"return (1.0 + sin(PI / (radius + PI_32)) / 2.0;" +
+                "return (1.0 + sin(PI / (fOffset * PI_32 - (x + PI_32)))) / 2.0;" +
             "}" +
 
             "void main() {" +
                 "vec2 pos = (texUV - vec2(0.5, 0.5)) * vec2(2.0, 2.0 / fRatio);" +
-                "float radius = sqrt(pos.x * pos.x + pos.y * pos.y) - fOffset;" +
+                "float radius = (pos.x * pos.x + pos.y * pos.y);" + // " - fOffset;" +
+                //"radius = radius * radius;" +
 
-                "gl_FragColor = mix(vColor_Inner, vColor_Outer, pingPong(radius));" +
+                "gl_FragColor = mix(vColor_Inner, vColor_Outer, mixValue(radius));" +
+
+            //    "gl_FragColor = vec4(radius - fOffset, 0, 0, 1);" +
+            //    "gl_FragColor = mix(vColor_Inner, vColor_Outer, pingPong(radius));" +
             "}";
 
     public static int loadShader(int type, String shaderCode) {

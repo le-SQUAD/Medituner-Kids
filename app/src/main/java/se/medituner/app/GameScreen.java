@@ -7,17 +7,17 @@ import android.os.Bundle;
 public class GameScreen extends AppCompatActivity {
 
     GLSurfaceView glSurfaceView;
-    GameRenderer renderer;
+    Scene scene;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         glSurfaceView = new GLSurfaceView(this);
-        renderer = new GameRenderer();
+        scene = new Scene();
 
         glSurfaceView.setEGLContextClientVersion(2);
-        glSurfaceView.setRenderer(renderer);
+        glSurfaceView.setRenderer(scene);
         //glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
         setContentView(glSurfaceView);
