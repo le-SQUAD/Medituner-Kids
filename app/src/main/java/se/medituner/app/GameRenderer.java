@@ -20,8 +20,18 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     // Shader program handle.
     private int hProgram;
 
+    private Triangle mTriangle;
+    public volatile float mAngle;
+    // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
+    private final float[] mMVPMatrix = new float[16];
+    private final float[] mModelMatrix = new float[16];
+    private final float[] mProjectionMatrix = new float[16];
+    private final float[] mViewMatrix = new float[16];
+
     // Stored array to avoid creating additional variables
     private long times[];
+
+    private int FLIP_FACTOR = -1;
 
     /*
     The array of colors that are taken by the shapes.
@@ -47,6 +57,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         System.out.println("Creating GL surface");
+
+        // initialize a triangle
+        mTriangle = new Triangle();
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -75,6 +88,19 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         times = new long[colors.length];
     }
 
+    public static int loadShader(int type, String shaderCode){
+
+        // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
+        // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
+        int shader = GLES20.glCreateShader(type);
+
+        // add the source code to the shader and compile it
+        GLES20.glShaderSource(shader, shaderCode);
+        GLES20.glCompileShader(shader);
+
+        return shader;
+    }
+
     /**
      * Called when the surface is resized.
      *
@@ -85,6 +111,13 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
+        GLES20.glViewport(0, 0, width, height);
+
+        float ratio = (float) width / height;
+
+        // this projection matrix is applied to object coordinates
+        // in the onDrawFrame() method
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
     }
 
     /**
@@ -97,18 +130,23 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         // Clear the surface
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-        times[0] = SystemClock.uptimeMillis() % MS_ANIMATION_PERIOD;
-        for (int i = 1; i < times.length; i++) {
-            times[i] = (times[0] + (MS_ANIMATION_PERIOD / times.length) * i) % MS_ANIMATION_PERIOD;
-        }
+        Matrix.setIdentityM(mModelMatrix, 0);
+        //touch should toggle bw pos and neg x
+        Matrix.scaleM(mModelMatrix, 0, FLIP_FACTOR, 1.0f, 1.0f);
 
-        for (int i = 0; i < times.length; i++) {
-            float time = times[i] / (float) MS_ANIMATION_PERIOD;
-            float scale = (float) Math.pow(time, ANIMATION_SCALE_POWER);
-            Matrix.setIdentityM(transformationMatrix, 0);
-            Matrix.scaleM(transformationMatrix, 0, scale, scale, scale);
-            colors[i][3] = 1.0f - scale;
-            exampleShape.draw(colors[i], transformationMatrix);
-        }
+        // Set the camera position (View matrix)
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+
+        // Calculate the projection and view transformation
+        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+
+        // Draw triangle
+        mTriangle.draw(mMVPMatrix);
+
+    }
+
+    public void flip(){
+        FLIP_FACTOR = FLIP_FACTOR / -1;
     }
 }
