@@ -31,7 +31,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     // Stored array to avoid creating additional variables
     private long times[];
 
-    private int FLIP_FACTOR = -1;
+    private float FLIP_FACTOR = (float) -0.5;
 
     /*
     The array of colors that are taken by the shapes.
@@ -84,7 +84,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthMask(false);
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-
         times = new long[colors.length];
     }
 
@@ -132,7 +131,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
         Matrix.setIdentityM(mModelMatrix, 0);
         //touch should toggle bw pos and neg x
-        Matrix.scaleM(mModelMatrix, 0, FLIP_FACTOR, 1.0f, 1.0f);
+        //Matrix.scaleM(mModelMatrix, 0, FLIP_FACTOR, 1.0f, 1.0f);
+
+        Matrix.translateM(mModelMatrix, 0, FLIP_FACTOR, -.75f, 1.0f);
 
         // Set the camera position (View matrix)
         Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
@@ -146,7 +147,11 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
     }
 
-    public void flip(){
-        FLIP_FACTOR = FLIP_FACTOR / -1;
+    public void flipRight(){
+        FLIP_FACTOR = (float) -0.5;
+    }
+
+    public void flipLeft(){
+        FLIP_FACTOR = (float) 0.5;
     }
 }

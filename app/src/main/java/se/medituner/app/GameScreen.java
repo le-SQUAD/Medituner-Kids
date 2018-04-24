@@ -14,5 +14,6 @@ public class GameScreen extends AppCompatActivity {
         glSurfaceView = new GameSurfaceView(this);
 
         setContentView(glSurfaceView);
+        //glSurfaceView.requestRender();
     }
 }
