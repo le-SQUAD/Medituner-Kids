@@ -13,7 +13,7 @@ public class Background {
 
     static final int COORDS_PER_VERTEX = 2;
     static final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
-    static final float QUAD_VERTICIES[] = {
+    static final float QUAD_POSITIONS[] = {
             -1.0f, 1.0f,  // top left
             -1.0f, -1.0f, // bottom left
             1.0f, -1.0f,  // bottom right
@@ -26,14 +26,17 @@ public class Background {
             1.0f, 1.0f  // Top right
     };
     static final short QUAD_DRAW_LIST[] = {0, 1, 2, 0, 2, 3};
-    static final int QUAD_VERTEX_COUNT = QUAD_VERTICIES.length / COORDS_PER_VERTEX;
 
     // Buffer of vertex coordinates.
     private FloatBuffer vertexBuffer, uvBuffer;
     // Buffer of vertex ids in order that they should be drawn.
     private ShortBuffer drawListBuffer;
-    // Handlers to program and position offsets for shape shader.
-    private int hProgram, hPosition, hInner, hOuter, hUV, hRatio, hOffset;
+    // Handlers to program and position offsets for the background shader.
+    private int hProgram, hPosition, hUV;
+    // Handlers to color offsets for the background shader.
+    private int hColorInner, hColorStrip, hColorOuter;
+    // Handlers to time and screen ratio offsets for the background shader.
+    private int hTime, hRatio;
     private float ratio;
 
     /**
@@ -69,9 +72,10 @@ public class Background {
         hProgram = programHandle;
         hPosition = GLES20.glGetAttribLocation(hProgram, Shaders.POSITION_NAME);
         hUV = GLES20.glGetAttribLocation(hProgram, Shaders.UV_NAME);
-        hInner = GLES20.glGetUniformLocation(hProgram, "vColor_Inner");
-        hOuter = GLES20.glGetUniformLocation(hProgram, "vColor_Outer");
-        hOffset = GLES20.glGetUniformLocation(hProgram, "fOffset");
+        hColorInner = GLES20.glGetUniformLocation(hProgram, "vColor_Inner");
+        hColorStrip = GLES20.glGetUniformLocation(hProgram, "vColor_Strip");
+        hColorOuter = GLES20.glGetUniformLocation(hProgram, "vColor_Outer");
+        hTime = GLES20.glGetUniformLocation(hProgram, "fTime");
         hRatio = GLES20.glGetUniformLocation(hProgram, "fRatio");
     }
 
@@ -88,11 +92,12 @@ public class Background {
     /**
      * Draw the shape with provided color and using provided matrix.
      *
-     * @param innerColor    Color A
-     * @param outerColor    Color B
-     * @param offset        offset between the colors
+     * @param innerColor    The color on the inside (the center of the screen).
+     * @param stripColor    The strip (darker) color.
+     * @param outerColor    The color on the outside (towards the edges of the screen).
+     * @param time          Linear increasing time for the animation, between 0 and 1.
      */
-    public void draw(float[] innerColor, float[] outerColor, float offset) {
+    public void draw(float[] innerColor, float[] stripColor, float[] outerColor, float time) {
         // Set the next vertex-array appointment to the 'position' offset in the shader.
         GLES20.glEnableVertexAttribArray(hPosition);
         GLES20.glEnableVertexAttribArray(hUV);
@@ -106,10 +111,12 @@ public class Background {
                 GLES20.GL_FLOAT, false,
                 VERTEX_STRIDE, uvBuffer);
 
-        GLES20.glUniform4fv(hInner, 1, innerColor, 0);
-        GLES20.glUniform4fv(hOuter, 1, outerColor, 0);
+
+        GLES20.glUniform4fv(hColorInner, 1, innerColor, 0);
+        GLES20.glUniform4fv(hColorStrip, 1, stripColor, 0);
+        GLES20.glUniform4fv(hColorOuter, 1, outerColor, 0);
         GLES20.glUniform1f(hRatio, ratio);
-        GLES20.glUniform1f(hOffset, offset);
+        GLES20.glUniform1f(hTime, time);
 
         // Draw the triangles.
         GLES20.glDrawElements(GLES20.GL_TRIANGLES,
@@ -129,7 +136,7 @@ public class Background {
      */
     public static Background getInstance(int programHandle) {
         if (instance == null)
-            instance = new Background(programHandle, QUAD_VERTICIES, QUAD_UVS, QUAD_DRAW_LIST);
+            instance = new Background(programHandle, QUAD_POSITIONS, QUAD_UVS, QUAD_DRAW_LIST);
         return instance;
     }
 }

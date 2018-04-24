@@ -24,14 +24,16 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private int hBackgroundProgram;
 
     private static final long MS_ANIMATION_TIME = 2000l;
-    private float colors[][] = {
-        { 0.8f, 0.0f, 0.0f, 1.0f },
-        { 0.5f, 0.0f, 0.0f, 1.0f },
-        { 0.7f, 0.7f, 0.7f, 1.0f }
-    };
-    private float lastTime = 2.0f;
+    private static final float COLOR_STRIP[] = { 0.1f, 0.0f, 0.0f, 1.0f };
+    private static final short OBSTACLE_COUNT = 20;
+    private float color_inner[] = new float[4];
+    private float color_outer[] = new float[4];
+    private float color_model[][];
+    private double lastAngle = 0.0;
+    private double rotationRate = -0.2;
+    private long creationTimes[];
     private float ratio;
-    private float cachedSin, cachedCos;
+    private float cachedSin[], cachedCos[];
     private float scaleMatrix[] = new float[16], translateMatrix[] = new float[16], transformMatrix[] = new float[16];
     private Random rng;
 
@@ -60,6 +62,15 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         model = new Quad(hQuadProgram,1.0f, 1.0f);
 
         rng = new Random();
+        color_inner = new float[] {0.2f, 0.0f, 0.1f, 1.0f};
+        color_outer = new float[] {0.3f, 0.0f, 0.0f, 1.0f};
+        color_model = new float[OBSTACLE_COUNT][4];
+        cachedCos = new float[OBSTACLE_COUNT];
+        cachedSin = new float[OBSTACLE_COUNT];
+        creationTimes = new long[OBSTACLE_COUNT];
+        for (int i = 0; i < creationTimes.length; i++) {
+            creationTimes[i] = SystemClock.uptimeMillis() + (i * (MS_ANIMATION_TIME / OBSTACLE_COUNT));
+        }
     }
 
     @Override
@@ -71,38 +82,50 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        float time = SystemClock.uptimeMillis() % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME * 2.0f;
-        float offset = getOffset(time);
+        for (int i = 0; i < OBSTACLE_COUNT; i++) {
+            if (SystemClock.uptimeMillis() - creationTimes[i] > MS_ANIMATION_TIME) {
+                creationTimes[i] = SystemClock.uptimeMillis();
 
-        if (lastTime > time) {
-            double angle = rng.nextDouble() * Math.PI * 2.0f;
-            cachedSin = (float) Math.sin(angle);
-            cachedCos = (float) Math.cos(angle);
-            colors[2] = randomColor();
+                lastAngle += rotationRate;
+                cachedSin[i] = (float) Math.sin(lastAngle);
+                cachedCos[i] = (float) Math.cos(lastAngle);
+                randomColor(color_model[i]);
+            }
         }
-        lastTime = time;
 
         GLES20.glUseProgram(hBackgroundProgram);
-        background.draw(colors[0], colors[1], time);
+        background.draw(color_inner, COLOR_STRIP, color_outer,
+                SystemClock.uptimeMillis() % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME);
+
         GLES20.glUseProgram(hQuadProgram);
-        Matrix.setIdentityM(scaleMatrix, 0);
-        Matrix.scaleM(scaleMatrix, 0, offset, offset * ratio, 1.0f);
-        Matrix.setIdentityM(translateMatrix, 0);
-        Matrix.translateM(translateMatrix, 0,
-                offset * cachedCos, offset * cachedSin * ratio, 0.0f);
-        Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, scaleMatrix, 0);
-        model.draw(colors[2], transformMatrix);
+        for (int i = 0; i < OBSTACLE_COUNT; i++) {
+            float time = (SystemClock.uptimeMillis() - creationTimes[i]) / (float) MS_ANIMATION_TIME;
+            if (time > 0.0f) {
+                float offset = getOffset(time);
+                Matrix.setIdentityM(scaleMatrix, 0);
+                Matrix.scaleM(scaleMatrix, 0, offset, offset * ratio, 1.0f);
+                Matrix.setIdentityM(translateMatrix, 0);
+                Matrix.translateM(translateMatrix, 0,
+                        offset * cachedCos[i], offset * cachedSin[i] * ratio, 0.0f);
+                Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, scaleMatrix, 0);
+                model.draw(color_model[i], transformMatrix);
+            }
+        }
     }
 
-    private float[] randomColor() {
-        float color[] = new float[4];
-        for (int i = 0; i < color.length; i++)
+    /**
+     * Generate a new color and put it into given array.
+     *
+     * @param color
+     */
+    private void randomColor(float[] color) {
+        for (int i = 0; i < 3; i++)
             color[i] = rng.nextFloat();
-        return color;
+        color[3] = 1.0f;
     }
 
     @Override
     public float getOffset(float time) {
-        return time * time * time;
+        return (time * time * time) * 2f;
     }
 }

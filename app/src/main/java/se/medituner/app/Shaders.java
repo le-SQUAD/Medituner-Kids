@@ -43,43 +43,50 @@ public class Shaders {
             "}";
 
     static final String BACKGROUND_FRAGMENT =
-            "precision mediump float;" +
-            "uniform vec4 vColor_Outer;" +
-            "uniform vec4 vColor_Inner;" +
-            "uniform float fOffset;" +
-            "uniform float fRatio;" +
+        "precision mediump float;" +
 
-            "varying vec2 texUV;" +
+        // Colors of the inner, outer and strip loops
+        "uniform vec4 vColor_Outer;" +
+        "uniform vec4 vColor_Strip;" +
+        "uniform vec4 vColor_Inner;" +
+        // We expect a 0 to 1 linear time for the illusion to work.
+        "uniform float fTime;" +
+        "uniform float fRatio;" +
 
-            /*
-            "float pingPong(float x) {" +
-                "x = mod(x, 2.0);" +
-                "if (x > 1.0) {" +
-                    "return 2.0 - x;" +
-                "} else {" +
-                    "return x;" +
-                "}" +
-            "}" +
-            */
+        "varying vec2 texUV;" +
 
-            "const float PI = 3.1415926535897932384626433832795;" +
-            "const float PI_32 = 0.09817477042;" +
+        //"const float PI = 3.1415926535897932384626433832795;" +
+        "const float PIx2 = 6.28318530718;" +
 
-            "float mixValue(float x) {" +
-                //"return (1.0 + sin(PI / (radius + PI_32)) / 2.0;" +
-                "return (1.0 + sin(PI / (fOffset * PI_32 - (x + PI_32)))) / 2.0;" +
-            "}" +
+        // Create an offset from given value
+        "float offset(float x) {" +
+            "return 1.0 / x;" +
+        "}" +
 
-            "void main() {" +
-                "vec2 pos = (texUV - vec2(0.5, 0.5)) * vec2(2.0, 2.0 / fRatio);" +
-                "float radius = (pos.x * pos.x + pos.y * pos.y);" + // " - fOffset;" +
-                //"radius = radius * radius;" +
+        // Shift a -1 to 1 ranged value to 0 to 1 ranged one.
+        "float shift(float x) {" +
+            "return (1.0 + x) / 2.0;" +
+        "}" +
 
-                "gl_FragColor = mix(vColor_Inner, vColor_Outer, mixValue(radius));" +
+        // The strip mixing value function
+        "float mixFunc(float x) {" +
+            "return sin(offset(x) + fTime * PIx2);" +
+        "}" +
 
-            //    "gl_FragColor = vec4(radius - fOffset, 0, 0, 1);" +
-            //    "gl_FragColor = mix(vColor_Inner, vColor_Outer, pingPong(radius));" +
-            "}";
+        "vec4 color(float radius) {" +
+            "return mix(" +
+                "mix(vColor_Inner, vColor_Outer, radius)," +
+                "vColor_Strip," +
+                "shift(mixFunc(radius))" +
+            ");" +
+        "}" +
+
+        "void main() {" +
+            "vec2 pos = (texUV - 0.5) * vec2(2.0, 2.0 / fRatio);" +
+            "float radius = (pos.x * pos.x + pos.y * pos.y);" +
+
+            "gl_FragColor = color(radius);" +
+        "}";
 
     public static int loadShader(int type, String shaderCode) {
         int shader = GLES20.glCreateShader(type);
