@@ -6,7 +6,7 @@ import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
 public class GameSurfaceView extends GLSurfaceView{
-    private GameRenderer renderer;
+    private Scene scene;
 
     private int maxX;
     private int halfX;
@@ -16,10 +16,10 @@ public class GameSurfaceView extends GLSurfaceView{
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
-        renderer = new GameRenderer();
+        scene = new Scene(context);
 
         // Set the Renderer for drawing on the GLSurfaceView
-        setRenderer(renderer);
+        setRenderer(scene);
 
         maxX = Resources.getSystem().getDisplayMetrics().widthPixels;
         System.out.println("MAX X: " + maxX);
@@ -38,10 +38,10 @@ public class GameSurfaceView extends GLSurfaceView{
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if(x >= halfX){
-                    renderer.flipRight();
+                    scene.flipRight();
                 }
                 else{
-                    renderer.flipLeft();
+                    scene.flipLeft();
                 }
                 requestRender();
         }

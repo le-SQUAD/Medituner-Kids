@@ -5,15 +5,13 @@ import android.os.Bundle;
 
 public class GameScreen extends AppCompatActivity {
 
-    GameSurfaceView glSurfaceView;
+    GameSurfaceView gameSurfaceView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        glSurfaceView = new GameSurfaceView(this);
-
-        setContentView(glSurfaceView);
-        //glSurfaceView.requestRender();
+        gameSurfaceView = new GameSurfaceView(this);
+        setContentView(gameSurfaceView);
     }
 }
