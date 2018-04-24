@@ -113,10 +113,10 @@ public class MojoScreen extends AppCompatActivity {
         grinningBounceMojo = (ImageView) findViewById(R.id.grinningBounceMojo);
         frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
 
-        smilingBounceMojo.bringToFront();
         smilingWaveMojo.bringToFront();
         frowningMojo.bringToFront();
         grinningBounceMojo.bringToFront();
+        smilingBounceMojo.bringToFront();
 
         // Set up schedule
         initializeSchedule();
