@@ -33,6 +33,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private static final float MOJO_Y_OFFSET = -0.75f;
     private float angle = -0.896055385f * 180.0f;
 
+    private static final float MOJO_FLOAT_MAX_DISTANCE = 0.1f;
+
     private int hTextureMojo;
 
     private static final long MS_ANIMATION_TIME = 2000l;
@@ -46,6 +48,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     private static final float MOJO_SCALE = 0.6f;
+
+    private static final float TAU = (float) Math.PI * 2.0f;
 
     /*
     { 0.37647058823f, 0.0431372549f, 0.0156862745f, 1.0f }
@@ -147,17 +151,22 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             }
         }
 
-        Matrix.setIdentityM(scaleMatrix, 0);
-        Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
+        {
+            float time = SystemClock.uptimeMillis() % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME;
+            Matrix.setIdentityM(scaleMatrix, 0);
+            Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
 
-        Matrix.setIdentityM(translateMatrix, 0);
-        Matrix.translateM(translateMatrix, 0, flipFactor, MOJO_Y_OFFSET, 0.0f);
+            Matrix.setIdentityM(translateMatrix, 0);
+            float mojoX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+            float mojoY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+            Matrix.translateM(translateMatrix, 0, flipFactor + mojoX, MOJO_Y_OFFSET + mojoY, 0.0f);
 
-        Matrix.setRotateM(rotationMatrix, 0, angle, 0.0f, 0.0f, 1.0f);
+            Matrix.setRotateM(rotationMatrix, 0, angle, 0.0f, 0.0f, 1.0f);
 
-        Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotationMatrix, 0);
-        Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
-        model.draw(COLOR_DEFAULT, transformMatrix, hTextureMojo);
+            Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotationMatrix, 0);
+            Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
+            model.draw(COLOR_DEFAULT, transformMatrix, hTextureMojo);
+        }
     }
 
     public void flipRight() {
