@@ -3,6 +3,7 @@ package se.medituner.app;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -114,10 +115,10 @@ public class MojoScreen extends AppCompatActivity {
         grinningBounceMojo = (ImageView) findViewById(R.id.grinningBounceMojo);
         frowningMojo = (ImageView) findViewById(R.id.frowningMojo);
 
-        smilingBounceMojo.bringToFront();
         smilingWaveMojo.bringToFront();
         frowningMojo.bringToFront();
         grinningBounceMojo.bringToFront();
+        smilingBounceMojo.bringToFront();
 
         // Set up schedule
         initializeSchedule();
@@ -209,6 +210,18 @@ public class MojoScreen extends AppCompatActivity {
         }
         schedule.connectStreak(streak);
         checkMedication();
+    }
+
+    /**
+     * Called when 'play' button is pressed.
+     *
+     * Switches to the game activity.
+     *
+     * @param view Android button view that was pressed.
+     */
+    public void onButtonPlay(View view) {
+        Intent intent = new Intent(this, GameScreen.class);
+        startActivity(intent);
     }
 
     /**
