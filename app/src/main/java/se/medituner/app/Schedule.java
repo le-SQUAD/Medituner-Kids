@@ -120,6 +120,7 @@ public class Schedule implements Serializable {
         Calendar comparison = time.now();
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);
+        comparison.set(Calendar.MILLISECOND, 0);
 
         comparison.set(Calendar.HOUR_OF_DAY, 5);
         if (now.getTime().before(comparison.getTime())) {
@@ -180,6 +181,7 @@ public class Schedule implements Serializable {
         Calendar comparison = time.now();
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);
+        comparison.set(Calendar.MILLISECOND, 0);
 
         comparison.set(Calendar.HOUR_OF_DAY, 5);
         if (now.getTime().before(comparison.getTime())) {

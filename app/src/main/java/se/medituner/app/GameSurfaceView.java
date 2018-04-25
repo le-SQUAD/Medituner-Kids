@@ -1,6 +1,7 @@
 package se.medituner.app;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -8,18 +9,24 @@ import android.view.MotionEvent;
 import java.util.jar.Attributes;
 
 public class GameSurfaceView extends GLSurfaceView{
-    private GameRenderer renderer;
+    private Scene scene;
 
+    private int maxX;
+    private int halfX;
     public GameSurfaceView(Context context) {
         super(context);
 
         init(context);
     }
+        scene = new Scene(context);
 
-    public GameSurfaceView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        // Set the Renderer for drawing on the GLSurfaceView
+        setRenderer(scene);
 
-        init(context);
+        maxX = Resources.getSystem().getDisplayMetrics().widthPixels;
+        System.out.println("MAX X: " + maxX);
+        halfX = maxX / 2;
+
     }
 
    /* public GameSurfaceView(Context context, AttributeSet attrs, int defStyle){
@@ -44,14 +51,18 @@ public class GameSurfaceView extends GLSurfaceView{
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.
 
-        System.out.println(e);
+        int x = (int)e.getRawX();
+
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
-
-                renderer.flip();
+                if(x >= halfX){
+                    scene.flipRight();
+                }
+                else{
+                    scene.flipLeft();
+                }
                 requestRender();
         }
-
         return true;
     }
 
