@@ -105,7 +105,7 @@ public class Shaders {
 
         "void main() {" +
             "vec2 pos = (texUV - 0.5) * vec2(2.0 * fRatio, 2.0);" +
-            "float radius = (pos.x * pos.x + pos.y * pos.y);" +
+            "float radius = distance(vec2(0.0, 0.0), pos);" +
 
             "gl_FragColor = vec4(color(radius), 1);" +
         "}";
