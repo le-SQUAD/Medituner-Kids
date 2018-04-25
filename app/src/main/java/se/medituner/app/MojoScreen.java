@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.text.BreakIterator;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,6 +32,7 @@ public class MojoScreen extends AppCompatActivity {
     public static final int MS_REWARD_STREAK_HIDE_DURATION = 1200;  // Duration of the streak popup disappearing animation
     public static final int MS_REWARD_STREAK_HIDE_DELAY = 1800;     // Delay between the streak popup appearing and disappearing.
     public static final int MS_REWARD_STREAK_SHOW_DELAY = 800;      // A delay before the streak increasing and the reward popup appearing. Should not be 0 for technical reasons
+
 
     public static final String SCHEDULE_FILENAME = "schedule";
     public static final String STREAK_FILENAME= "streak";
@@ -498,4 +500,11 @@ public class MojoScreen extends AppCompatActivity {
             }, MS_REWARD_STREAK_SHOW_DELAY);
         }
     }
+
+
+
+
+
+
+
 }
