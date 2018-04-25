@@ -38,7 +38,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     // Shader program handle.
     private int hShapeProgram;
     private int hBackgroundProgram;
-
+    //TEST
+    private int mProgram;
+    private Obstacle mObstacle;
     // Stored array to avoid creating additional variables
     private long times[];
 
@@ -86,6 +88,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         GLES20.glUseProgram(hShapeProgram);
 
         exampleShape = Shape.generateQuad(hShapeProgram);
+        // TEST
+        mObstacle = new Obstacle();
 
         hBackgroundProgram = GLES20.glCreateProgram();
         GLES20.glAttachShader(hBackgroundProgram, Shaders.loadShader(GLES20.GL_VERTEX_SHADER, Shaders.BACKGROUND_VERTEX));
@@ -124,9 +128,13 @@ public class GameRenderer implements GLSurfaceView.Renderer {
      */
     @Override
     public void onDrawFrame(GL10 gl) {
-        Background background = Background.getInstance(hBackgroundProgram);
+        //GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        //Background background = Background.getInstance(hBackgroundProgram);
         GLES20.glUseProgram(hBackgroundProgram);
         float time = SystemClock.uptimeMillis() % MS_ANIMATION_PERIOD / (float) MS_ANIMATION_PERIOD;
-        background.draw(colors[0], colors[5], time);
+        //background.draw(colors[0], colors[5], time);
+        // TEST
+        //Obstacle mObstacle = Obstacle.getInstance();
+        mObstacle.draw();
     }
 }
