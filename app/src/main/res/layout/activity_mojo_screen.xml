@@ -41,7 +41,7 @@
         app:layout_constraintVertical_bias="0.49" />
 
     <ImageView
-        android:id="@+id/smilingBounceMojo"
+        android:id="@+id/mojoImageView"
         android:layout_width="278dp"
         android:layout_height="282dp"
         android:layout_marginTop="256dp"

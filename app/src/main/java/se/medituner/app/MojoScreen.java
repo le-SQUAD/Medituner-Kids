@@ -45,7 +45,7 @@ public class MojoScreen extends AppCompatActivity {
     private boolean grinWaveAnimationPlayed = false;
     private AnimationDrawable waveAnimation;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
-    private ImageView smilingBounceMojo, smilingWaveMojo, frowningMojo, grinningBounceMojo, questionImageView;
+    private ImageView mojoImageView, questionImageView;
     private View streakPopupView;
     private Persistence persistence;
     private Timer scheduler = new Timer(true);
@@ -111,10 +111,10 @@ public class MojoScreen extends AppCompatActivity {
         // Set up animations
         accelerateInterpolator = new AccelerateInterpolator();
         bounceInterpolator = new BounceInterpolator();
-        smilingBounceMojo = (ImageView) findViewById(R.id.smilingBounceMojo);
+        mojoImageView = (ImageView) findViewById(R.id.mojoImageView);
 
-        smilingBounceMojo.setImageResource(R.drawable.smiling1);
-        smilingBounceMojo.bringToFront();
+        mojoImageView.setImageResource(R.drawable.smiling1);
+        mojoImageView.bringToFront();
 
         // Set up schedule
         initializeSchedule();
@@ -295,25 +295,25 @@ public class MojoScreen extends AppCompatActivity {
 
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
 
-        smilingBounceMojo.setVisibility(View.VISIBLE);
+        mojoImageView.setVisibility(View.VISIBLE);
 
-        smilingBounceMojo.setImageResource(R.drawable.grinning1);
+        mojoImageView.setImageResource(R.drawable.grinning1);
 
-        ViewPropertyAnimator viewPropertyAnimator = smilingBounceMojo.animate()
+        ViewPropertyAnimator viewPropertyAnimator = mojoImageView.animate()
                 .translationY(-500).setInterpolator(accelerateInterpolator).setDuration(500).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         //Mojo falls and bounces
-                        smilingBounceMojo.animate()
+                        mojoImageView.animate()
                                 .translationY(0)
                                 .setInterpolator(bounceInterpolator).setDuration(1000).setListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
 
-                                smilingBounceMojo.setBackgroundResource(R.drawable.arm_animation_grinning);
-                                smilingBounceMojo.setImageResource(android.R.color.transparent);
+                                mojoImageView.setBackgroundResource(R.drawable.arm_animation_grinning);
+                                mojoImageView.setImageResource(android.R.color.transparent);
                                 // Get the background, which has been compiled to an AnimationDrawable object.
-                                waveAnimation = (AnimationDrawable) smilingBounceMojo.getBackground();
+                                waveAnimation = (AnimationDrawable) mojoImageView.getBackground();
 
                                 if (grinWaveAnimationPlayed) {
                                     waveAnimation.stop();
@@ -357,23 +357,22 @@ public class MojoScreen extends AppCompatActivity {
         // Hide the popup
         questionPopup.dismissPopupWindow();
 
-        smilingBounceMojo.setImageResource(R.drawable.smiling1);
-        smilingBounceMojo.setImageResource(R.drawable.smiling1);
-        ViewPropertyAnimator viewPropertyAnimator = smilingBounceMojo.animate()
+        mojoImageView.setImageResource(R.drawable.smiling1);
+        ViewPropertyAnimator viewPropertyAnimator = mojoImageView.animate()
                 .translationY(-500).setInterpolator(accelerateInterpolator).setDuration(500).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         //Mojo falls and bounces
-                        smilingBounceMojo.animate()
+                        mojoImageView.animate()
                                 .translationY(0)
                                 .setInterpolator(bounceInterpolator).setDuration(1000).setListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
 
-                                smilingBounceMojo.setBackgroundResource(R.drawable.arm_animation);
-                                smilingBounceMojo.setImageResource(android.R.color.transparent);
+                                mojoImageView.setBackgroundResource(R.drawable.arm_animation);
+                                mojoImageView.setImageResource(android.R.color.transparent);
                                 // Get the background, which has been compiled to an AnimationDrawable object.
-                                waveAnimation = (AnimationDrawable) smilingBounceMojo.getBackground();
+                                waveAnimation = (AnimationDrawable) mojoImageView.getBackground();
 
                                 if (smileWaveAnimationPlayed) {
                                     waveAnimation.stop();
@@ -415,9 +414,9 @@ public class MojoScreen extends AppCompatActivity {
         // Hide the popup
         questionPopup.dismissPopupWindow();
 
-        smilingBounceMojo.setBackgroundResource(R.drawable.frown_animation);
-        smilingBounceMojo.setImageResource(android.R.color.transparent);
-        AnimationDrawable frownAnimation = (AnimationDrawable) smilingBounceMojo.getBackground();
+        mojoImageView.setBackgroundResource(R.drawable.frown_animation);
+        mojoImageView.setImageResource(android.R.color.transparent);
+        AnimationDrawable frownAnimation = (AnimationDrawable) mojoImageView.getBackground();
 
         if (frownAnimationPlayed) {
             frownAnimation.stop();
