@@ -1,4 +1,4 @@
-package se.medituner.app;
+package se.medituner.app.game;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

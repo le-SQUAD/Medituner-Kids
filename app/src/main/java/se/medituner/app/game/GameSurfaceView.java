@@ -1,4 +1,4 @@
-package se.medituner.app;
+package se.medituner.app.game;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -38,10 +38,10 @@ public class GameSurfaceView extends GLSurfaceView{
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if(x >= halfX){
-                    scene.flipRight();
+                    scene.flipMojoRight();
                 }
                 else{
-                    scene.flipLeft();
+                    scene.flipMojoLeft();
                 }
                 requestRender();
         }

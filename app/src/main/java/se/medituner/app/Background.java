@@ -7,6 +7,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import se.medituner.app.game.Shaders;
+
 public class Background {
 
     private static Background instance = null;

@@ -1,4 +1,4 @@
-package se.medituner.app;
+package se.medituner.app.game;
 
 import android.opengl.GLES20;
 
