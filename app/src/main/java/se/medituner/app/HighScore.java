@@ -20,7 +20,7 @@ public class HighScore extends Activity{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.highscore_view);
-        text = findViewById(R.id.textView2);
+        text = findViewById(R.id.currentScoreId);
         text.bringToFront();
 
         timer = new Timer();

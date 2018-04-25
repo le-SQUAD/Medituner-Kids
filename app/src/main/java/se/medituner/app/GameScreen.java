@@ -9,23 +9,30 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class GameScreen extends AppCompatActivity {
-    TextView text;
+    TextView currentScore;
+    TextView highScore;
     int score;
+    int hiScore = 0;
+
     Timer timer;
     GameSurfaceView glSurfaceView;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    //Do the while loop as long as the game is on, when game over check if hiScore should update
+   //while(game != over){
+        @Override
+        protected void onCreate (Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
         glSurfaceView = new GameSurfaceView(this);
 
         setContentView(R.layout.highscore_view);
 
-        //Set the placeholder for high score in front
+        //Set the hiScore and currentScore in front
         glSurfaceView = findViewById(R.id.glSurfaceViewID);
-        text = findViewById(R.id.textView2);
-        text.bringToFront();
+        highScore = findViewById(R.id.hiScoreId);
+        highScore.bringToFront();
+        currentScore = findViewById(R.id.currentScoreId);
+        currentScore.bringToFront();
 
         /*
         Adds to the score by one each 0.5 second
@@ -39,24 +46,35 @@ public class GameScreen extends AppCompatActivity {
             public void run() {
                 timerMethod();
             }
-            }, 500, 500);
-        }
+        }, 500, 500);
+    }
 
-        private void timerMethod(){
+        private void timerMethod () {
         this.runOnUiThread(timer_tick);
-        }
+    }
         private Runnable timer_tick = new Runnable() {
             @Override
             public void run() {
-                text.setText("score: " + score);
+                currentScore.setText("score: " + score);
                 score++;
-                }
+            }
         };
+    //}
+    //call function getHiScore when game is over:
+    getHiScore(score);
 
     /*
     Get the score to be able to save it to the high score list
      */
-    public int getScore() {
-        return score;
+    public void getHiScore(int score) {
+        if(score > hiScore){
+            highScore.setText("hiScore: " + score);
+            hiScore = score;
+        }else{
+            highScore.setText("hiScore: " + hiScore);
+        }
+
     }
+
+
 }
