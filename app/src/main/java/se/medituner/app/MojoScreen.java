@@ -218,7 +218,7 @@ public class MojoScreen extends AppCompatActivity {
      * @param view Android button view that was pressed.
      */
     public void onButtonPlay(View view) {
-        Intent intent = new Intent(this, GameScreen.class);
+        Intent intent = new Intent(this, OpenGLES20Activity.class);
         startActivity(intent);
     }
 
