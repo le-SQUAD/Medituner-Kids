@@ -8,7 +8,7 @@ import android.widget.TextView;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public abstract class GameScreen extends AppCompatActivity {
+public class GameScreen extends AppCompatActivity {
     TextView currentScore;
     TextView highScore;
     int score;
@@ -19,8 +19,8 @@ public abstract class GameScreen extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    //Do the while loop as long as the game is on, when game over check if hiScore should update
-    //while(game != over){
+        //Do the while loop as long as the game is on, when game over check if hiScore should update
+        //while (game != over){
         super.onCreate(savedInstanceState);
 
         glSurfaceView = new GameSurfaceView(this);
@@ -47,11 +47,11 @@ public abstract class GameScreen extends AppCompatActivity {
                 timerMethod();
             }
         }, 500, 500);
-
+        //}
         //while loop ends
-
         getHiScore(score);
     }
+
 
     private void timerMethod() {
         this.runOnUiThread(timer_tick);
