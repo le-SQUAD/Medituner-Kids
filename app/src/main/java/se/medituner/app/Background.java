@@ -34,7 +34,7 @@ public class Background {
     // Handlers to program and position offsets for the background shader.
     private int hProgram, hPosition, hUV;
     // Handlers to color offsets for the background shader.
-    private int hColorInner, hColorStrip, hColorOuter;
+    private int hColors[];
     // Handlers to time and screen ratio offsets for the background shader.
     private int hTime, hRatio;
     private float ratio;
@@ -72,9 +72,11 @@ public class Background {
         hProgram = programHandle;
         hPosition = GLES20.glGetAttribLocation(hProgram, Shaders.POSITION_NAME);
         hUV = GLES20.glGetAttribLocation(hProgram, Shaders.UV_NAME);
-        hColorInner = GLES20.glGetUniformLocation(hProgram, "vColor_Inner");
-        hColorStrip = GLES20.glGetUniformLocation(hProgram, "vColor_Strip");
-        hColorOuter = GLES20.glGetUniformLocation(hProgram, "vColor_Outer");
+        hColors = new int[4];
+        hColors[0] = GLES20.glGetUniformLocation(hProgram, "vColor0");
+        hColors[1] = GLES20.glGetUniformLocation(hProgram, "vColor1");
+        hColors[2] = GLES20.glGetUniformLocation(hProgram, "vColor2");
+        hColors[3] = GLES20.glGetUniformLocation(hProgram, "vColor3");
         hTime = GLES20.glGetUniformLocation(hProgram, "fTime");
         hRatio = GLES20.glGetUniformLocation(hProgram, "fRatio");
     }
@@ -97,7 +99,7 @@ public class Background {
      * @param outerColor    The color on the outside (towards the edges of the screen).
      * @param time          Linear increasing time for the animation, between 0 and 1.
      */
-    public void draw(float[] innerColor, float[] stripColor, float[] outerColor, float time) {
+    public void draw(float[][] colors, float time) {
         // Set the next vertex-array appointment to the 'position' offset in the shader.
         GLES20.glEnableVertexAttribArray(hPosition);
         GLES20.glEnableVertexAttribArray(hUV);
@@ -112,9 +114,8 @@ public class Background {
                 VERTEX_STRIDE, uvBuffer);
 
 
-        GLES20.glUniform4fv(hColorInner, 1, innerColor, 0);
-        GLES20.glUniform4fv(hColorStrip, 1, stripColor, 0);
-        GLES20.glUniform4fv(hColorOuter, 1, outerColor, 0);
+        for (int i = 0; i < hColors.length; i++)
+            GLES20.glUniform3fv(hColors[i], 1, colors[i], 0);
         GLES20.glUniform1f(hRatio, ratio);
         GLES20.glUniform1f(hTime, time);
 
