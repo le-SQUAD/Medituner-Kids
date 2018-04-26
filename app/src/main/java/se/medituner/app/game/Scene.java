@@ -32,24 +32,29 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private Quad model;
 
     private static final long MS_ANIMATION_TIME = 2000l;
+    private static final long MS_MOJO_HIT_COOLDOWN = 140l;
+
+    private static final float LOWEST_COLOR = 0.75f;
+
+    private static final float COLORS_BACKGROUND[][] = {
+            { 0.5f, 0.0431372549f, 0.0431372549f },
+            { 0.73725490196f, 0.34117647058f, 0.34117647058f },
+            { 0.65098039215f, 0.19215686274f, 0.19215686274f },
+            { 0.85098039215f, 0.5f, 0.5f }
+    };
+    private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    private static final float TAU = (float) Math.PI * 2.0f;
+    private static final short OBSTACLE_COUNT = 4;
+    private static final Lane LANES[] = Lane.values();
 
     // Mojo related variables.
     private static final float MOJO_SCALE = 0.6f;
     private static final float MOJO_FLOAT_MAX_DISTANCE = 0.1f;
-    private static final float MOJO_OFFSET = 0.75f;
+    private static final float MOJO_OFFSET = 0.7f;
     private Lane mojoLane = Lane.LANE_LEFT;
     private float mojoX, mojoY;
-
-    private static final float COLORS_BACKGROUND[][] = {
-        { 0.5f, 0.0431372549f, 0.0431372549f },
-        { 0.73725490196f, 0.34117647058f, 0.34117647058f },
-        { 0.65098039215f, 0.19215686274f, 0.19215686274f },
-        { 0.85098039215f, 0.5f, 0.5f }
-    };
-    private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    private static final float TAU = (float) Math.PI * 2.0f;
-    private static final short OBSTACLE_COUNT = 5;
-    private static final Lane LANES[] = Lane.values();
+    private float mojoColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    private long lastMojoHit = -200;
 
     private static long obstacleBreak;
 
@@ -184,6 +189,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
                         lane);
             } else if (now > obstacles[i].creationTime) {
                 float offset = getOffset((now - obstacles[i].creationTime) / (float) MS_ANIMATION_TIME);
+                checkCollision(offset, obstacles[i].lane, now);
                 obstacles[i].draw(offset);
             }
         }
@@ -202,7 +208,11 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotateMatrix, 0);
         Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
 
-        model.draw(COLOR_DEFAULT, transformMatrix, hTextureMojo);
+        mojoColor[0] = mojoColor[1] = mojoColor[2] =
+                clampHit((now - lastMojoHit) / (float) MS_MOJO_HIT_COOLDOWN)
+                        * (1.0f - LOWEST_COLOR) + LOWEST_COLOR;
+
+        model.draw(mojoColor, transformMatrix, hTextureMojo);
     }
 
     /**
@@ -248,6 +258,14 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         }
     }
 
+    private float clampHit(float x) {
+        if (x < 0.0f)
+            return 0.0f;
+        else if (x > 1.0f)
+            return 1.0f;
+        else
+            return x;
+    }
 
     private void updateMojo() {
         mojoAngle = getLaneAngle(mojoLane);
@@ -272,6 +290,14 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     private float getRandomAngleOffset() {
         return (rng.nextFloat() - 0.5f) / 3.5f;
+    }
+
+    private void checkCollision(float offset, Lane lane, long moment) {
+        if (lane == mojoLane) {
+            if (offset >= 0.65f && offset <= 0.9f) {
+                lastMojoHit = moment;
+            }
+        }
     }
 
     /**
