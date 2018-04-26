@@ -1,4 +1,4 @@
-package se.medituner.app;
+package se.medituner.app.game;
 
 /**
  * The scene interface that houses methods used by the background and drawable objects.

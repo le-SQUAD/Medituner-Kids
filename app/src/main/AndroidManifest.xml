@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GameScreen"
+            android:name=".game.GameScreen"
             android:screenOrientation="portrait">
         </activity>
     </application>

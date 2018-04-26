@@ -1,4 +1,4 @@
-package se.medituner.app;
+package se.medituner.app.game;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,8 +14,14 @@ import java.util.Random;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import se.medituner.app.Background;
+import se.medituner.app.R;
+
 /**
  * The scene which encompasses background and drawable objects.
+ * Houses some game logic.
+ *
+ * @author Grigory Glukhov
  */
 public class Scene implements IScene, GLSurfaceView.Renderer {
 
@@ -25,19 +31,14 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private Background background;
     private Quad model;
 
-    // Handles to shaders.
-    private int hQuadProgram;
-    private int hBackgroundProgram;
-
-    private float flipFactor = 0.6f;
-    private static final float MOJO_Y_OFFSET = -0.75f;
-    private float angle = -0.896055385f * 180.0f;
-
-    private static final float MOJO_FLOAT_MAX_DISTANCE = 0.1f;
-
-    private int hTextureMojo;
-
     private static final long MS_ANIMATION_TIME = 2000l;
+
+    // Mojo related variables.
+    private static final float MOJO_SCALE = 0.6f;
+    private static final float MOJO_FLOAT_MAX_DISTANCE = 0.1f;
+    private static final float MOJO_Y_OFFSET = -0.75f;
+    private float flipFactor = 0.6f;
+    private float angle = -0.896055385f * 180.0f;
 
     private static final float COLORS_BACKGROUND[][] = {
         { 0.5f, 0.0431372549f, 0.0431372549f },
@@ -47,32 +48,53 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     };
     private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-    private static final float MOJO_SCALE = 0.6f;
 
     private static final float TAU = (float) Math.PI * 2.0f;
 
-    /*
-    { 0.37647058823f, 0.0431372549f, 0.0156862745f, 1.0f }
-    { 0.4431372549f, 0.04705882352f, 0.0156862745f, 1.0f };
-    { 0.98823529411f, 0.29803921568f, 0.30588235294f, 1.0f };
-    { 0.6f, 0.05882352941f, 0.00784313725f, 1.0f };
-    */
     private static final short OBSTACLE_COUNT = 0;
+
+    // Handles to shaders.
+    private int hQuadProgram;
+    private int hBackgroundProgram;
+
+    // Handlers to textuers
+    private int hTextureMojo;
+
+    // Screen (surface view) width-to-height ratio
+    private float ratio;
+
+    // Pre-allocated arrays for matricies.
+    private float scaleMatrix[] = new float[16], translateMatrix[] = new float[16];
+    private float rotationMatrix[] = new float[16], transformMatrix[] = new float[16];
+
+    // RNG used by the scene.
+    private Random rng;
+
+    // Temporary variables that should be changed later.
     private float color_model[][];
     private double lastAngle = 0.0;
     private double rotationRate = -0.2;
     private long creationTimes[];
     private float lastTime = 2.0f;
-    private float ratio;
     private float cachedSin[], cachedCos[];
-    private float scaleMatrix[] = new float[16], translateMatrix[] = new float[16];
-    private float rotationMatrix[] = new float[16], transformMatrix[] = new float[16];
-    private Random rng;
 
+    /**
+     * Create a new scene with given app context.
+     *
+     * The context will be used to get textures for Mojo and obstacles.
+     *
+     * @param context App context to be used for loading textures.
+     */
     public Scene(Context context) {
         this.context = context;
     }
 
+    /**
+     * Called once when the surface is created, most of the one-time initialization happens here.
+     *
+     * @param gl        unused
+     * @param config    unused
+     */
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         // Compile shaders
@@ -110,6 +132,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         }
     }
 
+    /**
+     * Called after the creation of the surface and every time its dimensions change.
+     *
+     * @param gl        unused
+     * @param width     The new width of the surface.
+     * @param height    The new height of the surface.
+     */
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
@@ -117,6 +146,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         ratio = width / (float) height;
     }
 
+    /**
+     * Called when the frame should be drawn.
+     * This is the core function for drawing a frame.
+     *
+     * @param gl    unused
+     * @author Grigory Glukhov, Aleksandra Soltan
+     */
     @Override
     public void onDrawFrame(GL10 gl) {
         for (int i = 0; i < OBSTACLE_COUNT; i++) {
@@ -169,14 +205,24 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         }
     }
 
-    public void flipRight() {
+    /**
+     * Flip Mojo to the right side of the screen.
+     *
+     * @author Aleksandra Soltan
+     */
+    public void flipMojoRight() {
         if (flipFactor < 0.0f) {
             flipFactor = -flipFactor;
             angle = -angle;
         }
     }
 
-    public void flipLeft() {
+    /**
+     * Flip Mojo to the left side of the screen.
+     *
+     * @author Aleksandra Soltan
+     */
+    public void flipMojoLeft() {
         if (flipFactor > 0.0f) {
             flipFactor = -flipFactor;
             angle = -angle;
@@ -202,9 +248,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     /**
      * Load an android resource as a texture.
      *
-     * @param context
-     * @param resourceId
-     * @return
+     * @param context       The app context to be used for loading the resource.
+     * @param resourceId    The resource id of the texture to be loaded.
+     * @return The handle to the loaded texture.
      */
     public static int loadTexture(final Context context, final int resourceId) {
 

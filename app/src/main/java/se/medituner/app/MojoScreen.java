@@ -16,10 +16,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.text.BreakIterator;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import se.medituner.app.game.GameScreen;
 
 import static android.view.Gravity.CENTER;
 

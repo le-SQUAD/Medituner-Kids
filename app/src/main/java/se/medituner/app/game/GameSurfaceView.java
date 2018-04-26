@@ -1,23 +1,41 @@
-package se.medituner.app;
+package se.medituner.app.game;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.opengl.GLSurfaceView;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import java.util.jar.Attributes;
-
+/**
+ * Custom GLSurfaceView that processes touch inputs and supplies correct calls to the underlying Scene.
+ *
+ * @author Aleksandra Soltan
+ */
 public class GameSurfaceView extends GLSurfaceView{
     private Scene scene;
 
     private int maxX;
     private int halfX;
+
+    /**
+     * Create a new GameSurfaceView with provided context that will be used to gather information about
+     * device size.
+     *
+     * Also creates the underlying scene and sets it up for rendering.
+     *
+     * @param context
+     * @author Aleksandra Soltan
+     */
     public GameSurfaceView(Context context) {
         super(context);
 
+<<<<<<< HEAD:app/src/main/java/se/medituner/app/GameSurfaceView.java
         init(context);
     }
+=======
+        // Create an OpenGL ES 2.0 context
+        setEGLContextClientVersion(2);
+
+>>>>>>> development:app/src/main/java/se/medituner/app/game/GameSurfaceView.java
         scene = new Scene(context);
 
         // Set the Renderer for drawing on the GLSurfaceView
@@ -29,22 +47,12 @@ public class GameSurfaceView extends GLSurfaceView{
 
     }
 
-   /* public GameSurfaceView(Context context, AttributeSet attrs, int defStyle){
-        super(context, attrs, defStyle);
-
-        init(context);
-    }
-    */
-   private void init(Context context){
-       // Create an OpenGL ES 2.0 context
-       setEGLContextClientVersion(2);
-
-       renderer = new GameRenderer();
-
-       // Set the Renderer for drawing on the GLSurfaceView
-       setRenderer(renderer);
-   }
-
+    /**
+     * Process touch event.
+     *
+     * @param e
+     * @return
+     */
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         // MotionEvent reports input details from the touch screen
@@ -56,10 +64,10 @@ public class GameSurfaceView extends GLSurfaceView{
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if(x >= halfX){
-                    scene.flipRight();
+                    scene.flipMojoRight();
                 }
                 else{
-                    scene.flipLeft();
+                    scene.flipMojoLeft();
                 }
                 requestRender();
         }

@@ -1,5 +1,7 @@
-package se.medituner.app;
+package se.medituner.app.game;
+import se.medituner.app.*;
 
+import android.annotation.SuppressLint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -9,7 +11,10 @@ import java.util.TimerTask;
 
 //GameScreen view the users current score and hiScore
 public class GameScreen extends AppCompatActivity {
-
+/**
+ * Game screen activity.
+ * @author Agnes Petäjävaara
+ */
     private Persistence persistence;
     public static final String SAVED_SCORE = "savedScore";
     TextView currentScore;
@@ -66,6 +71,7 @@ public class GameScreen extends AppCompatActivity {
         this.runOnUiThread(timer_tick);
     }//@aurhor Agnes
     private Runnable timer_tick = new Runnable() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void run() {
             currentScore.setText("score: " + score);
@@ -75,8 +81,6 @@ public class GameScreen extends AppCompatActivity {
                 getHiScore();
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
     };
@@ -85,7 +89,8 @@ public class GameScreen extends AppCompatActivity {
     check if the current score is higher than hiScore, if so update it!
     @author Agnes
      */
-    public void getHiScore() throws IOException, InterruptedException {
+    @SuppressLint("SetTextI18n")
+    public void getHiScore() throws IOException{
         System.out.println("score: " + score);
         if(score > hiScore){
             hiScore = score;
@@ -100,7 +105,6 @@ public class GameScreen extends AppCompatActivity {
             highScore.setText("hiScore: " + hiScore);
             persistence.saveObject(hiScore, SAVED_SCORE);
         }
-
 
     }
 }
