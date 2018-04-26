@@ -11,7 +11,10 @@ public class Obstacle {
     private float cachedSin, cachedCos;
     private int textureHandle;
 
+    private static final float FADE_OFFSET = 2.5f;
+
     public long creationTime;
+    public Lane lane;
 
     public static float color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     private static float screenRatio;
@@ -30,35 +33,22 @@ public class Obstacle {
         inverseRatio = 1.0f / ratio;
     }
 
-    public void set(float angle, int textureHandle, long creationTime) {
+    public void set(float angle, int textureHandle, long creationTime, Lane lane) {
         cachedCos = (float) Math.cos(angle);
         cachedSin = (float) Math.sin(angle);
         this.textureHandle = textureHandle;
         this.creationTime = creationTime;
+        this.lane = lane;
     }
 
     public void draw(float offset) {
-        /*
-        Matrix.setIdentityM(scaleMatrix, 0);
-        Matrix.scaleM(scaleMatrix, 0,
-                offset, offset * screenRatio, 1.0f);
-
-        Matrix.setIdentityM(translateMatrix, 0);
-        Matrix.translateM(translateMatrix, 0,
-                cachedCos, cachedSin, 0.0f);
-
-        Matrix.multiplyMM(transformMatrix, 0,
-                scaleMatrix, 0,
-                transformMatrix, 0);
-        */
-
         Matrix.setIdentityM(transformMatrix, 0);
         Matrix.translateM(transformMatrix, 0,
                 offset * inverseRatio * cachedCos, offset * inverseRatio * cachedSin, 0.0f);
         Matrix.scaleM(transformMatrix, 0,
                 offset, offset * screenRatio, 1.0f);
 
-        color[3] = 1.5f - offset;
+        color[3] = FADE_OFFSET - (offset * FADE_OFFSET);
         quad.draw(color, transformMatrix, textureHandle);
     }
 }
