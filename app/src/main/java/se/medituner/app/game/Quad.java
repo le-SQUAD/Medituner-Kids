@@ -1,4 +1,4 @@
-package se.medituner.app;
+package se.medituner.app.game;
 
 import android.opengl.GLES20;
 
@@ -10,6 +10,8 @@ import java.nio.ShortBuffer;
 /**
  * A quad (rectangle) drawable object.
  *
+ * A helper utility that handles most of the OpenGL interaction.
+ * @author Grigory Glukhov
  */
 public class Quad {
 
@@ -33,9 +35,9 @@ public class Quad {
     /**
      * Create a drawable shape.
      *
-     * @param programHandle The handle to shader program that will be used by the shape.
-     * @param vertices     Reference vertex array
-     * @param draw_order    Reference draw order index array
+     * @param programHandle The handle to shader program that will be used by the quad.
+     * @param width         The width for the new quad.
+     * @param height        The height for the new quad.
      */
     public Quad(int programHandle, float width, float height) {
         final float halfWidth = width / 2.0f;
@@ -80,9 +82,9 @@ public class Quad {
     /**
      * Draw the shape with provided color and using provided matrix.
      *
-     * @param color     A color of the form { float, float, float, float}
-     * @param matrix    A 4x4 transformation matrix for the shape.
-     * @param textureHandle
+     * @param color         A color of the form { float r, float g, float b, float a}
+     * @param matrix        A 4x4 transformation matrix for the quad.
+     * @param textureHandle A handle for the texture resource to be used for the quad.
      */
     public void draw(float[] color, float[] matrix, int textureHandle) {
         // Set the next vertex-array appointment to the 'position' offset in the shader.

@@ -1,15 +1,30 @@
-package se.medituner.app;
+package se.medituner.app.game;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
+/**
+ * Custom GLSurfaceView that processes touch inputs and supplies correct calls to the underlying Scene.
+ *
+ * @author Aleksandra Soltan
+ */
 public class GameSurfaceView extends GLSurfaceView{
     private Scene scene;
 
     private int maxX;
     private int halfX;
+
+    /**
+     * Create a new GameSurfaceView with provided context that will be used to gather information about
+     * device size.
+     *
+     * Also creates the underlying scene and sets it up for rendering.
+     *
+     * @param context
+     * @author Aleksandra Soltan
+     */
     public GameSurfaceView(Context context) {
         super(context);
 
@@ -27,6 +42,12 @@ public class GameSurfaceView extends GLSurfaceView{
 
     }
 
+    /**
+     * Process touch event.
+     *
+     * @param e
+     * @return
+     */
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         // MotionEvent reports input details from the touch screen
@@ -38,10 +59,10 @@ public class GameSurfaceView extends GLSurfaceView{
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if(x >= halfX){
-                    scene.flipRight();
+                    scene.flipMojoRight();
                 }
                 else{
-                    scene.flipLeft();
+                    scene.flipMojoLeft();
                 }
                 requestRender();
         }

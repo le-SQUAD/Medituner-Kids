@@ -13,7 +13,7 @@ import java.net.URL;
  *  A restful Java client
  *  Returns user specific treatment plan from database
  */
-public class getRequest {
+public class GetRequest {
     public static String getData(){
         String access_token = "pf73ImOQj2Hw0pSu6n3CdnB6p1bpC15ivO9IN-kEqtgLe6pDs6wUrmf0n0A2_EuqR4R47JSiwfa_3YUt2uFWoOFjh7AE0_mFY-lIiGd13VlEs0uRxsxC-6Ydo9r96lkuHdX-D2dRmHZ69GaFGnwfDr_NrTDWaaLhY2otrcgqdjW_9ZYRgiNM0nMjIvl7_zkZdeeSmtI86R2NccD5LtgzV9OANRSOJZOq3KYowhVYVOil_B7_x4fZEimp_iEsCmGmeQINVeMhKT67RknQXs2RcQRvOOduRJT2VNQoGjsdboo_4shXptNbI744h6JoeJS5FbzdPi-lQv1NdPY6BcX76RLUeCnSgg7WNdR4cLw9Te5WrKLmWwWl6wAGAcYgbrPAEqbW1hKHBPHXBIT45A6Vfvh-06_01K52IormiaLt9hzCF5AK4Gj8IGcYxhBuLjfMlIXboLi9Gaf36qcSzN-QVg";
         String API_tPlan = "/api/ver1/treatmentplan/";
