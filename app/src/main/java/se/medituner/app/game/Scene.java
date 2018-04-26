@@ -59,7 +59,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private int hQuadProgram;
     private int hBackgroundProgram;
 
-    // Handlers to textuers
+    // Handlers to textures
     private int hTextureMojo;
     private int hTexturesObstacle[];
 
