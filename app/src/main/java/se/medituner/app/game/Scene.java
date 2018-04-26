@@ -36,9 +36,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     // Mojo related variables.
     private static final float MOJO_SCALE = 0.6f;
     private static final float MOJO_FLOAT_MAX_DISTANCE = 0.1f;
-    private static final float MOJO_Y_OFFSET = -0.75f;
-    private float flipFactor = 0.6f;
-    private float angle = -0.896055385f * 180.0f;
+    private static final float MOJO_OFFSET = 0.75f;
+    private boolean bMojoRight = true;
+    private float mojoX, mojoY;
 
     private static final float COLORS_BACKGROUND[][] = {
         { 0.5f, 0.0431372549f, 0.0431372549f },
@@ -48,10 +48,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     };
     private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-
     private static final float TAU = (float) Math.PI * 2.0f;
 
-    private static final short OBSTACLE_COUNT = 4;
+    private static final short OBSTACLE_COUNT = 8;
 
     private Obstacle obstacles[];
 
@@ -64,11 +63,18 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private int hTexturesObstacle[];
 
     // Screen (surface view) width-to-height ratio
-    private float ratio;
+    private float ratio, invRatio;
 
     // Pre-allocated arrays for matricies.
     private float scaleMatrix[] = new float[16], translateMatrix[] = new float[16];
-    private float rotationMatrix[] = new float[16], transformMatrix[] = new float[16];
+    private float rotateMatrix[] = new float[16], transformMatrix[] = new float[16];
+
+    private float diagonalLength;
+    private float laneAngles[] = {
+            (float) -Math.PI * 1.0f / 4.0f,
+            (float) -Math.PI * 3.0f / 4.0f
+    };
+    private float mojoAngle;
 
     // RNG used by the scene.
     private Random rng;
@@ -116,6 +122,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
         // Load textures
         hTextureMojo = loadTexture(context, R.drawable.mojoinbubble);
+        hTexturesObstacle = new int[2];
+        hTexturesObstacle[0] = loadTexture(context, R.drawable.pollenobstacle);
+        hTexturesObstacle[1] = loadTexture(context, R.drawable.smokeobstacle);
 
         rng = new Random();
 
@@ -136,6 +145,14 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
         background.resize(width, height);
         ratio = width / (float) height;
+        invRatio = (float) height / (float) width;
+        diagonalLength = (float) Math.sqrt(1.0f + invRatio * invRatio);
+
+        // Mojo scaling will remain the same for a given ratio
+        Matrix.setIdentityM(scaleMatrix, 0);
+        Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
+
+        updateMojo();
         Obstacle.setScreenRatio(ratio);
     }
 
@@ -159,7 +176,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         GLES20.glUseProgram(hQuadProgram);
         for (Obstacle obstacle : obstacles) {
             if (now - obstacle.creationTime > MS_ANIMATION_TIME) {
-                obstacle.set((float) (rng.nextFloat() * Math.PI * 2.0), hTextureMojo, now + rng.nextInt((int) MS_ANIMATION_TIME));
+                obstacle.set(laneAngles[rng.nextInt(laneAngles.length)],
+                        hTexturesObstacle[rng.nextInt(hTexturesObstacle.length)],
+                        now + rng.nextInt((int) MS_ANIMATION_TIME));
             } else if (now > obstacle.creationTime) {
                 float offset = getOffset((now - obstacle.creationTime) / (float) MS_ANIMATION_TIME);
                 obstacle.draw(offset);
@@ -168,19 +187,50 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
 
         // Mojo
-        Matrix.setIdentityM(scaleMatrix, 0);
-        Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
-
         Matrix.setIdentityM(translateMatrix, 0);
-        float mojoX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-        float mojoY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-        Matrix.translateM(translateMatrix, 0, flipFactor + mojoX, MOJO_Y_OFFSET + mojoY, 0.0f);
+        float mojoOffsetX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        float mojoOffsetY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        Matrix.translateM(translateMatrix, 0, mojoX + mojoOffsetX, mojoY + mojoOffsetY, 0.0f);
 
-        Matrix.setRotateM(rotationMatrix, 0, angle, 0.0f, 0.0f, 1.0f);
+        setMojoRotationMatrix(rotateMatrix, mojoX + mojoOffsetX, (mojoY + mojoOffsetY) * invRatio);
+        Matrix.rotateM(rotateMatrix, 0,
+                90.0f, 0.0f, 0.0f, 1.0f);
 
-        Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotationMatrix, 0);
+        Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotateMatrix, 0);
         Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
+
         model.draw(COLOR_DEFAULT, transformMatrix, hTextureMojo);
+    }
+
+    /**
+     * Sets up the mojo rotation matrix for him to look at the centre.
+     *
+     * @param matrix
+     */
+    private void setMojoRotationMatrix(float[] matrix, float x, float y) {
+        float dist = (float) Math.sqrt(x * x + y * y);
+        float cos = x / dist;
+        float sin = y / dist;
+
+        matrix[0] = cos;
+        matrix[1] = sin;
+        matrix[2] = 0.0f;
+        matrix[3] = 0.0f;
+
+        matrix[4] = -sin;
+        matrix[5] = cos;
+        matrix[6] = 0.0f;
+        matrix[7] = 0.0f;
+
+        matrix[8] = 0.0f;
+        matrix[9] = 0.0f;
+        matrix[10] = 1.0f;
+        matrix[11] = 0.0f;
+
+        matrix[12] = 0.0f;
+        matrix[13] = 0.0f;
+        matrix[14] = 0.0f;
+        matrix[15] = 1.0f;
     }
 
     /**
@@ -189,9 +239,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @author Aleksandra Soltan
      */
     public void flipMojoRight() {
-        if (flipFactor < 0.0f) {
-            flipFactor = -flipFactor;
-            angle = -angle;
+        if (!bMojoRight) {
+            bMojoRight = true;
+            updateMojo();
         }
     }
 
@@ -201,10 +251,22 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @author Aleksandra Soltan
      */
     public void flipMojoLeft() {
-        if (flipFactor > 0.0f) {
-            flipFactor = -flipFactor;
-            angle = -angle;
+        if (bMojoRight) {
+            bMojoRight = false;
+            updateMojo();
         }
+    }
+
+    private void updateMojo() {
+        if (bMojoRight) {
+            mojoAngle = laneAngles[0];
+        } else {
+            mojoAngle = laneAngles[1];
+        }
+        mojoX = (float) Math.cos(mojoAngle) * MOJO_OFFSET * invRatio;
+        mojoY = (float) Math.sin(mojoAngle) * MOJO_OFFSET * invRatio;
+
+        mojoAngle = (mojoAngle * 180.0f / (float) Math.PI) + 90.0f;
     }
 
     /**
@@ -220,7 +282,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     @Override
     public float getOffset(float time) {
-        return (time * time * time);
+        return ((time * time * time));
     }
 
     /**

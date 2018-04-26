@@ -18,10 +18,10 @@ public class Quad {
     static final int COORDS_PER_VERTEX = 2;
     static final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
     static final float QUAD_UVS[] = {
-        0.0f, 1.0f, // Top left
-        0.0f, 0.0f, // Bottom left
-        1.0f, 0.0f, // Bottom right
-        1.0f, 1.0f  // Top right
+        0.0f, 0.0f, // Top left
+        0.0f, 1.0f, // Bottom left
+        1.0f, 1.0f, // Bottom right
+        1.0f, 0.0f  // Top right
     };
     static final short QUAD_DRAW_LIST[] = {0, 1, 2, 0, 2, 3};
 
