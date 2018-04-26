@@ -51,7 +51,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     private static final float TAU = (float) Math.PI * 2.0f;
 
-    private static final short OBSTACLE_COUNT = 0;
+    private static final short OBSTACLE_COUNT = 4;
+
+    private Obstacle obstacles[];
 
     // Handles to shaders.
     private int hQuadProgram;
@@ -59,6 +61,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     // Handlers to textuers
     private int hTextureMojo;
+    private int hTexturesObstacle[];
 
     // Screen (surface view) width-to-height ratio
     private float ratio;
@@ -69,14 +72,6 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     // RNG used by the scene.
     private Random rng;
-
-    // Temporary variables that should be changed later.
-    private float color_model[][];
-    private double lastAngle = 0.0;
-    private double rotationRate = -0.2;
-    private long creationTimes[];
-    private float lastTime = 2.0f;
-    private float cachedSin[], cachedCos[];
 
     /**
      * Create a new scene with given app context.
@@ -123,13 +118,10 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         hTextureMojo = loadTexture(context, R.drawable.mojoinbubble);
 
         rng = new Random();
-        color_model = new float[OBSTACLE_COUNT][4];
-        cachedCos = new float[OBSTACLE_COUNT];
-        cachedSin = new float[OBSTACLE_COUNT];
-        creationTimes = new long[OBSTACLE_COUNT];
-        for (int i = 0; i < creationTimes.length; i++) {
-            creationTimes[i] = SystemClock.uptimeMillis() + (i * (MS_ANIMATION_TIME / OBSTACLE_COUNT));
-        }
+
+        obstacles = new Obstacle[OBSTACLE_COUNT];
+        for (int i = 0; i < obstacles.length; i++)
+            obstacles[i] = new Obstacle(model);
     }
 
     /**
@@ -144,6 +136,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
         background.resize(width, height);
         ratio = width / (float) height;
+        Obstacle.setScreenRatio(ratio);
     }
 
     /**
@@ -155,54 +148,39 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      */
     @Override
     public void onDrawFrame(GL10 gl) {
-        for (int i = 0; i < OBSTACLE_COUNT; i++) {
-            if (SystemClock.uptimeMillis() - creationTimes[i] > MS_ANIMATION_TIME) {
-                creationTimes[i] = SystemClock.uptimeMillis();
+        long now = SystemClock.uptimeMillis();
+        float time = now % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME;
 
-                lastAngle += rotationRate;
-                cachedSin[i] = (float) Math.sin(lastAngle);
-                cachedCos[i] = (float) Math.cos(lastAngle);
-                randomColor(color_model[i]);
-            }
-        }
+        // Draw the background
+        GLES20.glUseProgram(hBackgroundProgram);
+        background.draw(COLORS_BACKGROUND, time);
 
-        {
-            float time = SystemClock.uptimeMillis() % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME;
-            GLES20.glUseProgram(hBackgroundProgram);
-            background.draw(COLORS_BACKGROUND, time);
-        }
-
+        // Draw obstacles
         GLES20.glUseProgram(hQuadProgram);
-        for (int i = 0; i < OBSTACLE_COUNT; i++) {
-            float time = (SystemClock.uptimeMillis() - creationTimes[i]) / (float) MS_ANIMATION_TIME;
-            if (time > 0.0f) {
-                float offset = getOffset(time);
-                Matrix.setIdentityM(scaleMatrix, 0);
-                Matrix.scaleM(scaleMatrix, 0, offset, offset * ratio, 1.0f);
-                Matrix.setIdentityM(translateMatrix, 0);
-                Matrix.translateM(translateMatrix, 0,
-                        offset * cachedCos[i], offset * cachedSin[i] * ratio, 0.0f);
-                Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, scaleMatrix, 0);
-                //model.draw(color_model[i], transformMatrix);
+        for (Obstacle obstacle : obstacles) {
+            if (now - obstacle.creationTime > MS_ANIMATION_TIME) {
+                obstacle.set((float) (rng.nextFloat() * Math.PI * 2.0), hTextureMojo, now + rng.nextInt((int) MS_ANIMATION_TIME));
+            } else if (now > obstacle.creationTime) {
+                float offset = getOffset((now - obstacle.creationTime) / (float) MS_ANIMATION_TIME);
+                obstacle.draw(offset);
             }
         }
 
-        {
-            float time = SystemClock.uptimeMillis() % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME;
-            Matrix.setIdentityM(scaleMatrix, 0);
-            Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
 
-            Matrix.setIdentityM(translateMatrix, 0);
-            float mojoX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-            float mojoY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-            Matrix.translateM(translateMatrix, 0, flipFactor + mojoX, MOJO_Y_OFFSET + mojoY, 0.0f);
+        // Mojo
+        Matrix.setIdentityM(scaleMatrix, 0);
+        Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
 
-            Matrix.setRotateM(rotationMatrix, 0, angle, 0.0f, 0.0f, 1.0f);
+        Matrix.setIdentityM(translateMatrix, 0);
+        float mojoX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        float mojoY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        Matrix.translateM(translateMatrix, 0, flipFactor + mojoX, MOJO_Y_OFFSET + mojoY, 0.0f);
 
-            Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotationMatrix, 0);
-            Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
-            model.draw(COLOR_DEFAULT, transformMatrix, hTextureMojo);
-        }
+        Matrix.setRotateM(rotationMatrix, 0, angle, 0.0f, 0.0f, 1.0f);
+
+        Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotationMatrix, 0);
+        Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
+        model.draw(COLOR_DEFAULT, transformMatrix, hTextureMojo);
     }
 
     /**
@@ -242,7 +220,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     @Override
     public float getOffset(float time) {
-        return (time * time * time) * 2f;
+        return (time * time * time);
     }
 
     /**
