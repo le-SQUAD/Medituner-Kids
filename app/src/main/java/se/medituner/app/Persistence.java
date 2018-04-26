@@ -15,7 +15,7 @@ import se.medituner.app.MojoScreen;
 /**
  * A utility class for persistence.
  *
- * @author Sasa Lekic, Grigory Glukhov
+ * @author Julia Danek, Sasa Lekic, Grigory Glukhov
  */
 public class Persistence {
 
@@ -31,7 +31,7 @@ public class Persistence {
      * @param object The object to save.
      * @param filename The filename of the object to save to.
      * @throws IOException Something terrible happened to one of the output streams.
-     * @author Sasa Lekic, Grigory Glukhov
+     * @author Julia Danek, Sasa Lekic, Grigory Glukhov
      */
     public void saveObject(Object object, String filename) throws IOException {
         FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
@@ -47,7 +47,7 @@ public class Persistence {
      * @return The loaded object
      * @throws IOException              Something terrible happened to one of the input streams.
      * @throws ClassNotFoundException   Couldn't find corresponding object class.
-     * @author Sasa Lekic, Grigory Glukhov
+     * @author Julia Danek, Sasa Lekic, Grigory Glukhov
      */
     public Object loadObject(String filename) throws IOException, ClassNotFoundException {
         FileInputStream fis = context.openFileInput(filename);
