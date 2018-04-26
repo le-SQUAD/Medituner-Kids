@@ -7,6 +7,9 @@
     <string name="btn_reset_queue">Reset Queue</string>
     <string name="btn_yes">Yes!</string>
     <string name="btn_no">No.</string>
+    <string name="btn_play">Play!</string>
+    <string name="score_current">SCORE: %1$d</string>
+    <string name="score_high">HISCORE: %1$d</string>
 
 
     <!-- Medication Names -->
