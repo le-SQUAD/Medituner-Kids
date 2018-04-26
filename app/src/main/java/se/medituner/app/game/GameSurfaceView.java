@@ -3,6 +3,7 @@ package se.medituner.app.game;
 import android.content.Context;
 import android.content.res.Resources;
 import android.opengl.GLSurfaceView;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 /**
@@ -28,6 +29,16 @@ public class GameSurfaceView extends GLSurfaceView{
     public GameSurfaceView(Context context) {
         super(context);
 
+        init(context);
+    }
+
+    public GameSurfaceView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+
+        init(context);
+    }
+
+    private void init(Context context) {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
@@ -39,7 +50,6 @@ public class GameSurfaceView extends GLSurfaceView{
         maxX = Resources.getSystem().getDisplayMetrics().widthPixels;
         System.out.println("MAX X: " + maxX);
         halfX = maxX / 2;
-
     }
 
     /**

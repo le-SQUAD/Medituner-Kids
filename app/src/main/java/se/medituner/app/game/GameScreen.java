@@ -29,8 +29,7 @@ public class GameScreen extends AppCompatActivity {
         //Do the while loop as long as the game is on, when game over check if hiScore should update
         //while (game != over){
         super.onCreate(savedInstanceState);
-        glSurfaceView = new GameSurfaceView(this);
-        setContentView(R.layout.highscore_view);
+        setContentView(R.layout.game_view);
         persistence = new Persistence(this);
 
         try{
@@ -43,7 +42,6 @@ public class GameScreen extends AppCompatActivity {
         }
 
         //Set the hiScore and currentScore in front
-        glSurfaceView = findViewById(R.id.glSurfaceViewID);
         highScore = findViewById(R.id.hiScoreId);
         highScore.bringToFront();
         currentScore = findViewById(R.id.currentScoreId);
@@ -85,9 +83,10 @@ public class GameScreen extends AppCompatActivity {
         }
     };
 
-    /*
-    check if the current score is higher than hiScore, if so update it!
-    @author Agnes
+    /**
+     * Check if the current score is higher than hiScore, if so update it!
+     *
+     * @author Agnes
      */
     @SuppressLint("SetTextI18n")
     public void getHiScore() throws IOException{
