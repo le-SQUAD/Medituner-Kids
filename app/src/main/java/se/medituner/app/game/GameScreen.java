@@ -9,11 +9,12 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+//GameScreen view the users current score and hiScore
+public class GameScreen extends AppCompatActivity {
 /**
  * Game screen activity.
+ * @author Agnes Petäjävaara
  */
-
-public class GameScreen extends AppCompatActivity {
     private Persistence persistence;
     public static final String SAVED_SCORE = "savedScore";
     TextView currentScore;
@@ -104,5 +105,6 @@ public class GameScreen extends AppCompatActivity {
             highScore.setText("hiScore: " + hiScore);
             persistence.saveObject(hiScore, SAVED_SCORE);
         }
+
     }
 }
