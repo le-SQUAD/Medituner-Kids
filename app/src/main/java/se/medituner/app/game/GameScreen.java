@@ -101,7 +101,7 @@ public class GameScreen extends AppCompatActivity {
             } catch (ClassNotFoundException e){
                 e.printStackTrace();
             } */
-            highScore.setText("hiScore: " + hiScore);
+            highScore.setText("high Score: " + hiScore);
             persistence.saveObject(hiScore, SAVED_SCORE);
         }
 
