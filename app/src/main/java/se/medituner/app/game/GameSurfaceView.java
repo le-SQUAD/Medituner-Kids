@@ -12,7 +12,7 @@ import android.view.MotionEvent;
  * @author Aleksandra Soltan
  */
 public class GameSurfaceView extends GLSurfaceView{
-    private Scene scene;
+    Scene scene;
 
     private int maxX;
     private int halfX;

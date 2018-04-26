@@ -46,10 +46,8 @@
         tools:layout_editor_absoluteY="39dp" />
 
     <se.medituner.app.game.GameSurfaceView
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"/>
-
-     />
-
+        android:id="@+id/gl_surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </android.support.constraint.ConstraintLayout >

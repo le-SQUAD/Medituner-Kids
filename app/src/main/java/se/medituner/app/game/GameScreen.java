@@ -16,13 +16,10 @@ public class GameScreen extends AppCompatActivity {
  * @author Agnes Petäjävaara
  */
     private Persistence persistence;
-    public static final String SAVED_SCORE = "savedScore";
-    TextView currentScore;
-    TextView highScore;
-    private int score;
-    private int hiScore;
-    Timer timer;
-    GameSurfaceView glSurfaceView;
+    private GameSurfaceView glSurfaceView;
+    private HighScore highScore;
+
+    private TextView scoreView, highScoreView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,78 +29,34 @@ public class GameScreen extends AppCompatActivity {
         setContentView(R.layout.game_view);
         persistence = new Persistence(this);
 
-        try{
-            hiScore = (int) persistence.loadObject(SAVED_SCORE);
-        } catch (IOException e){
-            System.err.println("could not load the high score, resetting it.");
-            hiScore = 0;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        // Initializing high score, will actually attempt to load persisted one.
+        highScore = new HighScore(this, persistence);
 
+        glSurfaceView = findViewById(R.id.gl_surface_view);
+        glSurfaceView.scene.linkHighScore(highScore);
         //Set the hiScore and currentScore in front
-        highScore = findViewById(R.id.hiScoreId);
-        highScore.bringToFront();
-        currentScore = findViewById(R.id.currentScoreId);
-        currentScore.bringToFront();
-        /*
-        Adds to the score by one each 0.5 second
-        Updates directly in game view by layout
-        @Author Agnes Petäjävaara
-         */
-        timer = new Timer();
-        score = 0;
-        timer.scheduleAtFixedRate(new TimerTask() {
+        highScoreView = findViewById(R.id.hiScoreId);
+        highScoreView.bringToFront();
+        scoreView = findViewById(R.id.currentScoreId);
+        scoreView.bringToFront();
+
+        highScore.begin();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        highScore.resetScore();
+    }
+
+    public void updateScoreTexts() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                timerMethod();
+                highScoreView.setText(getResources().getString(R.string.score_high, highScore.getHighScore()));
+                scoreView.setText(getResources().getString(R.string.score_current, highScore.getCurrentScore()));
             }
-        }, 500, 500);
-        /*}
-        //while loop ends - go to getHiScore:
-            getHiScore();
-        */
-    }
-    // @author Agnes
-    private void timerMethod() {
-        this.runOnUiThread(timer_tick);
-    }//@aurhor Agnes
-    private Runnable timer_tick = new Runnable() {
-        @SuppressLint("SetTextI18n")
-        @Override
-        public void run() {
-            currentScore.setText("score: " + score);
-            score++;
-            //Check if the current score should update the hiScore:
-            try {
-                getHiScore();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
-    /**
-     * Check if the current score is higher than hiScore, if so update it!
-     *
-     * @author Agnes
-     */
-    @SuppressLint("SetTextI18n")
-    public void getHiScore() throws IOException{
-        System.out.println("score: " + score);
-        if(score > hiScore){
-            hiScore = score;
-            highScore.setText("hiScore: " + score);
-            persistence.saveObject(hiScore, SAVED_SCORE);
-        }else{
-           /* try {
-                hiScore = (int) persistence.loadObject(SAVED_SCORE);
-            } catch (ClassNotFoundException e){
-                e.printStackTrace();
-            } */
-            highScore.setText("high Score: " + hiScore);
-            persistence.saveObject(hiScore, SAVED_SCORE);
-        }
-
+        });
     }
 }

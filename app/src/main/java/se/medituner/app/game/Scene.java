@@ -26,6 +26,7 @@ import se.medituner.app.R;
 public class Scene implements IScene, GLSurfaceView.Renderer {
 
     private Context context;
+    private HighScore highScore;
 
     // References to drawn objects.
     private Background background;
@@ -162,6 +163,17 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         Obstacle.setScreenRatio(ratio);
     }
 
+    public void linkHighScore(HighScore highScore) {
+        this.highScore = highScore;
+    }
+
+
+    private void collideMojo(long moment) {
+        lastMojoHit = moment;
+        if (highScore != null)
+            highScore.resetScore();
+    }
+
     /**
      * Called when the frame should be drawn.
      * This is the core function for drawing a frame.
@@ -295,7 +307,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private void checkCollision(float offset, Lane lane, long moment) {
         if (lane == mojoLane) {
             if (offset >= 0.65f && offset <= 0.9f) {
-                lastMojoHit = moment;
+                collideMojo(moment);
             }
         }
     }
