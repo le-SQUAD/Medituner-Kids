@@ -32,51 +32,57 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private Quad model;
 
     private static final long MS_ANIMATION_TIME = 2000l;
+    private static final long MS_MOJO_HIT_COOLDOWN = 140l;
+
+    private static final float LOWEST_COLOR = 0.75f;
+
+    private static final float COLORS_BACKGROUND[][] = {
+            { 0.5f, 0.0431372549f, 0.0431372549f },
+            { 0.73725490196f, 0.34117647058f, 0.34117647058f },
+            { 0.65098039215f, 0.19215686274f, 0.19215686274f },
+            { 0.85098039215f, 0.5f, 0.5f }
+    };
+    private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    private static final float TAU = (float) Math.PI * 2.0f;
+    private static final short OBSTACLE_COUNT = 4;
+    private static final Lane LANES[] = Lane.values();
 
     // Mojo related variables.
     private static final float MOJO_SCALE = 0.6f;
     private static final float MOJO_FLOAT_MAX_DISTANCE = 0.1f;
-    private static final float MOJO_Y_OFFSET = -0.75f;
-    private float flipFactor = 0.6f;
-    private float angle = -0.896055385f * 180.0f;
+    private static final float MOJO_OFFSET = 0.7f;
+    private Lane mojoLane = Lane.LANE_LEFT;
+    private float mojoX, mojoY;
+    private float mojoColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    private long lastMojoHit = -200;
 
-    private static final float COLORS_BACKGROUND[][] = {
-        { 0.5f, 0.0431372549f, 0.0431372549f },
-        { 0.73725490196f, 0.34117647058f, 0.34117647058f },
-        { 0.65098039215f, 0.19215686274f, 0.19215686274f },
-        { 0.85098039215f, 0.5f, 0.5f }
-    };
-    private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    private static long obstacleBreak;
 
-
-    private static final float TAU = (float) Math.PI * 2.0f;
-
-    private static final short OBSTACLE_COUNT = 0;
+    private Obstacle obstacles[];
 
     // Handles to shaders.
     private int hQuadProgram;
     private int hBackgroundProgram;
 
-    // Handlers to textuers
+    // Handlers to textures
     private int hTextureMojo;
+    private int hTexturesObstacle[];
 
     // Screen (surface view) width-to-height ratio
-    private float ratio;
+    private float ratio, invRatio;
 
-    // Pre-allocated arrays for matricies.
+    // Pre-allocated arrays for matrices.
     private float scaleMatrix[] = new float[16], translateMatrix[] = new float[16];
-    private float rotationMatrix[] = new float[16], transformMatrix[] = new float[16];
+    private float rotateMatrix[] = new float[16], transformMatrix[] = new float[16];
+
+    private float laneAngles[] = {
+            (float) -Math.PI * 1.0f / 4.0f,
+            (float) -Math.PI * 3.0f / 4.0f
+    };
+    private float mojoAngle;
 
     // RNG used by the scene.
     private Random rng;
-
-    // Temporary variables that should be changed later.
-    private float color_model[][];
-    private double lastAngle = 0.0;
-    private double rotationRate = -0.2;
-    private long creationTimes[];
-    private float lastTime = 2.0f;
-    private float cachedSin[], cachedCos[];
 
     /**
      * Create a new scene with given app context.
@@ -121,14 +127,16 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
         // Load textures
         hTextureMojo = loadTexture(context, R.drawable.mojoinbubble);
+        hTexturesObstacle = new int[2];
+        hTexturesObstacle[0] = loadTexture(context, R.drawable.pollenobstacle);
+        hTexturesObstacle[1] = loadTexture(context, R.drawable.smokeobstacle);
 
         rng = new Random();
-        color_model = new float[OBSTACLE_COUNT][4];
-        cachedCos = new float[OBSTACLE_COUNT];
-        cachedSin = new float[OBSTACLE_COUNT];
-        creationTimes = new long[OBSTACLE_COUNT];
-        for (int i = 0; i < creationTimes.length; i++) {
-            creationTimes[i] = SystemClock.uptimeMillis() + (i * (MS_ANIMATION_TIME / OBSTACLE_COUNT));
+
+        obstacleBreak = MS_ANIMATION_TIME / OBSTACLE_COUNT;
+        obstacles = new Obstacle[OBSTACLE_COUNT];
+        for (int i = 0; i < obstacles.length; i++) {
+            obstacles[i] = new Obstacle(model);
         }
     }
 
@@ -144,6 +152,14 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
         background.resize(width, height);
         ratio = width / (float) height;
+        invRatio = (float) height / (float) width;
+
+        // Mojo scaling will remain the same for a given ratio
+        Matrix.setIdentityM(scaleMatrix, 0);
+        Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
+
+        updateMojo();
+        Obstacle.setScreenRatio(ratio);
     }
 
     /**
@@ -155,77 +171,132 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      */
     @Override
     public void onDrawFrame(GL10 gl) {
-        for (int i = 0; i < OBSTACLE_COUNT; i++) {
-            if (SystemClock.uptimeMillis() - creationTimes[i] > MS_ANIMATION_TIME) {
-                creationTimes[i] = SystemClock.uptimeMillis();
+        long now = SystemClock.uptimeMillis();
+        float time = now % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME;
 
-                lastAngle += rotationRate;
-                cachedSin[i] = (float) Math.sin(lastAngle);
-                cachedCos[i] = (float) Math.cos(lastAngle);
-                randomColor(color_model[i]);
-            }
-        }
+        // Draw the background
+        GLES20.glUseProgram(hBackgroundProgram);
+        background.draw(COLORS_BACKGROUND, time);
 
-        {
-            float time = SystemClock.uptimeMillis() % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME;
-            GLES20.glUseProgram(hBackgroundProgram);
-            background.draw(COLORS_BACKGROUND, time);
-        }
-
+        // Draw obstacles
         GLES20.glUseProgram(hQuadProgram);
-        for (int i = 0; i < OBSTACLE_COUNT; i++) {
-            float time = (SystemClock.uptimeMillis() - creationTimes[i]) / (float) MS_ANIMATION_TIME;
-            if (time > 0.0f) {
-                float offset = getOffset(time);
-                Matrix.setIdentityM(scaleMatrix, 0);
-                Matrix.scaleM(scaleMatrix, 0, offset, offset * ratio, 1.0f);
-                Matrix.setIdentityM(translateMatrix, 0);
-                Matrix.translateM(translateMatrix, 0,
-                        offset * cachedCos[i], offset * cachedSin[i] * ratio, 0.0f);
-                Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, scaleMatrix, 0);
-                //model.draw(color_model[i], transformMatrix);
+        for (int i = 0; i < obstacles.length; i++) {
+            if (now - obstacles[i].creationTime > MS_ANIMATION_TIME) {
+                Lane lane = LANES[rng.nextInt(LANES.length)];
+                obstacles[i].set(getLaneAngle(lane) + getRandomAngleOffset(),
+                        hTexturesObstacle[rng.nextInt(hTexturesObstacle.length)],
+                        clampTime(now, i),
+                        lane);
+            } else if (now > obstacles[i].creationTime) {
+                float offset = getOffset((now - obstacles[i].creationTime) / (float) MS_ANIMATION_TIME);
+                checkCollision(offset, obstacles[i].lane, now);
+                obstacles[i].draw(offset);
             }
         }
 
-        {
-            float time = SystemClock.uptimeMillis() % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME;
-            Matrix.setIdentityM(scaleMatrix, 0);
-            Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
 
-            Matrix.setIdentityM(translateMatrix, 0);
-            float mojoX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-            float mojoY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-            Matrix.translateM(translateMatrix, 0, flipFactor + mojoX, MOJO_Y_OFFSET + mojoY, 0.0f);
+        // Mojo
+        Matrix.setIdentityM(translateMatrix, 0);
+        float mojoOffsetX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        float mojoOffsetY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        Matrix.translateM(translateMatrix, 0, mojoX + mojoOffsetX, mojoY + mojoOffsetY, 0.0f);
 
-            Matrix.setRotateM(rotationMatrix, 0, angle, 0.0f, 0.0f, 1.0f);
+        setMojoRotationMatrix(rotateMatrix, mojoX + mojoOffsetX, (mojoY + mojoOffsetY) * invRatio);
+        Matrix.rotateM(rotateMatrix, 0,
+                90.0f, 0.0f, 0.0f, 1.0f);
 
-            Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotationMatrix, 0);
-            Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
-            model.draw(COLOR_DEFAULT, transformMatrix, hTextureMojo);
-        }
+        Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotateMatrix, 0);
+        Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
+
+        mojoColor[0] = mojoColor[1] = mojoColor[2] =
+                clampHit((now - lastMojoHit) / (float) MS_MOJO_HIT_COOLDOWN)
+                        * (1.0f - LOWEST_COLOR) + LOWEST_COLOR;
+
+        model.draw(mojoColor, transformMatrix, hTextureMojo);
     }
 
     /**
-     * Flip Mojo to the right side of the screen.
+     * Sets up the mojo rotation matrix for him to look at the centre.
      *
-     * @author Aleksandra Soltan
+     * @param matrix
      */
-    public void flipMojoRight() {
-        if (flipFactor < 0.0f) {
-            flipFactor = -flipFactor;
-            angle = -angle;
-        }
+    private void setMojoRotationMatrix(float[] matrix, float x, float y) {
+        float dist = (float) Math.sqrt(x * x + y * y);
+        float cos = x / dist;
+        float sin = y / dist;
+
+        matrix[0] = cos;
+        matrix[1] = sin;
+        matrix[2] = 0.0f;
+        matrix[3] = 0.0f;
+
+        matrix[4] = -sin;
+        matrix[5] = cos;
+        matrix[6] = 0.0f;
+        matrix[7] = 0.0f;
+
+        matrix[8] = 0.0f;
+        matrix[9] = 0.0f;
+        matrix[10] = 1.0f;
+        matrix[11] = 0.0f;
+
+        matrix[12] = 0.0f;
+        matrix[13] = 0.0f;
+        matrix[14] = 0.0f;
+        matrix[15] = 1.0f;
     }
 
     /**
-     * Flip Mojo to the left side of the screen.
+     * Set the Mojo's lane to provided one.
      *
-     * @author Aleksandra Soltan
+     * @param lane The new Mojo lane.
      */
-    public void flipMojoLeft() {
-        if (flipFactor > 0.0f) {
-            flipFactor = -flipFactor;
-            angle = -angle;
+    public void setMojoLane(Lane lane) {
+        if (mojoLane != lane) {
+            mojoLane = lane;
+            updateMojo();
+        }
+    }
+
+    private float clampHit(float x) {
+        if (x < 0.0f)
+            return 0.0f;
+        else if (x > 1.0f)
+            return 1.0f;
+        else
+            return x;
+    }
+
+    private void updateMojo() {
+        mojoAngle = getLaneAngle(mojoLane);
+        mojoX = (float) Math.cos(mojoAngle) * MOJO_OFFSET * invRatio;
+        mojoY = (float) Math.sin(mojoAngle) * MOJO_OFFSET * invRatio;
+
+        mojoAngle = (mojoAngle * 180.0f / (float) Math.PI) + 90.0f;
+    }
+
+    private float getLaneAngle(Lane lane) {
+        switch (lane) {
+            case LANE_LEFT:
+                return laneAngles[1];
+
+            case LANE_RIGHT:
+                return laneAngles[0];
+
+            default:
+                return 0.0f;
+        }
+    }
+
+    private float getRandomAngleOffset() {
+        return (rng.nextFloat() - 0.5f) / 3.5f;
+    }
+
+    private void checkCollision(float offset, Lane lane, long moment) {
+        if (lane == mojoLane) {
+            if (offset >= 0.65f && offset <= 0.9f) {
+                lastMojoHit = moment;
+            }
         }
     }
 
@@ -240,9 +311,14 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         color[3] = 1.0f;
     }
 
+    private long clampTime(long now, int i) {
+        return now - now % MS_ANIMATION_TIME + obstacleBreak * i;
+    }
+
+
     @Override
     public float getOffset(float time) {
-        return (time * time * time) * 2f;
+        return time * time * time;
     }
 
     /**
