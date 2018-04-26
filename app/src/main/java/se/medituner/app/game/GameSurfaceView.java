@@ -28,14 +28,9 @@ public class GameSurfaceView extends GLSurfaceView{
     public GameSurfaceView(Context context) {
         super(context);
 
-<<<<<<< HEAD:app/src/main/java/se/medituner/app/GameSurfaceView.java
-        init(context);
-    }
-=======
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
->>>>>>> development:app/src/main/java/se/medituner/app/game/GameSurfaceView.java
         scene = new Scene(context);
 
         // Set the Renderer for drawing on the GLSurfaceView
