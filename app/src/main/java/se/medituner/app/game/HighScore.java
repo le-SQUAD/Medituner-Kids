@@ -59,6 +59,7 @@ public class HighScore {
      */
     public void stop() {
         if (task != null) {
+            task.cancel();
             timer.purge();
             task = null;
         }

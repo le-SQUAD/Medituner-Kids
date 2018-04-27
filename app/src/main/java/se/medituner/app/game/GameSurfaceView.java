@@ -68,13 +68,14 @@ public class GameSurfaceView extends GLSurfaceView{
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                /*
                 if(x >= halfX){
                     scene.setMojoLane(Lane.LANE_RIGHT);
-                }
-                else{
+                } else {
                     scene.setMojoLane(Lane.LANE_LEFT);
                 }
-                requestRender();
+                */
+                scene.toggleMojoLane();
         }
         return true;
     }

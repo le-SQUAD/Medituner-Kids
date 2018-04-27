@@ -270,6 +270,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         }
     }
 
+    public void toggleMojoLane() {
+        if (mojoLane == Lane.LANE_LEFT)
+            setMojoLane(Lane.LANE_RIGHT);
+        else
+            setMojoLane(Lane.LANE_LEFT);
+    }
+
     private float clampHit(float x) {
         if (x < 0.0f)
             return 0.0f;
@@ -306,7 +313,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     private void checkCollision(float offset, Lane lane, long moment) {
         if (lane == mojoLane) {
-            if (offset >= 0.65f && offset <= 0.9f) {
+            if (offset >= 0.65f && offset <= 0.8f) {
                 collideMojo(moment);
             }
         }
