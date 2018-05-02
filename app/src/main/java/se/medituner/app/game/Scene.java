@@ -44,6 +44,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private static final long MS_MIN_OBSTACLE_PERIOD = 285;
     private static final long MS_MAX_OBSTACLE_PERIOD = MS_ANIMATION_TIME;
 
+    private static final float OBSTACLE_MIN_PERIOD = 0.14225086402f;
+    private static final float OBSTACLE_MAX_PERIOD = 1.0f;
+
     private static final short OBSTACLE_COUNT = 7;
 
     private static final float LOWEST_COLOR = 0.75f;
@@ -91,6 +94,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             (float) -Math.PI * 3.0f / 4.0f
     };
     private float mojoAngle;
+
+    private long gameStartTime;
 
     // RNG used by the scene.
     private Random rng;
@@ -149,6 +154,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         for (int i = 0; i < obstacles.length; i++) {
             obstacles[i] = new Obstacle(model);
         }
+
     }
 
     /**
@@ -193,6 +199,10 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             highScore.resetScore();
     }
 
+    public void resetGameStartTime() {
+        gameStartTime = SystemClock.uptimeMillis();
+    }
+
     /**
      * Called when the frame should be drawn.
      * This is the core function for drawing a frame.
@@ -216,7 +226,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
                 Lane lane = LANES[rng.nextInt(LANES.length)];
                 obstacles[i].set(getLaneAngle(lane) + getRandomAngleOffset(),
                         hTexturesObstacle[rng.nextInt(hTexturesObstacle.length)],
-                        clampTime(now, i),
+                        findNextCreationTime(now, i),
                         lane);
             } else if (now > obstacles[i].creationTime) {
                 float offset = getOffset((now - obstacles[i].creationTime) / (float) MS_ANIMATION_TIME);
@@ -425,8 +435,12 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @param i     Obstacle's offset.
      * @return      New obstacle's spawn time.
      */
-    private long clampTime(long now, int i) {
-        return now - now % MS_ANIMATION_TIME + obstacleBreak * i;
+    private long findNextCreationTime(long now, int i) {
+        long beginningOfCurrentAnimation= now - now % MS_ANIMATION_TIME;
+        float time = (now - gameStartTime) / 1000.0f;
+        float nextTime = 1.0f / (time + OBSTACLE_MAX_PERIOD - OBSTACLE_MIN_PERIOD) + OBSTACLE_MIN_PERIOD;
+        long creationTime = (long) (nextTime * (float) MS_ANIMATION_TIME);
+        return beginningOfCurrentAnimation + creationTime;
     }
 
 
