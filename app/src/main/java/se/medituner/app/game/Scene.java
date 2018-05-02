@@ -53,6 +53,14 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             { 0.65098039215f, 0.19215686274f, 0.19215686274f },
             { 0.85098039215f, 0.5f, 0.5f }
     };
+
+    private static final float COLORS_RAINBOW[][] = {
+            {0.70588235f, 0.09803922f, 0.21960784f}, // Red
+            {0.97647059f, 0.60784314f, 0.22352941f}, // Yellow
+            {0.18823529f, 0.64313725f, 0.58431373f}, // Greenblue
+            {0.60392157f, 0.34901961f, 0.70980392f}  // Violet
+    };
+
     private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     private static final float TAU = (float) Math.PI * 2.0f;
     private static final Lane LANES[] = Lane.values();
