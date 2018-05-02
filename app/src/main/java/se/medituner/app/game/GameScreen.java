@@ -34,6 +34,7 @@ public class GameScreen extends AppCompatActivity {
 
         glSurfaceView = findViewById(R.id.gl_surface_view);
         glSurfaceView.scene.linkHighScore(highScore);
+        glSurfaceView.scene.setMojoInvulnerabilityTime(5000);
         //Set the hiScore and currentScore in front
         highScoreView = findViewById(R.id.hiScoreId);
         highScoreView.bringToFront();

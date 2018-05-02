@@ -261,6 +261,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @param matrix    The matrix to set.
      * @param x         The Mojos X position.
      * @param y         The Mojos Y position.
+     * @author Grigory Glukhov
      */
     private void setMojoMatrix(float[] matrix, float x, float y) {
         float dist = (float) Math.sqrt(x * x + y * y);
