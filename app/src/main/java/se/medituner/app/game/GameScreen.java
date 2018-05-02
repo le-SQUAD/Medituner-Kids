@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+import android.os.Handler;
 
 //GameScreen view the users current score and hiScore
 public class GameScreen extends AppCompatActivity {
@@ -43,6 +44,14 @@ public class GameScreen extends AppCompatActivity {
         highScoreView.bringToFront();
         scoreView = findViewById(R.id.currentScoreId);
         scoreView.bringToFront();
+
+
+        /**
+         * Implementing looping game sound
+         * @author Julia Danek
+         */
+        Sounds.getInstance().playSound(Sounds.Sound.S_GSONG, -1);
+
     }
 
     @Override
