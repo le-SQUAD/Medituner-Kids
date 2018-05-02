@@ -35,6 +35,17 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private static final long MS_ANIMATION_TIME = 2000l;
     private static final long MS_MOJO_HIT_COOLDOWN = 140l;
 
+    private static final float COLLISION_MIN_OFFSET = 0.45f;
+    private static final float COLLISION_MAX_OFFSET = 0.75f;
+
+    // To get this one needs to use inverse offset function (in our case it's O^-1(x) = x^(1/3)).
+    // To obtain the following number one needs to:
+    // MIN_PERIOD = Ceiling(1.0/(O^-1(MAX_OFFSET)-O^-1(MIN_OFFSET)) * ANIMATION_TIME)
+    private static final long MS_MIN_OBSTACLE_PERIOD = 285;
+    private static final long MS_MAX_OBSTACLE_PERIOD = MS_ANIMATION_TIME;
+
+    private static final short OBSTACLE_COUNT = 7;
+
     private static final float LOWEST_COLOR = 0.75f;
 
     private static final float COLORS_BACKGROUND[][] = {
@@ -45,12 +56,11 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     };
     private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     private static final float TAU = (float) Math.PI * 2.0f;
-    private static final short OBSTACLE_COUNT = 4;
     private static final Lane LANES[] = Lane.values();
 
     // Mojo related variables.
     private static final float MOJO_SCALE = 0.6f;
-    private static final float MOJO_FLOAT_MAX_DISTANCE = 0.1f;
+    private static final float MOJO_FLOAT_MAX_DISTANCE = 0.05f;
     private static final float MOJO_OFFSET = 0.7f;
     private Lane mojoLane = Lane.LANE_LEFT;
     private float mojoX, mojoY;
@@ -163,11 +173,20 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         Obstacle.setScreenRatio(ratio);
     }
 
+    /**
+     * Link a HighScore to be reset when a collision happens.
+     *
+     * @param highScore The HighScore to reset.
+     */
     public void linkHighScore(HighScore highScore) {
         this.highScore = highScore;
     }
 
-
+    /**
+     * Collide Mojo, updating the hit-time and resetting the score.
+     *
+     * @param moment    The moment of the collision.
+     */
     private void collideMojo(long moment) {
         lastMojoHit = moment;
         if (highScore != null)
@@ -206,8 +225,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             }
         }
 
-
         // Mojo
+        /*
         Matrix.setIdentityM(translateMatrix, 0);
         float mojoOffsetX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
         float mojoOffsetY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
@@ -217,49 +236,86 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         Matrix.rotateM(rotateMatrix, 0,
                 90.0f, 0.0f, 0.0f, 1.0f);
 
+        Matrix.setIdentityM(scaleMatrix, 0);
+        Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, MOJO_SCALE * ratio, 1.0f);
+
         Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotateMatrix, 0);
         Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
+        */
+
+        float mojoOffsetX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        float mojoOffsetY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        setMojoMatrix(transformMatrix, mojoX + mojoOffsetX, (mojoY + mojoOffsetY));
 
         mojoColor[0] = mojoColor[1] = mojoColor[2] =
-                clampHit((now - lastMojoHit) / (float) MS_MOJO_HIT_COOLDOWN)
+                clamp01((now - lastMojoHit) / (float) MS_MOJO_HIT_COOLDOWN)
                         * (1.0f - LOWEST_COLOR) + LOWEST_COLOR;
 
         model.draw(mojoColor, transformMatrix, hTextureMojo);
     }
 
     /**
-     * Sets up the mojo rotation matrix for him to look at the centre.
+     * Sets up the complete Mojo transformation matrix including scale, translation and rotation..
      *
-     * @param matrix
+     * @param matrix    The matrix to set.
+     * @param x         The Mojos X position.
+     * @param y         The Mojos Y position.
      */
-    private void setMojoRotationMatrix(float[] matrix, float x, float y) {
+    private void setMojoMatrix(float[] matrix, float x, float y) {
         float dist = (float) Math.sqrt(x * x + y * y);
         float cos = x / dist;
         float sin = y / dist;
 
-        matrix[0] = cos;
-        matrix[1] = sin;
+        /*
+        The resulting matrix is the result of several 2D transformations, from top to bottom:
+
+        [Actual rotation]
+        [cos    -sin]
+        [sin    cos]
+        *
+        [270 degree rotation]
+        [0      1]
+        [-1      0]
+        *
+        [Scaling (fake projection)]
+        [MOJO_SCALE     0]
+        [0              MOJO_SCALE * SCREEN_RATIO]
+        *
+        [Translation]
+        [0      0       x]
+        [0      0       y]
+        [0      0       1]
+
+        If you understand this, great job, you know linear algebra.
+         */
+
+        // Column 1
+        matrix[0] = -sin * MOJO_SCALE;
+        matrix[1] = cos * MOJO_SCALE * ratio;
         matrix[2] = 0.0f;
         matrix[3] = 0.0f;
 
-        matrix[4] = -sin;
-        matrix[5] = cos;
+        // Column 2
+        matrix[4] = -cos * MOJO_SCALE;
+        matrix[5] = -sin * MOJO_SCALE * ratio;
         matrix[6] = 0.0f;
         matrix[7] = 0.0f;
 
+        // Column 3
         matrix[8] = 0.0f;
         matrix[9] = 0.0f;
         matrix[10] = 1.0f;
         matrix[11] = 0.0f;
 
-        matrix[12] = 0.0f;
-        matrix[13] = 0.0f;
+        // Column 4
+        matrix[12] = x;
+        matrix[13] = y;
         matrix[14] = 0.0f;
         matrix[15] = 1.0f;
     }
 
     /**
-     * Set the Mojo's lane to provided one.
+     * Set the Mojos lane to provided one.
      *
      * @param lane The new Mojo lane.
      */
@@ -270,6 +326,11 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         }
     }
 
+    /**
+     * Toggle Mojos lane.
+     *
+     * If Mojo was in right lane toggle it to left and vice-versa.
+     */
     public void toggleMojoLane() {
         if (mojoLane == Lane.LANE_LEFT)
             setMojoLane(Lane.LANE_RIGHT);
@@ -277,7 +338,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             setMojoLane(Lane.LANE_LEFT);
     }
 
-    private float clampHit(float x) {
+    /**
+     * Clamp a floating number between 0 and 1 (set it to 0 if it's less than 0 or to 1 if it's bigger than 1).
+     *
+     * @param x The number to clamp.
+     * @return  The clamped number.
+     */
+    private float clamp01(float x) {
         if (x < 0.0f)
             return 0.0f;
         else if (x > 1.0f)
@@ -286,14 +353,23 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             return x;
     }
 
+    /**
+     * Update Mojos position and rotation angle.
+     */
     private void updateMojo() {
         mojoAngle = getLaneAngle(mojoLane);
-        mojoX = (float) Math.cos(mojoAngle) * MOJO_OFFSET * invRatio;
+        mojoX = (float) Math.cos(mojoAngle) * MOJO_OFFSET;
         mojoY = (float) Math.sin(mojoAngle) * MOJO_OFFSET * invRatio;
 
         mojoAngle = (mojoAngle * 180.0f / (float) Math.PI) + 90.0f;
     }
 
+    /**
+     * Get the corresponding angle for a given lane.
+     *
+     * @param lane  The lane for which to retrieve the angle.
+     * @return      The corresponding angle for the given lane.
+     */
     private float getLaneAngle(Lane lane) {
         switch (lane) {
             case LANE_LEFT:
@@ -307,15 +383,27 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         }
     }
 
+    /**
+     * Pick a random angle offset in radians.
+     *
+     * @return A random angle for offset.
+     */
     private float getRandomAngleOffset() {
         return (rng.nextFloat() - 0.5f) / 3.5f;
     }
 
+    /**
+     * Check if a certain offset collides with Mojo.
+     *
+     * @param offset    The obstacles offset to check.
+     * @param lane      The lane in which the obstacle is located.
+     * @param moment    The current moment in time.
+     */
     private void checkCollision(float offset, Lane lane, long moment) {
-        if (lane == mojoLane) {
-            if (offset >= 0.65f && offset <= 0.8f) {
+        if (lane == mojoLane
+                && offset >= COLLISION_MIN_OFFSET
+                && offset <= COLLISION_MAX_OFFSET) {
                 collideMojo(moment);
-            }
         }
     }
 
@@ -330,6 +418,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         color[3] = 1.0f;
     }
 
+    /**
+     * Clamp the time for obstacle spawning.
+     *
+     * @param now   Current time.
+     * @param i     Obstacle's offset.
+     * @return      New obstacle's spawn time.
+     */
     private long clampTime(long now, int i) {
         return now - now % MS_ANIMATION_TIME + obstacleBreak * i;
     }
