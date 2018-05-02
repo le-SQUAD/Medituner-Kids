@@ -39,15 +39,21 @@ public class GameScreen extends AppCompatActivity {
         highScoreView.bringToFront();
         scoreView = findViewById(R.id.currentScoreId);
         scoreView.bringToFront();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         highScore.begin();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
 
         highScore.resetScore();
+        highScore.stop();
     }
 
     public void updateScoreTexts() {
