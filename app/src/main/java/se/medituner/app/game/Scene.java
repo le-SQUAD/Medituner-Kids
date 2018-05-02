@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
-import android.opengl.Matrix;
 import android.os.SystemClock;
 
 import java.util.Random;
@@ -65,7 +64,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private Lane mojoLane = Lane.LANE_LEFT;
     private float mojoX, mojoY;
     private float mojoColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    private long lastMojoHit = -200;
+    private long mojoInvulnerabilityEnd = 0;
+    private long lastMojoHit = -MS_MOJO_HIT_COOLDOWN;
 
     private static long obstacleBreak;
 
@@ -83,14 +83,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private float ratio, invRatio;
 
     // Pre-allocated arrays for matrices.
-    private float scaleMatrix[] = new float[16], translateMatrix[] = new float[16];
-    private float rotateMatrix[] = new float[16], transformMatrix[] = new float[16];
+    private float transformMatrix[] = new float[16];
 
+    // Pre-calculated angles for lanes.
     private float laneAngles[] = {
             (float) -Math.PI * 1.0f / 4.0f,
             (float) -Math.PI * 3.0f / 4.0f
     };
-    private float mojoAngle;
 
     // RNG used by the scene.
     private Random rng;
@@ -165,11 +164,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         ratio = width / (float) height;
         invRatio = (float) height / (float) width;
 
+        /*
         // Mojo scaling will remain the same for a given ratio
         Matrix.setIdentityM(scaleMatrix, 0);
         Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
+        */
 
-        updateMojo();
+        updateMojoPositionAndRotation();
         Obstacle.setScreenRatio(ratio);
     }
 
@@ -245,7 +246,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
         float mojoOffsetX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
         float mojoOffsetY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-        setMojoMatrix(transformMatrix, mojoX + mojoOffsetX, (mojoY + mojoOffsetY));
+        setMojoMatrix(transformMatrix, mojoX + mojoOffsetX, mojoY + mojoOffsetY);
 
         mojoColor[0] = mojoColor[1] = mojoColor[2] =
                 clamp01((now - lastMojoHit) / (float) MS_MOJO_HIT_COOLDOWN)
@@ -315,6 +316,15 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     }
 
     /**
+     * Set new duration for Mojos invulnerability in millisecond.
+     *
+     * @param duration  The duration starting 'now' for Mojos invulnerability.
+     */
+    public void setMojoInvulnerabilityTime(long duration) {
+        mojoInvulnerabilityEnd = SystemClock.uptimeMillis() + duration;
+    }
+
+    /**
      * Set the Mojos lane to provided one.
      *
      * @param lane The new Mojo lane.
@@ -322,7 +332,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     public void setMojoLane(Lane lane) {
         if (mojoLane != lane) {
             mojoLane = lane;
-            updateMojo();
+            updateMojoPositionAndRotation();
         }
     }
 
@@ -356,12 +366,12 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     /**
      * Update Mojos position and rotation angle.
      */
-    private void updateMojo() {
-        mojoAngle = getLaneAngle(mojoLane);
+    private void updateMojoPositionAndRotation() {
+        float mojoAngle = getLaneAngle(mojoLane);
         mojoX = (float) Math.cos(mojoAngle) * MOJO_OFFSET;
         mojoY = (float) Math.sin(mojoAngle) * MOJO_OFFSET * invRatio;
 
-        mojoAngle = (mojoAngle * 180.0f / (float) Math.PI) + 90.0f;
+//        mojoAngle = (mojoAngle * 180.0f / (float) Math.PI) + 90.0f;
     }
 
     /**
@@ -401,6 +411,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      */
     private void checkCollision(float offset, Lane lane, long moment) {
         if (lane == mojoLane
+                && moment > mojoInvulnerabilityEnd
                 && offset >= COLLISION_MIN_OFFSET
                 && offset <= COLLISION_MAX_OFFSET) {
                 collideMojo(moment);
