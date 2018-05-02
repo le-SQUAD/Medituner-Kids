@@ -1,15 +1,15 @@
 <resources>
     <string name="app_name">Medituner Kids</string>
-    <string name="streak">Streak: %1$d</string>
-    <string name="streak_popup">GREAT JOB!\n%1$d in a row!</string>
-    <string name="popup_question">Have you taken your %1$s?</string>
-    <string name="btn_generate_schedule">Generate Schedule</string>
-    <string name="btn_reset_queue">Reset Queue</string>
-    <string name="btn_yes">Yes!</string>
-    <string name="btn_no">No.</string>
-    <string name="btn_play">Play!</string>
-    <string name="score_current">SCORE: %1$d</string>
-    <string name="score_high">HIGH SCORE: %1$d</string>
+    <string name="streak">Nivå: %1$d</string>
+    <string name="streak_popup">Bra jobbat!\n%1$d in a row!</string>
+    <string name="popup_question">Har du tagit %1$s?</string>
+    <string name="btn_generate_schedule">Skapa schema</string>
+    <string name="btn_reset_queue">Återställ kön</string>
+    <string name="btn_yes">Ja!</string>
+    <string name="btn_no">Nej.</string>
+    <string name="btn_play">Spela!</string>
+    <string name="score_current">Poäng: %1$d</string>
+    <string name="score_high">Rekord: %1$d</string>
 
     <!-- Medication Names -->
     <string name="aerobec">AeroBec</string>
