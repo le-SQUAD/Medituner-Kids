@@ -16,6 +16,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import se.medituner.app.Background;
 import se.medituner.app.R;
+import se.medituner.app.Sounds;
 
 /**
  * The scene which encompasses background and drawable objects.
@@ -170,6 +171,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     private void collideMojo(long moment) {
         lastMojoHit = moment;
+        // cough sound
+        Sounds.getInstance().playSound(Sounds.Sound.S_COUGH);
+
         if (highScore != null)
             highScore.resetScore();
     }

@@ -6,6 +6,8 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import se.medituner.app.Sounds;
+
 /**
  * Custom GLSurfaceView that processes touch inputs and supplies correct calls to the underlying Scene.
  *
@@ -75,6 +77,12 @@ public class GameSurfaceView extends GLSurfaceView{
                     scene.setMojoLane(Lane.LANE_LEFT);
                 }
                 */
+
+                /**
+                 * Sound implementet for each jump
+                 * @author Julia Danek
+                 */
+                Sounds.getInstance().playSound(Sounds.Sound.S_GJUMP);
                 scene.toggleMojoLane();
         }
         return true;
