@@ -7,9 +7,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
-//MIN HH:mm
-//public static final LocalTime MIN;
-
 /**
  * Medication schedule. Handles almost everything schedule-related.
  *
