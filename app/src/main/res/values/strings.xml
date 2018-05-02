@@ -11,7 +11,6 @@
     <string name="score_current">SCORE: %1$d</string>
     <string name="score_high">HIGH SCORE: %1$d</string>
 
-
     <!-- Medication Names -->
     <string name="aerobec">AeroBec</string>
     <string name="aerobecautohaler">AeroBec Autohaler</string>
