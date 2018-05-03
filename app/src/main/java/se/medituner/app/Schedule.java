@@ -7,9 +7,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
-//MIN HH:mm
-//public static final LocalTime MIN;
-
 /**
  * Medication schedule. Handles almost everything schedule-related.
  *
@@ -19,6 +16,10 @@ public class Schedule implements Serializable {
 
     public static final int GENERATOR_MIN_POOL_SIZE = 2;
     public static final int GENERATOR_MAX_POOL_SIZE = 5;
+
+    public static final int MORNING_PERIOD_BEGINNING = 5;
+    public static final int LUNCH_PERIOD_BEGINNING = 11;
+    public static final int EVENING_PERIOD_BEGINNING = 17;
 
     // Dependency injection
     private IClock time;
@@ -41,7 +42,7 @@ public class Schedule implements Serializable {
         eveningPool = new LinkedList<>();
         activeQueue = new LinkedList<>();
 
-        Calendar queueFakeTime = time.now();
+        Calendar queueFakeTime = Calendar.getInstance();
         queueFakeTime.setTime(getBeginningOfCurrentPeriod(time));
         queueFakeTime.add(Calendar.MINUTE, -10);
         queueCreationTime = queueFakeTime.getTime();
@@ -51,20 +52,59 @@ public class Schedule implements Serializable {
         this.streak = streak;
     }
 
-
     /**
      * Switches active queue to the correct pool
+     * @author Grigory Glukhov, Aleksandra Soltan
+     * @author Agnes Petäjävaara(latest update), added the not taken medication to the current pool
      */
     private void updateQueue() {
         Date periodBeginning = getBeginningOfCurrentPeriod(time);
-        queueCreationTime = time.now().getTime();
-        Calendar cal = time.now();
+        queueCreationTime = time.now();
+        Calendar cal = Calendar.getInstance();
         cal.setTime(periodBeginning);
         switch (cal.get(Calendar.HOUR_OF_DAY)) {
-            case 5:
-                activeQueue = new LinkedList<>(morningPool);
-                break;
 
+            //Checks if the all medication the previous day was taken, if so increase the streak and
+            //create a new morning pool of medication
+            case MORNING_PERIOD_BEGINNING: {
+                /*
+                if (!activeQueue.isEmpty() || getBeginningOfLastPeriod(time).after(queueCreationTime)) {
+                    streak.reset();
+                } else {
+                    streak.increment();
+                }
+                */
+                activeQueue = new LinkedList<>(morningPool);
+            }
+            break;
+
+            case LUNCH_PERIOD_BEGINNING: {
+                if (getBeginningOfLastPeriod(time).before(queueCreationTime)) {
+                    // This means activeQueue is semi-valid
+                    activeQueue = mergeQueues(activeQueue, lunchPool);
+                } else {
+                    // We can infer that activeQueue was created before this morning, so its invalid
+                    activeQueue = mergeQueues(morningPool, lunchPool);
+                }
+            } break;
+
+            case EVENING_PERIOD_BEGINNING: {
+                if (queueCreationTime.after(getBeginningOfLastPeriod(time))) {
+                    activeQueue = mergeQueues(activeQueue, eveningPool);
+                } else {
+                    Queue<Medication> lunchEveningMeds = mergeQueues(lunchPool, eveningPool);
+                    if (queueCreationTime.after(getBeginningOfPreviousPeriod(getBeginningOfLastPeriod(time)))) {
+                        activeQueue = mergeQueues(activeQueue, lunchEveningMeds);
+                    } else {
+                        activeQueue = mergeQueues(morningPool, lunchEveningMeds);
+                    }
+                }
+            } break;
+
+            default:
+                throw new IllegalStateException("Unexpected time of day!");
+
+           /*
             case 11:
                 activeQueue = new LinkedList<>(lunchPool);
                 break;
@@ -72,14 +112,15 @@ public class Schedule implements Serializable {
             default:
                 activeQueue = new LinkedList<>(eveningPool);
                 break;
+            */
         }
     }
 
     /**
      * Checks if the current queue is valid, and updates accordingly.
      *
-     * @param updateStreak Should the streak be updated? (incremented or reset)
-     * @author Aleksandra Soltan, Grigory Glukhov
+     * @param updateStreak  Should the streak be updated? (incremented or reset)
+     * @author              Aleksandra Soltan, Grigory Glukhov
      */
     public void validateQueue(boolean updateStreak) {
         if (queueCreationTime.before(getBeginningOfCurrentPeriod(time))) {
@@ -89,8 +130,12 @@ public class Schedule implements Serializable {
             System.out.println(updateStreak);
             if (updateStreak && streak != null) {
                 System.out.println("Checking for reset");
-                if (!activeQueue.isEmpty() || getBeginningOfLastPeriod(time).after(queueCreationTime)) {
-                    streak.reset();
+                if (!activeQueue.isEmpty()) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(getBeginningOfCurrentPeriod(time));
+                    if (calendar.get(Calendar.HOUR_OF_DAY) == MORNING_PERIOD_BEGINNING) {
+                        streak.reset();
+                    }
                 }
             }
             updateQueue();
@@ -111,13 +156,14 @@ public class Schedule implements Serializable {
      * Get the beginning of the current period (morningPool, lunchPool or eveningPool).
      * The returned date is back in time relative to time.now()
      *
-     * @param time IClock interface for now() method.
-     * @return Date corresponding to the beginning of the current period (back in time).
-     * @author Aleksandra Soltan, Grigory Glukhov
+     * @param time  IClock interface for now() method.
+     * @return      Date corresponding to the beginning of the current period (back in time).
+     * @author      Aleksandra Soltan, Grigory Glukhov
      */
     public static Date getBeginningOfCurrentPeriod(IClock time) {
-        Calendar now = time.now();
-        Calendar comparison = time.now();
+        Calendar now = Calendar.getInstance();
+        now.setTime(time.now());
+        Calendar comparison = Calendar.getInstance();
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);
         comparison.set(Calendar.MILLISECOND, 0);
@@ -144,58 +190,71 @@ public class Schedule implements Serializable {
     }
 
     /**
-     * Get the beginning of the previous period (in the past, before current period beginning).
+     * Return beginning of a previous period for a given time.
      *
-     * @param time IClock interface for now() method.
-     * @return The Date of the beginning of the previous period.
-     * @author Grigory Glukhov
+     * @param time  The beginning of relative current period.
+     * @return      The beginning of the period that was before the one that is "now".
      */
-    public static Date getBeginningOfLastPeriod(IClock time) {
-        Calendar calendar = time.now();
-        calendar.setTime(getBeginningOfCurrentPeriod(time));
+    public static Date getBeginningOfPreviousPeriod(Date time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time);
         switch (calendar.get(Calendar.HOUR_OF_DAY)) {
-            case 5:
-                calendar.add(Calendar.HOUR_OF_DAY, -12);
+            case MORNING_PERIOD_BEGINNING:
+                calendar.add(Calendar.HOUR_OF_DAY, MORNING_PERIOD_BEGINNING - EVENING_PERIOD_BEGINNING);
                 break;
 
-            case 11:
-                calendar.set(Calendar.HOUR_OF_DAY, 5);
+            case LUNCH_PERIOD_BEGINNING:
+                calendar.set(Calendar.HOUR_OF_DAY, MORNING_PERIOD_BEGINNING);
+                break;
+
+            case EVENING_PERIOD_BEGINNING:
+                calendar.set(Calendar.HOUR_OF_DAY, LUNCH_PERIOD_BEGINNING);
                 break;
 
             default:
-                calendar.set(Calendar.HOUR_OF_DAY, 17);
-                break;
+                throw new IllegalStateException("Unexpected time of day!");
         }
         return calendar.getTime();
     }
 
+    /**
+     * Get the beginning of the previous period (in the past, before current period beginning).
+     *
+     * @param time  IClock interface for now() method.
+     * @return      The Date of the beginning of the previous period.
+     * @author      Grigory Glukhov
+     */
+    public static Date getBeginningOfLastPeriod(IClock time) {
+        return getBeginningOfPreviousPeriod(getBeginningOfCurrentPeriod(time));
+    }
 
     /**
      * Get the beginning of the following period.
      *
-     * @param time IClock interface for now() method.
-     * @return Date corresponding to the beginning of the next period (future).
+     * @param time  IClock interface for now() method.
+     * @return      Date corresponding to the beginning of the next period (future).
      */
     public static Date getBeginningOfNextPeriod(IClock time) {
-        Calendar now = time.now();
-        Calendar comparison = time.now();
+        Calendar now = Calendar.getInstance();
+        now.setTime(time.now());
+        Calendar comparison = Calendar.getInstance();
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);
         comparison.set(Calendar.MILLISECOND, 0);
 
-        comparison.set(Calendar.HOUR_OF_DAY, 5);
+        comparison.set(Calendar.HOUR_OF_DAY, MORNING_PERIOD_BEGINNING);
         if (now.getTime().before(comparison.getTime())) {
             return comparison.getTime();
         } else {
-            comparison.set(Calendar.HOUR_OF_DAY, 11);
+            comparison.set(Calendar.HOUR_OF_DAY, LUNCH_PERIOD_BEGINNING);
             if (now.getTime().before(comparison.getTime())) {
                 return comparison.getTime();
             } else {
-                comparison.set(Calendar.HOUR_OF_DAY, 17);
+                comparison.set(Calendar.HOUR_OF_DAY, EVENING_PERIOD_BEGINNING);
                 if (now.getTime().before(comparison.getTime())) {
                     return comparison.getTime();
                 } else {
-                    comparison.add(Calendar.HOUR_OF_DAY, 12);
+                    comparison.add(Calendar.HOUR_OF_DAY, EVENING_PERIOD_BEGINNING - MORNING_PERIOD_BEGINNING);
                     return comparison.getTime();
                 }
             }
@@ -243,7 +302,8 @@ public class Schedule implements Serializable {
      * This is not functional behavior for the class and the method should only be used for testing!
      */
     public void resetQueue() {
-        Calendar calendar = time.now();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time.now());
         calendar.add(Calendar.DATE, -1);
         queueCreationTime = calendar.getTime();
         validateQueue(false);
@@ -253,8 +313,8 @@ public class Schedule implements Serializable {
      * Generate a new schedule.
      * The new schedule generated will have between GENERATOR_MIN_POOL and GENERATOR_MAX_POOL non missing items in each pool
      *
-     * @param time The time class to be used in the new schedule.
-     * @return A newly generated schedule.
+     * @param time  The time class to be used in the new schedule.
+     * @return      A newly generated schedule.
      */
     public static Schedule generate(IClock time) {
         Schedule schedule = new Schedule(time);
@@ -262,35 +322,41 @@ public class Schedule implements Serializable {
         Random rng = new Random();
 
         int bound = GENERATOR_MAX_POOL_SIZE - GENERATOR_MIN_POOL_SIZE;
-        int queueSize = GENERATOR_MIN_POOL_SIZE + rng.nextInt(bound);
+        int queueSize;
 
         Medication meds[] = Medication.values();
 
-        for (int i = 0; i < queueSize; i++) {
-            Medication med = Medication.MISSING;
-            while (med == Medication.MISSING) {
-                med = meds[rng.nextInt(meds.length)];
+        Queue[] pools = new Queue[] {
+            schedule.morningPool, schedule.lunchPool, schedule.eveningPool
+        };
+
+        for (Queue pool : pools) {
+            queueSize = GENERATOR_MIN_POOL_SIZE + rng.nextInt(bound);
+            for (int i = 0; i < queueSize; i++) {
+                Medication med = Medication.MISSING;
+                while (med == Medication.MISSING) {
+                    med = meds[rng.nextInt(meds.length)];
+                }
+                pool.add(med);
             }
-            schedule.addMedToMorningPool(med);
-        }
-
-        queueSize = GENERATOR_MIN_POOL_SIZE + rng.nextInt(bound);
-        for (int i = 0; i < queueSize; i++) {
-            Medication med = Medication.MISSING;
-            while (med == Medication.MISSING)
-                med = meds[rng.nextInt(meds.length)];
-            schedule.addMedToLunchPool(med);
-        }
-
-        queueSize = GENERATOR_MIN_POOL_SIZE + rng.nextInt(bound);
-        for (int i = 0; i < queueSize; i++) {
-            Medication med = Medication.MISSING;
-            while (med == Medication.MISSING)
-                med = meds[rng.nextInt(meds.length)];
-            schedule.addMedToEveningPool(med);
         }
 
         schedule.validateQueue(false);
         return schedule;
+    }
+
+    /**
+     * Merging two queues together
+     * @author Agnes Petäjävaara
+     *
+     * @param q1    The activeQueue with the not not taken medication from the previous period
+     * @param q2    The medication for the current period
+     * @return      One merged queue where the second queue comes after the first
+     */
+    public Queue<Medication> mergeQueues(Queue<Medication> q1, Queue<Medication> q2) {
+        Queue<Medication> resultQueue;
+        resultQueue = new LinkedList<>(q1);
+        resultQueue.addAll(q2);
+        return resultQueue;
     }
 }
