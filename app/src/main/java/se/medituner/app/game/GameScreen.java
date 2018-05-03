@@ -2,12 +2,16 @@ package se.medituner.app.game;
 import se.medituner.app.*;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.TextView;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+import android.os.Handler;
 
 //GameScreen view the users current score and hiScore
 public class GameScreen extends AppCompatActivity {
@@ -34,11 +38,20 @@ public class GameScreen extends AppCompatActivity {
 
         glSurfaceView = findViewById(R.id.gl_surface_view);
         glSurfaceView.scene.linkHighScore(highScore);
+        glSurfaceView.scene.setMojoInvulnerabilityTime(5000);
         //Set the hiScore and currentScore in front
         highScoreView = findViewById(R.id.hiScoreId);
         highScoreView.bringToFront();
         scoreView = findViewById(R.id.currentScoreId);
         scoreView.bringToFront();
+
+
+        /**
+         * Implementing looping game sound
+         * @author Julia Danek
+         */
+        Sounds.getInstance().playSound(Sounds.Sound.S_GSONG, -1);
+
     }
 
     @Override
@@ -46,7 +59,32 @@ public class GameScreen extends AppCompatActivity {
         super.onResume();
 
         highScore.begin();
-    }
+
+        /*
+        If "BackButton" (backarrow) pressed - goes back to MojoScreen
+        @author Julia Danek
+        */
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        }
+
+        /*
+        If "BackButton" pressed - ends activity
+        @author Julia Danek
+        */
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item){
+           int id = item.getItemId();
+
+           if (id == android.R.id.home){
+               //ends the activity
+               this.finish();
+           }
+        return super.onOptionsItemSelected(item);
+        }
 
     @Override
     protected void onPause() {
@@ -65,4 +103,6 @@ public class GameScreen extends AppCompatActivity {
             }
         });
     }
+
+
 }

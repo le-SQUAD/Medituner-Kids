@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
-import android.opengl.Matrix;
 import android.os.SystemClock;
 
 import java.util.Random;
@@ -16,6 +15,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import se.medituner.app.Background;
 import se.medituner.app.R;
+import se.medituner.app.Sounds;
 
 /**
  * The scene which encompasses background and drawable objects.
@@ -34,6 +34,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     private static final long MS_ANIMATION_TIME = 2000l;
     private static final long MS_MOJO_HIT_COOLDOWN = 140l;
+    private static final long MS_RAINBOW_TRANSITION_DURATION = 1000l;
 
     private static final float COLLISION_MIN_OFFSET = 0.45f;
     private static final float COLLISION_MAX_OFFSET = 0.75f;
@@ -54,12 +55,20 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
     private static final float LOWEST_COLOR = 0.75f;
 
-    private static final float COLORS_BACKGROUND[][] = {
+    private static final float COLORS_BACKGROUND_DEFAULT[][] = {
             { 0.5f, 0.0431372549f, 0.0431372549f },
             { 0.73725490196f, 0.34117647058f, 0.34117647058f },
             { 0.65098039215f, 0.19215686274f, 0.19215686274f },
             { 0.85098039215f, 0.5f, 0.5f }
     };
+
+    private static final float COLORS_BACKGROUND_RAINBOW[][] = {
+            {0.70588235f, 0.09803922f, 0.21960784f}, // Red
+            {0.97647059f, 0.60784314f, 0.22352941f}, // Yellow
+            {0.18823529f, 0.64313725f, 0.58431373f}, // Greenblue
+            {0.60392157f, 0.34901961f, 0.70980392f}  // Violet
+    };
+
     private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     private static final float TAU = (float) Math.PI * 2.0f;
     private static final Lane LANES[] = Lane.values();
@@ -71,7 +80,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private Lane mojoLane = Lane.LANE_LEFT;
     private float mojoX, mojoY;
     private float mojoColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    private long lastMojoHit = -200;
+    private long mojoInvulnerabilityEnd = 0;
+    private long lastMojoHit = -MS_MOJO_HIT_COOLDOWN;
 
     private static long obstacleBreak;
 
@@ -89,14 +99,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private float ratio, invRatio;
 
     // Pre-allocated arrays for matrices.
-    private float scaleMatrix[] = new float[16], translateMatrix[] = new float[16];
-    private float rotateMatrix[] = new float[16], transformMatrix[] = new float[16];
+    private float transformMatrix[] = new float[16];
 
+    // Pre-calculated angles for lanes.
     private float laneAngles[] = {
             (float) -Math.PI * 1.0f / 4.0f,
             (float) -Math.PI * 3.0f / 4.0f
     };
-    private float mojoAngle;
 
     // RNG used by the scene.
     private Random rng;
@@ -174,11 +183,13 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         ratio = width / (float) height;
         invRatio = (float) height / (float) width;
 
+        /*
         // Mojo scaling will remain the same for a given ratio
         Matrix.setIdentityM(scaleMatrix, 0);
         Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, ratio * MOJO_SCALE, 1.0f);
+        */
 
-        updateMojo();
+        updateMojoPositionAndRotation();
         Obstacle.setScreenRatio(ratio);
     }
 
@@ -203,6 +214,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         for (int i = 0; i < obstacles.length; i++)
             if (obstacles[i].creationTime > moment)
                 obstacles[i].creationTime = moment - MS_ANIMATION_TIME;
+        // cough sound
+        Sounds.getInstance().playSound(Sounds.Sound.S_COUGH);
+
         if (highScore != null)
             highScore.resetScore();
     }
@@ -225,7 +239,20 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
         // Draw the background
         GLES20.glUseProgram(hBackgroundProgram);
-        background.draw(COLORS_BACKGROUND, time);
+        if (now >= mojoInvulnerabilityEnd
+                || mojoInvulnerabilityEnd - now >= MS_RAINBOW_TRANSITION_DURATION) {
+            float[][] backgroundColors = (now <= mojoInvulnerabilityEnd)
+                    ? COLORS_BACKGROUND_RAINBOW
+                    : COLORS_BACKGROUND_DEFAULT;
+            background.draw(backgroundColors, time);
+        } else {
+            float[][] colors = new float[4][3];
+            float x = (mojoInvulnerabilityEnd - now) / (float) MS_RAINBOW_TRANSITION_DURATION;
+            for (int i = 0; i < colors.length; i++) {
+                colors[i] = lerpColor(COLORS_BACKGROUND_DEFAULT[i], COLORS_BACKGROUND_RAINBOW[i], x);
+            }
+            background.draw(colors, time);
+        }
 
         // Draw obstacles
         GLES20.glUseProgram(hQuadProgram);
@@ -243,27 +270,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             }
         }
 
-        // Mojo
-        /*
-        Matrix.setIdentityM(translateMatrix, 0);
         float mojoOffsetX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
         float mojoOffsetY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-        Matrix.translateM(translateMatrix, 0, mojoX + mojoOffsetX, mojoY + mojoOffsetY, 0.0f);
-
-        setMojoRotationMatrix(rotateMatrix, mojoX + mojoOffsetX, (mojoY + mojoOffsetY) * invRatio);
-        Matrix.rotateM(rotateMatrix, 0,
-                90.0f, 0.0f, 0.0f, 1.0f);
-
-        Matrix.setIdentityM(scaleMatrix, 0);
-        Matrix.scaleM(scaleMatrix, 0, MOJO_SCALE, MOJO_SCALE * ratio, 1.0f);
-
-        Matrix.multiplyMM(transformMatrix, 0, scaleMatrix, 0, rotateMatrix, 0);
-        Matrix.multiplyMM(transformMatrix, 0, translateMatrix, 0, transformMatrix, 0);
-        */
-
-        float mojoOffsetX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-        float mojoOffsetY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-        setMojoMatrix(transformMatrix, mojoX + mojoOffsetX, (mojoY + mojoOffsetY));
+        setMojoMatrix(transformMatrix, mojoX + mojoOffsetX, mojoY + mojoOffsetY);
 
         mojoColor[0] = mojoColor[1] = mojoColor[2] =
                 clamp01((now - lastMojoHit) / (float) MS_MOJO_HIT_COOLDOWN)
@@ -278,6 +287,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @param matrix    The matrix to set.
      * @param x         The Mojos X position.
      * @param y         The Mojos Y position.
+     * @author Grigory Glukhov
      */
     private void setMojoMatrix(float[] matrix, float x, float y) {
         float dist = (float) Math.sqrt(x * x + y * y);
@@ -333,6 +343,15 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     }
 
     /**
+     * Set new duration for Mojos invulnerability in millisecond.
+     *
+     * @param duration  The duration starting 'now' for Mojos invulnerability.
+     */
+    public void setMojoInvulnerabilityTime(long duration) {
+        mojoInvulnerabilityEnd = SystemClock.uptimeMillis() + duration;
+    }
+
+    /**
      * Set the Mojos lane to provided one.
      *
      * @param lane The new Mojo lane.
@@ -340,7 +359,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     public void setMojoLane(Lane lane) {
         if (mojoLane != lane) {
             mojoLane = lane;
-            updateMojo();
+            updateMojoPositionAndRotation();
         }
     }
 
@@ -374,12 +393,10 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     /**
      * Update Mojos position and rotation angle.
      */
-    private void updateMojo() {
-        mojoAngle = getLaneAngle(mojoLane);
+    private void updateMojoPositionAndRotation() {
+        float mojoAngle = getLaneAngle(mojoLane);
         mojoX = (float) Math.cos(mojoAngle) * MOJO_OFFSET;
         mojoY = (float) Math.sin(mojoAngle) * MOJO_OFFSET * invRatio;
-
-        mojoAngle = (mojoAngle * 180.0f / (float) Math.PI) + 90.0f;
     }
 
     /**
@@ -419,6 +436,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      */
     private void checkCollision(float offset, Lane lane, long moment) {
         if (lane == mojoLane
+                && moment > mojoInvulnerabilityEnd
                 && offset >= COLLISION_MIN_OFFSET
                 && offset <= COLLISION_MAX_OFFSET) {
                 collideMojo(moment);
@@ -463,6 +481,23 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     @Override
     public float getOffset(float time) {
         return time * time * time;
+    }
+
+    /**
+     * Linearly interpolate between 2 colors.
+     *
+     * @param a Color a (when x = 0).
+     * @param b Color b (when x = 1).
+     * @param x Resulting color distribution.
+     * @return  New color which is linearly interpolated between a and b.
+     */
+    public float[] lerpColor(float[] a, float[] b, float x) {
+        float[] color = new float[a.length];
+        clamp01(x);
+        for (int i = 0; i < a.length; i++) {
+            color[i] = a[i] * (1.0f - x) + b[i] * x;
+        }
+        return color;
     }
 
     /**
