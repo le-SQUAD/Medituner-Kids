@@ -32,9 +32,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private Background background;
     private Quad model;
 
-    private static final long MS_ANIMATION_TIME = 2000l;
-    private static final long MS_MOJO_HIT_COOLDOWN = 140l;
-    private static final long MS_RAINBOW_TRANSITION_DURATION = 1000l;
+    private static final long MS_ANIMATION_TIME = 2000L;
+    private static final long MS_MOJO_HIT_COOLDOWN = 140L;
+    private static final long MS_RAINBOW_TRANSITION_DURATION = 1000L;
 
     private static final float COLLISION_MIN_OFFSET = 0.45f;
     private static final float COLLISION_MAX_OFFSET = 0.75f;
@@ -76,10 +76,12 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private Lane mojoLane = Lane.LANE_LEFT;
     private float mojoX, mojoY;
     private float mojoColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    private long mojoInvulnerabilityEnd = 0;
     private long lastMojoHit = -MS_MOJO_HIT_COOLDOWN;
+    private long mojoInvulnerabilityDuration;
+    private volatile long mojoInvulnerabilityEnd = 0;
 
     private static long obstacleBreak;
+    private long lastFrameTime;
 
     private Obstacle obstacles[];
 
@@ -160,6 +162,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         for (int i = 0; i < obstacles.length; i++) {
             obstacles[i] = new Obstacle(model);
         }
+
+        lastFrameTime = SystemClock.uptimeMillis();
     }
 
     /**
@@ -223,11 +227,12 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
         // Draw the background
         GLES20.glUseProgram(hBackgroundProgram);
-        if (now >= mojoInvulnerabilityEnd
-                || mojoInvulnerabilityEnd - now >= MS_RAINBOW_TRANSITION_DURATION) {
-            backgroundColors = (now <= mojoInvulnerabilityEnd)
-                    ? COLORS_BACKGROUND_RAINBOW
-                    : COLORS_BACKGROUND_DEFAULT;
+        if (now > mojoInvulnerabilityEnd
+                || (mojoInvulnerabilityEnd - now) > MS_RAINBOW_TRANSITION_DURATION) {
+            float[][] colors = (mojoInvulnerabilityEnd > now)
+                    ? COLORS_BACKGROUND_RAINBOW.clone()
+                    : COLORS_BACKGROUND_DEFAULT.clone();
+            background.draw(colors, time);
         } else {
             float x = (mojoInvulnerabilityEnd - now) / (float) MS_RAINBOW_TRANSITION_DURATION;
             for (int i = 0; i < backgroundColors.length; i++) {
@@ -236,8 +241,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
                         COLORS_BACKGROUND_RAINBOW[i],
                         x);
             }
+            background.draw(backgroundColors, time);
         }
-        background.draw(backgroundColors, time);
 
         // Draw obstacles
         GLES20.glUseProgram(hQuadProgram);
@@ -264,6 +269,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
                         * (1.0f - LOWEST_COLOR) + LOWEST_COLOR;
 
         model.draw(mojoColor, transformMatrix, hTextureMojo);
+        lastFrameTime = now;
     }
 
     /**
@@ -334,7 +340,15 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @param duration  The duration starting 'now' for Mojos invulnerability.
      */
     public void setMojoInvulnerabilityTime(long duration) {
-        mojoInvulnerabilityEnd = SystemClock.uptimeMillis() + duration;
+        mojoInvulnerabilityDuration = duration;
+        resetMojoInvulnerability();
+    }
+
+    /**
+     * Reset (enable) Mojos invulnerability.
+     */
+    public void resetMojoInvulnerability() {
+        mojoInvulnerabilityEnd = SystemClock.uptimeMillis() + mojoInvulnerabilityDuration;
     }
 
     /**
@@ -359,6 +373,18 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             setMojoLane(Lane.LANE_RIGHT);
         else
             setMojoLane(Lane.LANE_LEFT);
+    }
+
+    /**
+     * Get remaining amount of Mojos invulnerability time.
+     *
+     * @return  Mojos remaining invulnerability time.
+     */
+    public long getRemainingMojoInvulnerability() {
+        if (lastFrameTime >= mojoInvulnerabilityEnd)
+            return 0;
+        else
+            return mojoInvulnerabilityEnd - lastFrameTime;
     }
 
     /**
