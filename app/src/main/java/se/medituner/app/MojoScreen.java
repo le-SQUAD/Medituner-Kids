@@ -195,6 +195,8 @@ public class MojoScreen extends AppCompatActivity {
     /**
      * Called when options button is pressed
      *
+     * Switches to options menu
+     *
      * @param view Android button view that was pressed.
      */
     public void onOptionsClick(View view) {
