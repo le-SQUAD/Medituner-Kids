@@ -64,13 +64,11 @@ public class Schedule implements Serializable {
             //Checks if the all medication the previous day was taken, if so increase the streak and
             //create a new morning pool of medication
             case 5:
-               /*
                 if(!activeQueue.isEmpty() || getBeginningOfLastPeriod(time).after(queueCreationTime)){
                     streak.reset();
                 }else{
                     streak.increment();
                 }
-                */
                 activeQueue = new LinkedList<>(morningPool);
                 break;
 
@@ -90,7 +88,6 @@ public class Schedule implements Serializable {
                     activeQueue = new LinkedList<>(mergeQueues(activeQueue,eveningPool));
                     break;
                 }
-
 
            /* case 11:
                 activeQueue = new LinkedList<>(lunchPool);
@@ -330,11 +327,12 @@ public class Schedule implements Serializable {
      *           q2 = the medication for the current period
      * @return one merged queue where the second queue comes after the first
      */
-    private static Queue mergeQueues(Queue q1, Queue q2) {
-        Queue<Object> resultQueue = null;
+    public Queue mergeQueues(Queue q1, Queue q2) {
+        Queue<Object> resultQueue;
         if (q1.isEmpty()) return q2;
         else if (q2.isEmpty()) return q1;
         else {
+            resultQueue = new LinkedList<>();
             while (!q1.isEmpty()){
                 resultQueue.add(q1.poll());
             }
