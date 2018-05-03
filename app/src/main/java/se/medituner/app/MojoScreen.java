@@ -220,6 +220,7 @@ public class MojoScreen extends AppCompatActivity {
      */
     public void onButtonPlay(View view) {
         Intent intent = new Intent(this, GameScreen.class);
+        intent.putExtra(GameScreen.EXTRA_STREAK_SIZE, streak.getValue());
         startActivity(intent);
     }
 
