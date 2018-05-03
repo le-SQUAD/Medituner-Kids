@@ -55,7 +55,7 @@ public class Schedule implements Serializable {
     /**
      * Switches active queue to the correct pool
      * @author Grigory Glukhov, Aleksandra Soltan
-     *         Agnes Petäjävaara(latest update), added not taken medication to the current pool
+     * @author Agnes Petäjävaara(latest update), added the not taken medication to the current pool
      */
     private void updateQueue() {
         Date periodBeginning = getBeginningOfCurrentPeriod(time);
