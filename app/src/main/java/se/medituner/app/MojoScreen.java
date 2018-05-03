@@ -68,7 +68,6 @@ public class MojoScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mojo_screen);
 
-    //    getActionBar().
         persistence = new Persistence(this);
 
         // Set up popups

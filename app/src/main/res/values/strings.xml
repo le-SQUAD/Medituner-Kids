@@ -11,6 +11,7 @@
     <string name="btn_play">Spela!</string>
     <string name="score_current">Poäng: %1$d</string>
     <string name="score_high">Rekord: %1$d</string>
+    <string name="menu_options">Inställningar</string>
 
     <!-- Medication Names -->
     <string name="aerobec">AeroBec</string>
