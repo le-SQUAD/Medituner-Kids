@@ -63,6 +63,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             {0.60392157f, 0.34901961f, 0.70980392f}  // Violet
     };
 
+    private float backgroundColors[][] = new float[4][3];
+
     private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     private static final float TAU = (float) Math.PI * 2.0f;
     private static final Lane LANES[] = Lane.values();
@@ -223,18 +225,19 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         GLES20.glUseProgram(hBackgroundProgram);
         if (now >= mojoInvulnerabilityEnd
                 || mojoInvulnerabilityEnd - now >= MS_RAINBOW_TRANSITION_DURATION) {
-            float[][] backgroundColors = (now <= mojoInvulnerabilityEnd)
+            backgroundColors = (now <= mojoInvulnerabilityEnd)
                     ? COLORS_BACKGROUND_RAINBOW
                     : COLORS_BACKGROUND_DEFAULT;
-            background.draw(backgroundColors, time);
         } else {
-            float[][] colors = new float[4][3];
             float x = (mojoInvulnerabilityEnd - now) / (float) MS_RAINBOW_TRANSITION_DURATION;
-            for (int i = 0; i < colors.length; i++) {
-                colors[i] = lerpColor(COLORS_BACKGROUND_DEFAULT[i], COLORS_BACKGROUND_RAINBOW[i], x);
+            for (int i = 0; i < backgroundColors.length; i++) {
+                backgroundColors[i] = lerpColor(backgroundColors[i],
+                        COLORS_BACKGROUND_DEFAULT[i],
+                        COLORS_BACKGROUND_RAINBOW[i],
+                        x);
             }
-            background.draw(colors, time);
         }
+        background.draw(backgroundColors, time);
 
         // Draw obstacles
         GLES20.glUseProgram(hQuadProgram);
@@ -279,17 +282,18 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         /*
         The resulting matrix is the result of several 2D transformations, from top to bottom:
 
-        [Actual rotation]
-        [cos    -sin]
-        [sin    cos]
-        *
-        [270 degree rotation]
-        [0      1]
-        [-1      0]
         *
         [Scaling (fake projection)]
         [MOJO_SCALE     0]
         [0              MOJO_SCALE * SCREEN_RATIO]
+        *
+        [Actual rotation]
+        [cos    -sin]
+        [sin    cos]
+        *
+        [90 degree rotation]
+        [0      -1]
+        [1      0]
         *
         [Translation]
         [0      0       x]
@@ -447,7 +451,6 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         return now - now % MS_ANIMATION_TIME + obstacleBreak * i;
     }
 
-
     @Override
     public float getOffset(float time) {
         return time * time * time;
@@ -461,13 +464,12 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @param x Resulting color distribution.
      * @return  New color which is linearly interpolated between a and b.
      */
-    public float[] lerpColor(float[] a, float[] b, float x) {
-        float[] color = new float[a.length];
+    public float[] lerpColor(float[] result, float[] a, float[] b, float x) {
         clamp01(x);
         for (int i = 0; i < a.length; i++) {
-            color[i] = a[i] * (1.0f - x) + b[i] * x;
+            result[i] = a[i] * (1.0f - x) + b[i] * x;
         }
-        return color;
+        return result;
     }
 
     /**
