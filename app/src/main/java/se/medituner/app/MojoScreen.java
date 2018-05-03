@@ -192,23 +192,14 @@ public class MojoScreen extends AppCompatActivity {
         schedule.connectStreak(streak);
         schedule.validateQueue(true);
     }
-
     /**
-     * Called when 'generate schedule' button is pressed.
-     *
-     * Generates a new schedule, saves it, updates medication queue and finally shows the medication popup.
+     * Called when options button is pressed
      *
      * @param view Android button view that was pressed.
      */
-    public void onButtonGenerateSchedule(View view) {
-        schedule = Schedule.generate(time);
-        try {
-            persistence.saveObject(schedule, SCHEDULE_FILENAME);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        schedule.connectStreak(streak);
-        checkMedication();
+    public void onOptionsClick(View view) {
+        Intent intent = new Intent(this, OptionsScreen.class);
+        startActivity(intent);
     }
 
     /**
@@ -490,7 +481,6 @@ public class MojoScreen extends AppCompatActivity {
             }, MS_REWARD_STREAK_SHOW_DELAY);
         }
     }
-
 
 
 
