@@ -43,9 +43,15 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     // To obtain the following number one needs to:
     // MIN_PERIOD = Ceiling(1.0/(O^-1(MAX_OFFSET)-O^-1(MIN_OFFSET)) * ANIMATION_TIME)
     private static final long MS_MIN_OBSTACLE_PERIOD = 285;
-    private static final long MS_MAX_OBSTACLE_PERIOD = MS_ANIMATION_TIME;
+    private static final long MS_MAX_OBSTACLE_PERIOD = 1000;
 
-    private static final short OBSTACLE_COUNT = 6;
+    private static final float OBSTACLE_PERIOD_OFFSET = 2.79525482923f;
+    private static final float OBSTACLE_MIN_PERIOD = 0.14225086402f;
+
+    private static final short OBSTACLE_COUNT = 8;
+
+    private long gameStartTime;
+    private long lastObstacleCreation;
 
     private static final float LOWEST_COLOR = 0.75f;
 
@@ -158,6 +164,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         for (int i = 0; i < obstacles.length; i++) {
             obstacles[i] = new Obstacle(model);
         }
+
+        gameStartTime = SystemClock.uptimeMillis();
+        lastObstacleCreation = SystemClock.uptimeMillis();
     }
 
     /**
@@ -200,11 +209,20 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      */
     private void collideMojo(long moment) {
         lastMojoHit = moment;
+        gameStartTime = moment;
+        lastObstacleCreation = moment;
+        for (int i = 0; i < obstacles.length; i++)
+            if (obstacles[i].creationTime > moment)
+                obstacles[i].creationTime = moment - MS_ANIMATION_TIME;
         // cough sound
         Sounds.getInstance().playSound(Sounds.Sound.S_COUGH);
 
         if (highScore != null)
             highScore.resetScore();
+    }
+
+    public void resetGameStartTime() {
+        gameStartTime = SystemClock.uptimeMillis();
     }
 
     /**
@@ -243,7 +261,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
                 Lane lane = LANES[rng.nextInt(LANES.length)];
                 obstacles[i].set(getLaneAngle(lane) + getRandomAngleOffset(),
                         hTexturesObstacle[rng.nextInt(hTexturesObstacle.length)],
-                        clampTime(now, i),
+                        findNextCreationTime(now),
                         lane);
             } else if (now > obstacles[i].creationTime) {
                 float offset = getOffset((now - obstacles[i].creationTime) / (float) MS_ANIMATION_TIME);
@@ -443,8 +461,20 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @param i     Obstacle's offset.
      * @return      New obstacle's spawn time.
      */
-    private long clampTime(long now, int i) {
-        return now - now % MS_ANIMATION_TIME + obstacleBreak * i;
+    private long findNextCreationTime(long now) {
+        /*
+        Lerp over 1 minute
+        float time = (now - gameStartTime) / (float) 60000;
+        long spawnOffset = (long) (MS_MAX_OBSTACLE_PERIOD * (1.0f - time))
+                + (long) (MS_MIN_OBSTACLE_PERIOD * time);
+        lastObstacleCreation += spawnOffset;
+        return lastObstacleCreation;
+        */
+        float time = (now - gameStartTime) / (float) 1000;
+        float period = 1.0f / (time + OBSTACLE_PERIOD_OFFSET) + OBSTACLE_MIN_PERIOD;
+        long timeOffset = (long) (period * MS_ANIMATION_TIME);
+        lastObstacleCreation += timeOffset;
+        return lastObstacleCreation;
     }
 
 
