@@ -51,6 +51,8 @@ public class Schedule implements Serializable {
 
     /**
      * Switches active queue to the correct pool
+     * @authors Greg?, Ola?
+     *          Agnes Petäjävaara(latest update), added not taken medication to the current pool
      */
     private void updateQueue() {
         Date periodBeginning = getBeginningOfCurrentPeriod(time);
@@ -58,17 +60,46 @@ public class Schedule implements Serializable {
         Calendar cal = time.now();
         cal.setTime(periodBeginning);
         switch (cal.get(Calendar.HOUR_OF_DAY)) {
+
+            //Checks if the all medication the previous day was taken, if so increase the streak and
+            //create a new morning pool of medication
             case 5:
+               /*
+                if(!activeQueue.isEmpty() || getBeginningOfLastPeriod(time).after(queueCreationTime)){
+                    streak.reset();
+                }else{
+                    streak.increment();
+                }
+                */
                 activeQueue = new LinkedList<>(morningPool);
                 break;
 
             case 11:
+                if(activeQueue.isEmpty()){
+                    activeQueue = new LinkedList<>(lunchPool);
+                    break;
+                }else{
+                    activeQueue = new LinkedList<>(mergeQueues(activeQueue,lunchPool));
+                    break;
+                }
+            default:
+                if(activeQueue.isEmpty()){
+                    activeQueue = new LinkedList<>(eveningPool);
+                    break;
+                }else{
+                    activeQueue = new LinkedList<>(mergeQueues(activeQueue,eveningPool));
+                    break;
+                }
+
+
+           /* case 11:
                 activeQueue = new LinkedList<>(lunchPool);
                 break;
 
             default:
                 activeQueue = new LinkedList<>(eveningPool);
                 break;
+            */
         }
     }
 
@@ -287,7 +318,30 @@ public class Schedule implements Serializable {
             schedule.addMedToEveningPool(med);
         }
 
-        schedule.validateQueue(false);
+       schedule.validateQueue(false);
         return schedule;
+    }
+
+    /**
+     * Merging two queues together
+     * @author Agnes Petäjävaara
+     *
+     * @param    q1 = the activeQueue with the not not taken medication from the previous period
+     *           q2 = the medication for the current period
+     * @return one merged queue where the second queue comes after the first
+     */
+    private static Queue mergeQueues(Queue q1, Queue q2) {
+        Queue<Object> resultQueue = null;
+        if (q1.isEmpty()) return q2;
+        else if (q2.isEmpty()) return q1;
+        else {
+            while (!q1.isEmpty()){
+                resultQueue.add(q1.poll());
+            }
+            while(!q2.isEmpty()){
+                resultQueue.add(q2.poll());
+            }
+            return resultQueue;
+        }
     }
 }
