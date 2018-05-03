@@ -22,18 +22,31 @@ public class MojoClothingList implements Serializable {
         bounceInterpolator = new BounceInterpolator();
     }
 
+    /**
+     * Add an animated ObjectAnimator to the jump and fall animator lists.
+     *
+     * @param resource The ImageView to animate and add to queue.
+     * @author Aleksandra Soltan
+     */
     public void addClothing(ImageView resource){
+        //Animate resource to jump up with Mojo
         ObjectAnimator jumpAnim = ObjectAnimator.ofFloat(resource, "translationY", -500);
         jumpAnim.setInterpolator(accelerateInterpolator);
         jumpAnim.setDuration(505);
         jumpObjectAnimators.add(jumpAnim);
 
+        //Animate resource to fall and bounce with Mojo
         ObjectAnimator fallAnim = ObjectAnimator.ofFloat(resource, "translationY", 0);
         fallAnim.setInterpolator(bounceInterpolator);
         fallAnim.setDuration(1000);
         fallObjectAnimators.add(fallAnim);
     }
 
+    /**
+     * Reset jump and fall animator lists.
+     *
+     * @author Aleksandra Soltan
+     */
     public void removeClothing(){
         jumpObjectAnimators = new ArrayList<>();
         fallObjectAnimators = new ArrayList<>();

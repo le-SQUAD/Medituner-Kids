@@ -59,7 +59,7 @@ public class MojoScreen extends AppCompatActivity {
     private Schedule schedule;
     private Queue<Medication> medicationQueue;
 
-    private MojoClothingList clothingList; //have to persist
+    private MojoClothingList clothingList;
     private ArrayList<ImageView> clothingImageViewList;
     private ArrayList<ObjectAnimator> jumpObjectAnimators;
     private ArrayList<ObjectAnimator> fallObjectAnimators;
@@ -147,6 +147,7 @@ public class MojoScreen extends AppCompatActivity {
         clothingImageViewList.add(mojoGlassesImageView);
 
         clothingList = new MojoClothingList();
+
         if(streak.getValue() == 3){
             clothingImageViewList.get(0).setVisibility(View.VISIBLE);
             clothingList.addClothing(clothingImageViewList.get(0));
@@ -302,9 +303,9 @@ public class MojoScreen extends AppCompatActivity {
 
 
     /**
-     * Show reward streak popup.
+     * Show reward streak popup, Mojo grinning animation, and update clothing if applicable
      *
-     * @author Sasa Lekic
+     * @author Sasa Lekic, Aleksandra Soltan
      */
     public void showStreakPopup() {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
@@ -353,6 +354,7 @@ public class MojoScreen extends AppCompatActivity {
         mojoImageView.setVisibility(View.VISIBLE);
         mojoImageView.setImageResource(R.drawable.grinning1);
 
+        //Mojo jumps
         jumpClothingAnimations.playTogether(jumpObjectAnimators.toArray(new ObjectAnimator[jumpObjectAnimators.size()]));
         jumpClothingAnimations.start();
 
@@ -417,6 +419,7 @@ public class MojoScreen extends AppCompatActivity {
         // Hide the popup
         questionPopup.dismissPopupWindow();
 
+        //Mojo jumps
         if(jumpObjectAnimators.size() != 0) {
             jumpClothingAnimations.playTogether(jumpObjectAnimators.toArray(new ObjectAnimator[jumpObjectAnimators.size()]));
             jumpClothingAnimations.start();
@@ -484,6 +487,7 @@ public class MojoScreen extends AppCompatActivity {
         // Hide the popup
         questionPopup.dismissPopupWindow();
 
+        //Play Mojo frowning animation
         mojoImageView.setBackgroundResource(R.drawable.frown_animation);
         mojoImageView.setImageResource(android.R.color.transparent);
         AnimationDrawable frownAnimation = (AnimationDrawable) mojoImageView.getBackground();
@@ -552,6 +556,7 @@ public class MojoScreen extends AppCompatActivity {
                             if (streakFunction())
                                 showStreakPopup();
                             else if(streak.getValue() == 0){
+                                //If streak is reset, remove Mojo's clothes
                                 for(int i = 0; i < clothingImageViewList.size(); i++){
                                     clothingImageViewList.get(i).setVisibility(View.INVISIBLE);
                                 }
