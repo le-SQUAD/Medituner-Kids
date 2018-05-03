@@ -87,20 +87,8 @@ public class MojoScreen extends AppCompatActivity {
         streakView = findViewById(R.id.streak_text);
         try {
             streak = (Streak) persistence.loadObject(STREAK_FILENAME);
-        } catch (IOException e) {
-            System.err.println("Could not load streak, resetting it.");
-            streak = new Streak();
-            try {
-                persistence.saveObject(streak, STREAK_FILENAME);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            finish();
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-            System.err.println("Resetting streak");
             streak = new Streak();
             try {
                 persistence.saveObject(streak, STREAK_FILENAME);
@@ -108,6 +96,7 @@ public class MojoScreen extends AppCompatActivity {
                 e1.printStackTrace();
             }
         }
+
         streak.setListener(new StreakListener());
         streakView.setText(getResources().getString(R.string.streak, streak.getValue()));
 
@@ -175,7 +164,7 @@ public class MojoScreen extends AppCompatActivity {
         try {
             System.out.println("Attempting to load schedule.");
             schedule = (Schedule) persistence.loadObject(SCHEDULE_FILENAME);
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Schedule not found. Creating new one.");
             e.printStackTrace();
             schedule = Schedule.generate(time);
@@ -184,9 +173,6 @@ public class MojoScreen extends AppCompatActivity {
             } catch (IOException e1) {
                 e.printStackTrace();
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            finish();
         }
 
         schedule.connectStreak(streak);
