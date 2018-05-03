@@ -2,9 +2,14 @@ package se.medituner.app;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -48,13 +54,20 @@ public class MojoScreen extends AppCompatActivity {
     private boolean grinWaveAnimationPlayed = false;
     private AnimationDrawable waveAnimation;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
-    private ImageView mojoImageView, questionImageView;
+    private ImageView mojoImageView, questionImageView, mojoHatImageView, mojoShoesImageView, mojoGlassesImageView;
     private View streakPopupView;
     private Persistence persistence;
     private Timer scheduler = new Timer(true);
 
     private Schedule schedule;
     private Queue<Medication> medicationQueue;
+
+    private MojoClothingList clothingList; //have to persist
+    private ArrayList<ImageView> clothingImageViewList;
+    private ArrayList<ObjectAnimator> jumpObjectAnimators;
+    private ArrayList<ObjectAnimator> fallObjectAnimators;
+    private AnimatorSet jumpClothingAnimations;
+    private AnimatorSet fallClothingAnimations;
 
     /**
      * The first thing to be called on app startup.
@@ -114,10 +127,45 @@ public class MojoScreen extends AppCompatActivity {
         // Set up animations
         accelerateInterpolator = new AccelerateInterpolator();
         bounceInterpolator = new BounceInterpolator();
+
         mojoImageView = (ImageView) findViewById(R.id.mojoImageView);
+        mojoHatImageView = (ImageView) findViewById(R.id.mojoHatImageView);
+        mojoShoesImageView = (ImageView) findViewById(R.id.mojoShoesImageView);
+        mojoGlassesImageView = (ImageView) findViewById(R.id.mojoGlassesImageView);
 
         mojoImageView.setImageResource(R.drawable.smiling1);
+
         mojoImageView.bringToFront();
+        mojoGlassesImageView.bringToFront();
+        mojoHatImageView.bringToFront();
+        mojoShoesImageView.bringToFront();
+
+        mojoGlassesImageView.setVisibility(View.INVISIBLE);
+        mojoHatImageView.setVisibility(View.INVISIBLE);
+        mojoShoesImageView.setVisibility(View.INVISIBLE);
+
+        clothingImageViewList = new ArrayList<ImageView>();
+        clothingImageViewList.add(mojoHatImageView);
+        clothingImageViewList.add(mojoShoesImageView);
+        clothingImageViewList.add(mojoGlassesImageView);
+
+        clothingList = new MojoClothingList();
+        if(streak.getValue() == 3){
+            clothingImageViewList.get(0).setVisibility(View.VISIBLE);
+            clothingList.addClothing(clothingImageViewList.get(0));
+        }
+        else if((streak.getValue() > 3)){
+            for(int i = 0; (i <= (streak.getValue() / 6)) && (i < clothingImageViewList.size()); i++){
+                ImageView activeClothing = clothingImageViewList.get(i);
+                activeClothing.setVisibility(View.VISIBLE);
+                clothingList.addClothing(activeClothing);
+            }
+        }
+
+        jumpObjectAnimators = clothingList.getJumpClothingAnimations();
+        fallObjectAnimators = clothingList.getFallClothingAnimations();
+        jumpClothingAnimations = new AnimatorSet();
+        fallClothingAnimations = new AnimatorSet();
 
         // Set up schedule
         initializeSchedule();
@@ -267,6 +315,14 @@ public class MojoScreen extends AppCompatActivity {
         rewardStreakTextView.setText(getResources().getString(R.string.streak_popup, streak.getValue()));
         waveAnimation.stop();
 
+        if(jumpObjectAnimators.size() < clothingImageViewList.size()){
+            ImageView activeClothing = clothingImageViewList.get(jumpObjectAnimators.size());
+            clothingList.addClothing(activeClothing);
+            activeClothing.setVisibility(View.VISIBLE);
+            jumpObjectAnimators = clothingList.getJumpClothingAnimations();
+            fallObjectAnimators = clothingList.getFallClothingAnimations();
+        }
+
         Sounds.getInstance().playSound(Sounds.Sound.S_STAR1);
         streakPopupView.setScaleX(0.0f);
         streakPopupView.setScaleY(0.0f);
@@ -298,16 +354,20 @@ public class MojoScreen extends AppCompatActivity {
         }, MS_REWARD_STREAK_HIDE_DELAY + MS_REWARD_STREAK_SHOW_DURATION);
 
         Sounds.getInstance().playSound(Sounds.Sound.S_JUMP);
-
         mojoImageView.setVisibility(View.VISIBLE);
-
         mojoImageView.setImageResource(R.drawable.grinning1);
+
+        jumpClothingAnimations.playTogether(jumpObjectAnimators.toArray(new ObjectAnimator[jumpObjectAnimators.size()]));
+        jumpClothingAnimations.start();
 
         ViewPropertyAnimator viewPropertyAnimator = mojoImageView.animate()
                 .translationY(-500).setInterpolator(accelerateInterpolator).setDuration(500).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         //Mojo falls and bounces
+                        fallClothingAnimations.playTogether(fallObjectAnimators.toArray(new ObjectAnimator[fallObjectAnimators.size()]));
+                        fallClothingAnimations.start();
+
                         mojoImageView.animate()
                                 .translationY(0)
                                 .setInterpolator(bounceInterpolator).setDuration(1000).setListener(new AnimatorListenerAdapter() {
@@ -361,12 +421,22 @@ public class MojoScreen extends AppCompatActivity {
         // Hide the popup
         questionPopup.dismissPopupWindow();
 
+        if(jumpObjectAnimators.size() != 0) {
+            jumpClothingAnimations.playTogether(jumpObjectAnimators.toArray(new ObjectAnimator[jumpObjectAnimators.size()]));
+            jumpClothingAnimations.start();
+        }
+
         mojoImageView.setImageResource(R.drawable.smiling1);
         ViewPropertyAnimator viewPropertyAnimator = mojoImageView.animate()
                 .translationY(-500).setInterpolator(accelerateInterpolator).setDuration(500).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         //Mojo falls and bounces
+                        if(fallObjectAnimators.size() != 0) {
+                            fallClothingAnimations.playTogether(fallObjectAnimators.toArray(new ObjectAnimator[fallObjectAnimators.size()]));
+                            fallClothingAnimations.start();
+                        }
+
                         mojoImageView.animate()
                                 .translationY(0)
                                 .setInterpolator(bounceInterpolator).setDuration(1000).setListener(new AnimatorListenerAdapter() {
@@ -455,7 +525,7 @@ public class MojoScreen extends AppCompatActivity {
      * Show the popup after set amount of milliseconds.
      *
      * @param delay The amount of milliseconds to snooze for.
-     * @author Aleksandra Soltans
+     * @author Aleksandra Soltan
      */
     private void snoozePopup(int delay) {
         scheduler.schedule(new TimerTask() {
@@ -485,6 +555,14 @@ public class MojoScreen extends AppCompatActivity {
                             streakView.setText(getResources().getString(R.string.streak, newStreak));
                             if (streakFunction())
                                 showStreakPopup();
+                            else if(streak.getValue() == 0){
+                                for(int i = 0; i < clothingImageViewList.size(); i++){
+                                    clothingImageViewList.get(i).setVisibility(View.INVISIBLE);
+                                }
+                                clothingList.removeClothing();
+                                jumpObjectAnimators = clothingList.getJumpClothingAnimations();
+                                fallObjectAnimators = clothingList.getFallClothingAnimations();
+                            }
                         }
                     });
                 }
