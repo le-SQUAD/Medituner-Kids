@@ -3,7 +3,7 @@
     <string name="streak">Nivå: %1$d</string>
     <string name="streak_popup">Bra jobbat!\n%1$d in a row!</string>
     <string name="popup_question">Har du tagit %1$s?</string>
-    <string name="btn_reset_highscore">Återställ rekord</string>
+    <string name="btn_reset_highscore">Återställ rekordet</string>
     <string name="btn_generate_schedule">Skapa schema</string>
     <string name="btn_reset_queue">Återställ kön</string>
     <string name="btn_reset_streak">Återställ nivå</string>

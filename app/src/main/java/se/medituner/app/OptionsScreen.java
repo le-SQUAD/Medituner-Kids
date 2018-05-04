@@ -29,7 +29,7 @@ public class OptionsScreen extends AppCompatActivity {
      * Options menu with buttons
      *
      * @param savedInstanceState Android caching
-     * @author Vendela Vlk, Julia Danek
+     * @author Vendela Vlk, Julia Danek, Grigory Glukhov
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {

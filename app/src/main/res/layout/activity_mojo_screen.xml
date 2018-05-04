@@ -36,15 +36,15 @@
 
     <ImageView
         android:id="@+id/btn_options"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="28dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
         android:onClick="onOptionsClick"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_preferences" />
+        app:srcCompat="@mipmap/cogwheel_image" />
 
     <ImageView
         android:id="@+id/mojoImageView"

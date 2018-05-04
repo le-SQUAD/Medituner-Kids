@@ -10,6 +10,8 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateInterpolator;
@@ -168,6 +170,7 @@ public class MojoScreen extends AppCompatActivity {
                     checkMedication();
                 }
             }, MS_FIRST_POPUP_DELAY);
+
     }
 
     public static MojoScreen getInstance() {
@@ -575,7 +578,10 @@ public class MojoScreen extends AppCompatActivity {
         }
     }
 
-
+    public void onCreateOptionMenu(MenuItem item){
+        Intent intent = new Intent(this, OptionsScreen.class);
+        startActivity(intent);
+    }
 
 
 
