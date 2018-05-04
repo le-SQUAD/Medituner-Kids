@@ -117,4 +117,36 @@
         app:layout_constraintStart_toStartOf="@+id/streak_text"
         app:layout_constraintTop_toBottomOf="@+id/btn_generate_schedule" />
 
+    <ImageView
+        android:id="@+id/speechBubble"
+        android:layout_width="305dp"
+        android:layout_height="109dp"
+        android:layout_marginBottom="400dp"
+        android:layout_marginLeft="160dp"
+        android:layout_marginStart="160dp"
+        android:elevation="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/speechbubble" />
+
+    <TextView
+        android:id="@+id/speechHello"
+        android:layout_width="62dp"
+        android:layout_height="28dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:elevation="3dp"
+        android:text="Hello!"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        app:layout_constraintBottom_toBottomOf="@+id/speechBubble"
+        app:layout_constraintEnd_toEndOf="@+id/speechBubble"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="@+id/speechBubble"
+        app:layout_constraintTop_toTopOf="@+id/speechBubble"
+        app:layout_constraintVertical_bias="0.307" />
+
 </android.support.constraint.ConstraintLayout>

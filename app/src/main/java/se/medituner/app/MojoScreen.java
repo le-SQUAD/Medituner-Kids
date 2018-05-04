@@ -8,6 +8,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateInterpolator;
@@ -40,15 +41,15 @@ public class MojoScreen extends AppCompatActivity {
 
     private IClock time = new SystemClock();
 
-    private Popup questionPopup, streakPopup;
+    private Popup questionPopup, streakPopup, helloPopup;
     private Streak streak;
-    private TextView streakView, questionTextView, rewardStreakTextView;
+    private TextView streakView, questionTextView, rewardStreakTextView, speechHello;
     private boolean frownAnimationPlayed = false;
     private boolean smileWaveAnimationPlayed = false;
     private boolean grinWaveAnimationPlayed = false;
     private AnimationDrawable waveAnimation;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
-    private ImageView mojoImageView, questionImageView;
+    private ImageView mojoImageView, questionImageView, speechBubble;
     private View streakPopupView;
     private Persistence persistence;
     private Timer scheduler = new Timer(true);
@@ -71,6 +72,10 @@ public class MojoScreen extends AppCompatActivity {
         persistence = new Persistence(this);
 
         // Set up popups
+        //hello popup
+        helloPopup = new Popup(this, R.layout.question_popup);
+        helloPopup.setAnimationStyle(android.R.style.Animation_Dialog);
+        //questionpopups etc
         questionPopup = new Popup(this, R.layout.question_popup);
         questionPopup.setAnimationStyle(android.R.style.Animation_Dialog);
         questionImageView = questionPopup.getPopupView().findViewById(R.id.medication_image);
@@ -131,6 +136,12 @@ public class MojoScreen extends AppCompatActivity {
                     checkMedication();
                 }
             }, MS_FIRST_POPUP_DELAY);
+
+        //speechbubble
+        speechHello=(TextView) findViewById(R.id.speechHello);
+        speechBubble=(ImageView) findViewById(R.id.speechBubble);
+        speechBubble.bringToFront();
+
     }
 
     /**
@@ -252,7 +263,7 @@ public class MojoScreen extends AppCompatActivity {
         // Set the dynamic image and name
         setPopupMedication(medicationQueue.element());
         // Show popup
-        questionPopup.showPopupWindow(currentScreen);
+        questionPopup.showPopupWindow(currentScreen, Gravity.CENTER, 190, -285);
     }
 
 
@@ -359,6 +370,8 @@ public class MojoScreen extends AppCompatActivity {
 
         // Hide the popup
         questionPopup.dismissPopupWindow();
+        speechHello.setVisibility(View.INVISIBLE);
+        speechBubble.setVisibility(View.INVISIBLE);
 
         mojoImageView.setImageResource(R.drawable.smiling1);
         ViewPropertyAnimator viewPropertyAnimator = mojoImageView.animate()
