@@ -17,7 +17,6 @@ public class MedicationTests {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-
         for (Medication med : Medication.values()) {
             if (Medication.getImageId(appContext.getResources(), appContext.getPackageName(), med) == 0)
                 fail("Medication resource not found for " + med.toString());
