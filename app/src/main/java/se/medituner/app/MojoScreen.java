@@ -51,7 +51,7 @@ public class MojoScreen extends AppCompatActivity {
     private boolean grinWaveAnimationPlayed = false;
     private AnimationDrawable waveAnimation;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
-    private ImageView mojoImageView, questionImageView, mojoHatImageView, mojoShoesImageView, mojoGlassesImageView;
+    private ImageView mojoImageView, questionImageView, mojoHatImageView, mojoShoesImageView;//, mojoGlassesImageView;
     private View streakPopupView;
     private Persistence persistence;
     private Timer scheduler = new Timer(true);
@@ -128,23 +128,23 @@ public class MojoScreen extends AppCompatActivity {
         mojoImageView = (ImageView) findViewById(R.id.mojoImageView);
         mojoHatImageView = (ImageView) findViewById(R.id.mojoHatImageView);
         mojoShoesImageView = (ImageView) findViewById(R.id.mojoShoesImageView);
-        mojoGlassesImageView = (ImageView) findViewById(R.id.mojoGlassesImageView);
+        //mojoGlassesImageView = (ImageView) findViewById(R.id.mojoGlassesImageView);
 
         mojoImageView.setImageResource(R.drawable.smiling1);
 
         mojoImageView.bringToFront();
-        mojoGlassesImageView.bringToFront();
+        //mojoGlassesImageView.bringToFront();
         mojoHatImageView.bringToFront();
         mojoShoesImageView.bringToFront();
 
-        mojoGlassesImageView.setVisibility(View.INVISIBLE);
+        //mojoGlassesImageView.setVisibility(View.INVISIBLE);
         mojoHatImageView.setVisibility(View.INVISIBLE);
         mojoShoesImageView.setVisibility(View.INVISIBLE);
 
         clothingImageViewList = new ArrayList<ImageView>();
         clothingImageViewList.add(mojoHatImageView);
         clothingImageViewList.add(mojoShoesImageView);
-        clothingImageViewList.add(mojoGlassesImageView);
+        //clothingImageViewList.add(mojoGlassesImageView);
 
         clothingList = new MojoClothingList();
 
