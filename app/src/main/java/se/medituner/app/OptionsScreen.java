@@ -1,5 +1,6 @@
 package se.medituner.app;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -43,9 +44,7 @@ public class OptionsScreen extends AppCompatActivity {
     }
 
     public void onButtonResetQueue(View view) {
-
-        MojoScreen mojoScreen = (MojoScreen) getParent();
-        mojoScreen.onButtonResetQueue(view);
+        MojoScreen.getInstance().onButtonResetQueue(view);
     }
 }
 

@@ -6,10 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -40,9 +37,10 @@ public class MojoScreen extends AppCompatActivity {
     public static final int MS_REWARD_STREAK_HIDE_DELAY = 1800;     // Delay between the streak popup appearing and disappearing.
     public static final int MS_REWARD_STREAK_SHOW_DELAY = 800;      // A delay before the streak increasing and the reward popup appearing. Should not be 0 for technical reasons
 
-
     public static final String SCHEDULE_FILENAME = "schedule";
     public static final String STREAK_FILENAME= "streak";
+
+    private static MojoScreen instance;
 
     private IClock time = new SystemClock();
 
@@ -80,6 +78,7 @@ public class MojoScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mojo_screen);
+        instance = this;
 
         persistence = new Persistence(this);
 
@@ -169,6 +168,10 @@ public class MojoScreen extends AppCompatActivity {
                     checkMedication();
                 }
             }, MS_FIRST_POPUP_DELAY);
+    }
+
+    public static MojoScreen getInstance() {
+        return instance;
     }
 
     /**
