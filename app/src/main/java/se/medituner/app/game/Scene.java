@@ -32,9 +32,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private Background background;
     private Quad model;
 
-    private static final long MS_ANIMATION_TIME = 2000l;
-    private static final long MS_MOJO_HIT_COOLDOWN = 140l;
-    private static final long MS_RAINBOW_TRANSITION_DURATION = 1000l;
+    private static final long MS_ANIMATION_TIME = 2000L;
+    private static final long MS_MOJO_HIT_COOLDOWN = 140L;
+    private static final long MS_RAINBOW_TRANSITION_DURATION = 1000L;
 
     private static final float COLLISION_MIN_OFFSET = 0.45f;
     private static final float COLLISION_MAX_OFFSET = 0.75f;
@@ -43,9 +43,15 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     // To obtain the following number one needs to:
     // MIN_PERIOD = Ceiling(1.0/(O^-1(MAX_OFFSET)-O^-1(MIN_OFFSET)) * ANIMATION_TIME)
     private static final long MS_MIN_OBSTACLE_PERIOD = 285;
-    private static final long MS_MAX_OBSTACLE_PERIOD = MS_ANIMATION_TIME;
+    private static final long MS_MAX_OBSTACLE_PERIOD = 1000;
 
-    private static final short OBSTACLE_COUNT = 6;
+    private static final float OBSTACLE_PERIOD_OFFSET = 2.79525482923f;
+    private static final float OBSTACLE_MIN_PERIOD = 0.14225086402f;
+
+    private static final short OBSTACLE_COUNT = 8;
+
+    private long gameStartTime;
+    private long lastObstacleCreation;
 
     private static final float LOWEST_COLOR = 0.75f;
 
@@ -63,6 +69,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             {0.60392157f, 0.34901961f, 0.70980392f}  // Violet
     };
 
+    private float backgroundColors[][] = new float[4][3];
+
     private static final float COLOR_DEFAULT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     private static final float TAU = (float) Math.PI * 2.0f;
     private static final Lane LANES[] = Lane.values();
@@ -74,10 +82,12 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private Lane mojoLane = Lane.LANE_LEFT;
     private float mojoX, mojoY;
     private float mojoColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    private long mojoInvulnerabilityEnd = 0;
     private long lastMojoHit = -MS_MOJO_HIT_COOLDOWN;
+    private long mojoInvulnerabilityDuration;
+    private volatile long mojoInvulnerabilityEnd = 0;
 
     private static long obstacleBreak;
+    private long lastFrameTime;
 
     private Obstacle obstacles[];
 
@@ -158,6 +168,10 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         for (int i = 0; i < obstacles.length; i++) {
             obstacles[i] = new Obstacle(model);
         }
+
+        lastFrameTime = SystemClock.uptimeMillis();
+        gameStartTime = SystemClock.uptimeMillis();
+        lastObstacleCreation = SystemClock.uptimeMillis();
     }
 
     /**
@@ -200,11 +214,20 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      */
     private void collideMojo(long moment) {
         lastMojoHit = moment;
+        gameStartTime = moment;
+        lastObstacleCreation = moment;
+        for (int i = 0; i < obstacles.length; i++)
+            if (obstacles[i].creationTime > moment)
+                obstacles[i].creationTime = moment - MS_ANIMATION_TIME;
         // cough sound
         Sounds.getInstance().playSound(Sounds.Sound.S_COUGH);
 
         if (highScore != null)
             highScore.resetScore();
+    }
+
+    public void resetGameStartTime() {
+        gameStartTime = SystemClock.uptimeMillis();
     }
 
     /**
@@ -221,19 +244,21 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
 
         // Draw the background
         GLES20.glUseProgram(hBackgroundProgram);
-        if (now >= mojoInvulnerabilityEnd
-                || mojoInvulnerabilityEnd - now >= MS_RAINBOW_TRANSITION_DURATION) {
-            float[][] backgroundColors = (now <= mojoInvulnerabilityEnd)
-                    ? COLORS_BACKGROUND_RAINBOW
-                    : COLORS_BACKGROUND_DEFAULT;
-            background.draw(backgroundColors, time);
-        } else {
-            float[][] colors = new float[4][3];
-            float x = (mojoInvulnerabilityEnd - now) / (float) MS_RAINBOW_TRANSITION_DURATION;
-            for (int i = 0; i < colors.length; i++) {
-                colors[i] = lerpColor(COLORS_BACKGROUND_DEFAULT[i], COLORS_BACKGROUND_RAINBOW[i], x);
-            }
+        if (now > mojoInvulnerabilityEnd
+                || (mojoInvulnerabilityEnd - now) > MS_RAINBOW_TRANSITION_DURATION) {
+            float[][] colors = (mojoInvulnerabilityEnd > now)
+                    ? COLORS_BACKGROUND_RAINBOW.clone()
+                    : COLORS_BACKGROUND_DEFAULT.clone();
             background.draw(colors, time);
+        } else {
+            float x = (mojoInvulnerabilityEnd - now) / (float) MS_RAINBOW_TRANSITION_DURATION;
+            for (int i = 0; i < backgroundColors.length; i++) {
+                backgroundColors[i] = lerpColor(backgroundColors[i],
+                        COLORS_BACKGROUND_DEFAULT[i],
+                        COLORS_BACKGROUND_RAINBOW[i],
+                        x);
+            }
+            background.draw(backgroundColors, time);
         }
 
         // Draw obstacles
@@ -243,7 +268,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
                 Lane lane = LANES[rng.nextInt(LANES.length)];
                 obstacles[i].set(getLaneAngle(lane) + getRandomAngleOffset(),
                         hTexturesObstacle[rng.nextInt(hTexturesObstacle.length)],
-                        clampTime(now, i),
+                        findNextCreationTime(now),
                         lane);
             } else if (now > obstacles[i].creationTime) {
                 float offset = getOffset((now - obstacles[i].creationTime) / (float) MS_ANIMATION_TIME);
@@ -261,6 +286,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
                         * (1.0f - LOWEST_COLOR) + LOWEST_COLOR;
 
         model.draw(mojoColor, transformMatrix, hTextureMojo);
+        lastFrameTime = now;
     }
 
     /**
@@ -279,17 +305,18 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         /*
         The resulting matrix is the result of several 2D transformations, from top to bottom:
 
-        [Actual rotation]
-        [cos    -sin]
-        [sin    cos]
-        *
-        [270 degree rotation]
-        [0      1]
-        [-1      0]
         *
         [Scaling (fake projection)]
         [MOJO_SCALE     0]
         [0              MOJO_SCALE * SCREEN_RATIO]
+        *
+        [Actual rotation]
+        [cos    -sin]
+        [sin    cos]
+        *
+        [90 degree rotation]
+        [0      -1]
+        [1      0]
         *
         [Translation]
         [0      0       x]
@@ -330,7 +357,15 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @param duration  The duration starting 'now' for Mojos invulnerability.
      */
     public void setMojoInvulnerabilityTime(long duration) {
-        mojoInvulnerabilityEnd = SystemClock.uptimeMillis() + duration;
+        mojoInvulnerabilityDuration = duration;
+        resetMojoInvulnerability();
+    }
+
+    /**
+     * Reset (enable) Mojos invulnerability.
+     */
+    public void resetMojoInvulnerability() {
+        mojoInvulnerabilityEnd = SystemClock.uptimeMillis() + mojoInvulnerabilityDuration;
     }
 
     /**
@@ -355,6 +390,18 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             setMojoLane(Lane.LANE_RIGHT);
         else
             setMojoLane(Lane.LANE_LEFT);
+    }
+
+    /**
+     * Get remaining amount of Mojos invulnerability time.
+     *
+     * @return  Mojos remaining invulnerability time.
+     */
+    public long getRemainingMojoInvulnerability() {
+        if (lastFrameTime >= mojoInvulnerabilityEnd)
+            return 0;
+        else
+            return mojoInvulnerabilityEnd - lastFrameTime;
     }
 
     /**
@@ -443,10 +490,21 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @param i     Obstacle's offset.
      * @return      New obstacle's spawn time.
      */
-    private long clampTime(long now, int i) {
-        return now - now % MS_ANIMATION_TIME + obstacleBreak * i;
+    private long findNextCreationTime(long now) {
+        /*
+        Lerp over 1 minute
+        float time = (now - gameStartTime) / (float) 60000;
+        long spawnOffset = (long) (MS_MAX_OBSTACLE_PERIOD * (1.0f - time))
+                + (long) (MS_MIN_OBSTACLE_PERIOD * time);
+        lastObstacleCreation += spawnOffset;
+        return lastObstacleCreation;
+        */
+        float time = (now - gameStartTime) / (float) 1000;
+        float period = 1.0f / (time + OBSTACLE_PERIOD_OFFSET) + OBSTACLE_MIN_PERIOD;
+        long timeOffset = (long) (period * MS_ANIMATION_TIME);
+        lastObstacleCreation += timeOffset;
+        return lastObstacleCreation;
     }
-
 
     @Override
     public float getOffset(float time) {
@@ -461,13 +519,12 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
      * @param x Resulting color distribution.
      * @return  New color which is linearly interpolated between a and b.
      */
-    public float[] lerpColor(float[] a, float[] b, float x) {
-        float[] color = new float[a.length];
+    public float[] lerpColor(float[] result, float[] a, float[] b, float x) {
         clamp01(x);
         for (int i = 0; i < a.length; i++) {
-            color[i] = a[i] * (1.0f - x) + b[i] * x;
+            result[i] = a[i] * (1.0f - x) + b[i] * x;
         }
-        return color;
+        return result;
     }
 
     /**

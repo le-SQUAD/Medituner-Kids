@@ -55,7 +55,7 @@ public class Sounds {
                         .build();
 
             } else {
-                //first 3 = amout of different sounds
+                //first 8 = amount of different sounds
                 soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
             }
 
