@@ -103,15 +103,34 @@ public class ScheduleUnitTests {
         schedule.validateQueue(false);
         Queue<Medication> testQueue = schedule.getActiveQueue();
         assertEquals(Medication.MISSING, testQueue.element());
+        testQueue.remove();
 
         clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_LUNCH + 1);
         schedule.validateQueue(false);
         testQueue = schedule.getActiveQueue();
         assertEquals(Medication.AEROBEC, testQueue.element());
+        testQueue.remove();
 
         clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_EVENING + 1);
         schedule.validateQueue(false);
         testQueue = schedule.getActiveQueue();
         assertEquals(Medication.ULTIBROBREEZEHALER, testQueue.element());
+        testQueue.remove();
+    }
+
+    @Test
+    public void scheduleCorrectlySkipsPeriods() {
+        clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_MORNING + 1);
+
+        schedule.validateQueue(false);
+
+        clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_EVENING + 1);
+        schedule.validateQueue(false);
+        Queue<Medication> testQueue = schedule.getActiveQueue();
+
+        assertEquals(3, testQueue.size());
+        assertEquals(Medication.MISSING, testQueue.remove());
+        assertEquals(Medication.AEROBEC, testQueue.remove());
+        assertEquals(Medication.ULTIBROBREEZEHALER, testQueue.remove());
     }
 }

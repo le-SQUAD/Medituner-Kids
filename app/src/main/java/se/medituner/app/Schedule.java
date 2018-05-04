@@ -59,7 +59,6 @@ public class Schedule implements Serializable {
      */
     private void updateQueue() {
         Date periodBeginning = getBeginningOfCurrentPeriod(time);
-        queueCreationTime = time.now();
         Calendar cal = Calendar.getInstance();
         cal.setTime(periodBeginning);
         switch (cal.get(Calendar.HOUR_OF_DAY)) {
@@ -104,6 +103,7 @@ public class Schedule implements Serializable {
             default:
                 throw new IllegalStateException("Unexpected time of day!");
         }
+        queueCreationTime = time.now();
     }
 
     /**
