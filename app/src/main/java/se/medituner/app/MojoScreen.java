@@ -6,10 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -40,9 +37,10 @@ public class MojoScreen extends AppCompatActivity {
     public static final int MS_REWARD_STREAK_HIDE_DELAY = 1800;     // Delay between the streak popup appearing and disappearing.
     public static final int MS_REWARD_STREAK_SHOW_DELAY = 800;      // A delay before the streak increasing and the reward popup appearing. Should not be 0 for technical reasons
 
-
     public static final String SCHEDULE_FILENAME = "schedule";
     public static final String STREAK_FILENAME= "streak";
+
+    private static MojoScreen instance;
 
     private IClock time = new SystemClock();
 
@@ -80,6 +78,7 @@ public class MojoScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mojo_screen);
+        instance = this;
 
         persistence = new Persistence(this);
 
@@ -171,6 +170,10 @@ public class MojoScreen extends AppCompatActivity {
             }, MS_FIRST_POPUP_DELAY);
     }
 
+    public static MojoScreen getInstance() {
+        return instance;
+    }
+
     /**
      * Updates the schedule, validates the medication queue and then shows question popup if necessary.
      *
@@ -227,23 +230,16 @@ public class MojoScreen extends AppCompatActivity {
         schedule.connectStreak(streak);
         schedule.validateQueue(true);
     }
-
     /**
-     * Called when 'generate schedule' button is pressed.
+     * Called when options button is pressed
      *
-     * Generates a new schedule, saves it, updates medication queue and finally shows the medication popup.
+     * Switches to options menu
      *
      * @param view Android button view that was pressed.
      */
-    public void onButtonGenerateSchedule(View view) {
-        schedule = Schedule.generate(time);
-        try {
-            persistence.saveObject(schedule, SCHEDULE_FILENAME);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        schedule.connectStreak(streak);
-        checkMedication();
+    public void onOptionsClick(View view) {
+        Intent intent = new Intent(this, OptionsScreen.class);
+        startActivity(intent);
     }
 
     /**
@@ -560,7 +556,6 @@ public class MojoScreen extends AppCompatActivity {
             }, MS_REWARD_STREAK_SHOW_DELAY);
         }
     }
-
 
 
 
