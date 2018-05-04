@@ -10,12 +10,9 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-<<<<<<< HEAD
 import android.view.Gravity;
-=======
 import android.view.Menu;
 import android.view.MenuItem;
->>>>>>> 137cfa4f4057aecd2338a6f08affa9e6d129af2b
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateInterpolator;
@@ -179,18 +176,15 @@ public class MojoScreen extends AppCompatActivity {
                 }
             }, MS_FIRST_POPUP_DELAY);
 
-<<<<<<< HEAD
         //speechbubble
         speechHello=(TextView) findViewById(R.id.speechHello);
         speechBubble=(ImageView) findViewById(R.id.speechBubble);
         speechBubble.bringToFront();
 
-=======
     }
 
     public static MojoScreen getInstance() {
         return instance;
->>>>>>> 137cfa4f4057aecd2338a6f08affa9e6d129af2b
     }
 
     /**
