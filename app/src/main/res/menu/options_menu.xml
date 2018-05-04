@@ -4,6 +4,7 @@
     <item
         android:title="@string/menu_options"
         android:id="@+id/menu_action_options"
+        android:onClick="onCreateOptionMenu"
         android:icon="@android:drawable/ic_menu_preferences"
         app:showAsAction="always" />
 
