@@ -6,9 +6,11 @@
     <string name="btn_reset_highscore">Återställ rekordet</string>
     <string name="btn_generate_schedule">Skapa schema</string>
     <string name="btn_reset_queue">Återställ kön</string>
+    <string name="btn_reset_streak">Återställ nivå</string>
     <string name="btn_yes">Ja!</string>
     <string name="btn_no">Nej.</string>
     <string name="btn_play">Spela!</string>
+    <string name="game_speed">Spelhastighet: %1$.2f</string>
     <string name="score_current">Poäng: %1$d</string>
     <string name="score_high">Rekord: %1$d</string>
     <string name="menu_options">Inställningar</string>

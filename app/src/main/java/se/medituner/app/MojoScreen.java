@@ -73,8 +73,8 @@ public class MojoScreen extends AppCompatActivity {
      * The first thing to be called on app startup.
      * Most of the initialization happens here.
      *
-     * @param savedInstanceState Android caching
-     * @author Grigory Glukhov, Aleksandra Soltan, Sasa Lekic, Julia Danek, Agnes Petajavaara, Vendela Vlk
+     * @param savedInstanceState    Android caching
+     * @author                      Grigory Glukhov, Aleksandra Soltan, Sasa Lekic, Julia Danek, Agnes Petajavaara, Vendela Vlk
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -259,19 +259,37 @@ public class MojoScreen extends AppCompatActivity {
     }
 
     /**
-     * Called when 'reset queue' button is pressed.
-     *
-     * Resets the current queue.
-     *
-     * @param view Android button view that was pressed.
+     * Reset the current streak.
+     * Will persist the new streak!
      */
-    public void onButtonResetQueue(View view) {
+    public void resetStreak() {
+        streak.reset();
+    }
+
+    /**
+     * Reset the current queue.
+     */
+    public void resetQueue() {
         schedule.resetQueue();
         try {
             persistence.saveObject(schedule, SCHEDULE_FILENAME);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        checkMedication();
+    }
+
+    /**
+     * Generate a brand new schedule.
+     */
+    public void generateSchedule() {
+        schedule = Schedule.generate(time);
+        try {
+            persistence.saveObject(schedule, SCHEDULE_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        schedule.connectStreak(streak);
         checkMedication();
     }
 
