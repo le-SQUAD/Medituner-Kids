@@ -113,13 +113,19 @@ public class Schedule implements Serializable {
      * @author              Aleksandra Soltan, Grigory Glukhov
      */
     public void validateQueue(boolean updateStreak) {
+        Date date = getBeginningOfCurrentPeriod(time);
         if (queueCreationTime.before(getBeginningOfCurrentPeriod(time))) {
             if (updateStreak && streak != null) {
-                System.out.println("Checking for reset");
                 if (!activeQueue.isEmpty()) {
                     Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(getBeginningOfCurrentPeriod(time));
-                    if (calendar.get(Calendar.HOUR_OF_DAY) == PERIOD_BEGINNING_MORNING) {
+                    // Set to this morning
+                    calendar.setTime(time.now());
+                    calendar.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
+                    calendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
+
+                    if (queueCreationTime.before(calendar.getTime())) {
                         streak.reset();
                     }
                 }
@@ -127,7 +133,7 @@ public class Schedule implements Serializable {
             updateQueue();
             streakUpdated = false;
         } else {
-            if (activeQueue.isEmpty() && !streakUpdated && streak != null) {
+            if (activeQueue.isEmpty() && updateStreak && !streakUpdated && streak != null) {
                 // Queue is empty, it doesn't need to update,
                 // However we want to reward the player immediately
                 streakUpdated = true;
@@ -150,6 +156,7 @@ public class Schedule implements Serializable {
         Calendar now = Calendar.getInstance();
         now.setTime(time.now());
         Calendar comparison = Calendar.getInstance();
+        comparison.setTime(time.now());
 
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);
@@ -225,6 +232,7 @@ public class Schedule implements Serializable {
         Calendar now = Calendar.getInstance();
         now.setTime(time.now());
         Calendar comparison = Calendar.getInstance();
+        comparison.setTime(time.now());
 
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);

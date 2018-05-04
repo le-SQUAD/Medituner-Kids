@@ -15,6 +15,7 @@ public class ScheduleUnitTests {
     private Calendar calendar = Calendar.getInstance();
     private TestClock clock = new TestClock(calendar);
     private Schedule schedule;
+    private Streak streak;
 
     private class TestClock implements IClock {
 
@@ -34,6 +35,8 @@ public class ScheduleUnitTests {
     public void setUpSchedule() {
         clock.simulatedNow.set(Calendar.HOUR_OF_DAY, 8);
         schedule = new Schedule(clock);
+        streak = new Streak();
+        schedule.connectStreak(streak);
 
         schedule.addMedToMorningPool(Medication.MISSING);
         schedule.addMedToLunchPool(Medication.AEROBEC);
@@ -102,20 +105,23 @@ public class ScheduleUnitTests {
 
         schedule.validateQueue(false);
         Queue<Medication> testQueue = schedule.getActiveQueue();
-        assertEquals(Medication.MISSING, testQueue.element());
-        testQueue.remove();
+        assertEquals(Medication.MISSING, testQueue.remove());
 
         clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_LUNCH + 1);
         schedule.validateQueue(false);
         testQueue = schedule.getActiveQueue();
-        assertEquals(Medication.AEROBEC, testQueue.element());
-        testQueue.remove();
+        assertEquals(Medication.AEROBEC, testQueue.remove());
 
         clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_EVENING + 1);
         schedule.validateQueue(false);
         testQueue = schedule.getActiveQueue();
-        assertEquals(Medication.ULTIBROBREEZEHALER, testQueue.element());
-        testQueue.remove();
+        assertEquals(Medication.ULTIBROBREEZEHALER, testQueue.remove());
+
+        clock.simulatedNow.add(Calendar.DATE, 1);
+        clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_MORNING + 1);
+        schedule.validateQueue(false);
+        testQueue = schedule.getActiveQueue();
+        assertEquals(Medication.MISSING, testQueue.remove());
     }
 
     @Test
@@ -132,5 +138,43 @@ public class ScheduleUnitTests {
         assertEquals(Medication.MISSING, testQueue.remove());
         assertEquals(Medication.AEROBEC, testQueue.remove());
         assertEquals(Medication.ULTIBROBREEZEHALER, testQueue.remove());
+    }
+
+    @Test
+    public void scheduleUpdatesStreakAccordingly() {
+        clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_MORNING + 1);
+        schedule.validateQueue(false);
+
+        // Initial streak is 0
+        assertEquals(0, streak.getValue());
+
+        schedule.getActiveQueue().remove();
+        schedule.validateQueue(true);
+
+        assertEquals(1, streak.getValue());
+
+        // Skipping to evening
+        clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_EVENING + 1);
+        schedule.validateQueue(true);
+        assertEquals(1, streak.getValue());
+
+        schedule.validateQueue(true);
+        assertEquals(1, streak.getValue());
+
+        schedule.validateQueue(false);
+
+        // Skip to next lunch.
+        clock.simulatedNow.add(Calendar.DATE, 1);
+        clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_LUNCH + 1);
+
+        schedule.validateQueue(true);
+        assertEquals(0, streak.getValue());
+
+        Queue<Medication> testQueue = schedule.getActiveQueue();
+        assertEquals(2, testQueue.size());
+        assertEquals(Medication.MISSING, testQueue.remove());
+        assertEquals(Medication.AEROBEC, testQueue.remove());
+        schedule.validateQueue(true);
+        assertEquals(1, streak.getValue());
     }
 }
