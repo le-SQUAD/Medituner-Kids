@@ -43,8 +43,16 @@ public class OptionsScreen extends AppCompatActivity {
         HighScore.resetHighScore(persistence);
     }
 
+    public void onButtonGenerateSchedule(View view) {
+        MojoScreen.getInstance().generateSchedule();
+    }
+
     public void onButtonResetQueue(View view) {
-        MojoScreen.getInstance().onButtonResetQueue(view);
+        MojoScreen.getInstance().resetQueue();
+    }
+
+    public void onButtonResetStreak(View view) {
+        MojoScreen.getInstance().resetStreak();
     }
 }
 
