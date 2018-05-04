@@ -48,6 +48,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     private static final float OBSTACLE_PERIOD_OFFSET = 2.79525482923f;
     private static final float OBSTACLE_MIN_PERIOD = 0.14225086402f;
 
+    private float backgroundSpeed = 1.0f;
+
     private static final short OBSTACLE_COUNT = 8;
 
     private long gameStartTime;
@@ -240,7 +242,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl) {
         long now = SystemClock.uptimeMillis();
-        float time = now % MS_ANIMATION_TIME / (float) MS_ANIMATION_TIME;
+        long animPeriod = (long) (MS_ANIMATION_TIME / backgroundSpeed);
+        float backgroundTime = now % animPeriod / (float) animPeriod;
 
         // Draw the background
         GLES20.glUseProgram(hBackgroundProgram);
@@ -249,7 +252,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             float[][] colors = (mojoInvulnerabilityEnd > now)
                     ? COLORS_BACKGROUND_RAINBOW.clone()
                     : COLORS_BACKGROUND_DEFAULT.clone();
-            background.draw(colors, time);
+            background.draw(colors, backgroundTime);
         } else {
             float x = (mojoInvulnerabilityEnd - now) / (float) MS_RAINBOW_TRANSITION_DURATION;
             for (int i = 0; i < backgroundColors.length; i++) {
@@ -258,7 +261,7 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
                         COLORS_BACKGROUND_RAINBOW[i],
                         x);
             }
-            background.draw(backgroundColors, time);
+            background.draw(backgroundColors, backgroundTime);
         }
 
         // Draw obstacles
@@ -277,8 +280,8 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
             }
         }
 
-        float mojoOffsetX = (float) Math.sin(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
-        float mojoOffsetY = (float) Math.cos(time * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        float mojoOffsetX = (float) Math.sin(backgroundTime * TAU) * MOJO_FLOAT_MAX_DISTANCE;
+        float mojoOffsetY = (float) Math.cos(backgroundTime * TAU) * MOJO_FLOAT_MAX_DISTANCE;
         setMojoMatrix(transformMatrix, mojoX + mojoOffsetX, mojoY + mojoOffsetY);
 
         mojoColor[0] = mojoColor[1] = mojoColor[2] =
@@ -566,5 +569,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         }
 
         return textureHandle[0];
+    }
+
+    public void setBackgroundSpeed(float speed) {
+        backgroundSpeed = speed;
     }
 }

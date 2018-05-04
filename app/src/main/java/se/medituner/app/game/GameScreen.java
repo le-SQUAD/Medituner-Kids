@@ -2,6 +2,8 @@ package se.medituner.app.game;
 import se.medituner.app.*;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -46,9 +48,16 @@ public class GameScreen extends AppCompatActivity {
 
         long invulnerabilityTime = streakToInvulnerabilityTime(getIntent().getIntExtra(EXTRA_STREAK_SIZE, 0));
 
+        SharedPreferences sp = getSharedPreferences(
+                OptionsScreen.PREFERENCE_NAME,
+                Context.MODE_PRIVATE
+        );
+        float gameSpeed = sp.getFloat(OptionsScreen.KEY_GAME_SPEED, OptionsScreen.DEFAULT_GAME_SPEED);
+
         glSurfaceView = findViewById(R.id.gl_surface_view);
         glSurfaceView.scene.linkHighScore(highScore);
         glSurfaceView.scene.setMojoInvulnerabilityTime(invulnerabilityTime);
+        glSurfaceView.scene.setBackgroundSpeed(gameSpeed);
         //Set the hiScore and currentScore in front
         highScoreView = findViewById(R.id.hiScoreId);
         highScoreView.bringToFront();
