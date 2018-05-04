@@ -17,9 +17,9 @@ public class Schedule implements Serializable {
     public static final int GENERATOR_MIN_POOL_SIZE = 2;
     public static final int GENERATOR_MAX_POOL_SIZE = 5;
 
-    public static final int MORNING_PERIOD_BEGINNING = 5;
-    public static final int LUNCH_PERIOD_BEGINNING = 11;
-    public static final int EVENING_PERIOD_BEGINNING = 17;
+    public static final int PERIOD_BEGINNING_MORNING = 5;
+    public static final int PERIOD_BEGINNING_LUNCH = 11;
+    public static final int PERIOD_BEGINNING_EVENING = 17;
 
     // Dependency injection
     private IClock time;
@@ -59,14 +59,12 @@ public class Schedule implements Serializable {
      */
     private void updateQueue() {
         Date periodBeginning = getBeginningOfCurrentPeriod(time);
-        queueCreationTime = time.now();
         Calendar cal = Calendar.getInstance();
         cal.setTime(periodBeginning);
         switch (cal.get(Calendar.HOUR_OF_DAY)) {
-
             //Checks if the all medication the previous day was taken, if so increase the streak and
             //create a new morning pool of medication
-            case MORNING_PERIOD_BEGINNING: {
+            case PERIOD_BEGINNING_MORNING: {
                 /*
                 if (!activeQueue.isEmpty() || getBeginningOfLastPeriod(time).after(queueCreationTime)) {
                     streak.reset();
@@ -74,11 +72,12 @@ public class Schedule implements Serializable {
                     streak.increment();
                 }
                 */
-                activeQueue = new LinkedList<>(morningPool);
+                    activeQueue = new LinkedList<>(morningPool);
             }
+
             break;
 
-            case LUNCH_PERIOD_BEGINNING: {
+            case PERIOD_BEGINNING_LUNCH:  {
                 if (getBeginningOfLastPeriod(time).before(queueCreationTime)) {
                     // This means activeQueue is semi-valid
                     activeQueue = mergeQueues(activeQueue, lunchPool);
@@ -88,7 +87,7 @@ public class Schedule implements Serializable {
                 }
             } break;
 
-            case EVENING_PERIOD_BEGINNING: {
+            case PERIOD_BEGINNING_EVENING: {
                 if (queueCreationTime.after(getBeginningOfLastPeriod(time))) {
                     activeQueue = mergeQueues(activeQueue, eveningPool);
                 } else {
@@ -103,17 +102,8 @@ public class Schedule implements Serializable {
 
             default:
                 throw new IllegalStateException("Unexpected time of day!");
-
-           /*
-            case 11:
-                activeQueue = new LinkedList<>(lunchPool);
-                break;
-
-            default:
-                activeQueue = new LinkedList<>(eveningPool);
-                break;
-            */
         }
+        queueCreationTime = time.now();
     }
 
     /**
@@ -123,17 +113,19 @@ public class Schedule implements Serializable {
      * @author              Aleksandra Soltan, Grigory Glukhov
      */
     public void validateQueue(boolean updateStreak) {
+        Date date = getBeginningOfCurrentPeriod(time);
         if (queueCreationTime.before(getBeginningOfCurrentPeriod(time))) {
-            System.out.println("Updating queue");
-            System.out.print(streak);
-            System.out.print(" ");
-            System.out.println(updateStreak);
             if (updateStreak && streak != null) {
-                System.out.println("Checking for reset");
                 if (!activeQueue.isEmpty()) {
                     Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(getBeginningOfCurrentPeriod(time));
-                    if (calendar.get(Calendar.HOUR_OF_DAY) == MORNING_PERIOD_BEGINNING) {
+                    // Set to this morning
+                    calendar.setTime(time.now());
+                    calendar.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
+                    calendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
+
+                    if (queueCreationTime.before(calendar.getTime())) {
                         streak.reset();
                     }
                 }
@@ -141,7 +133,7 @@ public class Schedule implements Serializable {
             updateQueue();
             streakUpdated = false;
         } else {
-            if (activeQueue.isEmpty() && !streakUpdated) {
+            if (activeQueue.isEmpty() && updateStreak && !streakUpdated && streak != null) {
                 // Queue is empty, it doesn't need to update,
                 // However we want to reward the player immediately
                 streakUpdated = true;
@@ -164,23 +156,25 @@ public class Schedule implements Serializable {
         Calendar now = Calendar.getInstance();
         now.setTime(time.now());
         Calendar comparison = Calendar.getInstance();
+        comparison.setTime(time.now());
+
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);
         comparison.set(Calendar.MILLISECOND, 0);
 
-        comparison.set(Calendar.HOUR_OF_DAY, 5);
+        comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
         if (now.getTime().before(comparison.getTime())) {
-            comparison.add(Calendar.HOUR_OF_DAY, -12);
+            comparison.add(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING - PERIOD_BEGINNING_EVENING);
             return comparison.getTime();
         } else {
-            comparison.set(Calendar.HOUR_OF_DAY, 11);
+            comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_LUNCH);
             if (now.getTime().before(comparison.getTime())) {
-                comparison.set(Calendar.HOUR_OF_DAY, 5);
+                comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
                 return comparison.getTime();
             } else {
-                comparison.set(Calendar.HOUR_OF_DAY, 17);
+                comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_EVENING);
                 if (now.getTime().before(comparison.getTime())) {
-                    comparison.set(Calendar.HOUR_OF_DAY, 11);
+                    comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_LUNCH);
                     return comparison.getTime();
                 } else {
                     return comparison.getTime();
@@ -199,16 +193,16 @@ public class Schedule implements Serializable {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(time);
         switch (calendar.get(Calendar.HOUR_OF_DAY)) {
-            case MORNING_PERIOD_BEGINNING:
-                calendar.add(Calendar.HOUR_OF_DAY, MORNING_PERIOD_BEGINNING - EVENING_PERIOD_BEGINNING);
+            case PERIOD_BEGINNING_MORNING:
+                calendar.add(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING - PERIOD_BEGINNING_EVENING);
                 break;
 
-            case LUNCH_PERIOD_BEGINNING:
-                calendar.set(Calendar.HOUR_OF_DAY, MORNING_PERIOD_BEGINNING);
+            case PERIOD_BEGINNING_LUNCH:
+                calendar.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
                 break;
 
-            case EVENING_PERIOD_BEGINNING:
-                calendar.set(Calendar.HOUR_OF_DAY, LUNCH_PERIOD_BEGINNING);
+            case PERIOD_BEGINNING_EVENING:
+                calendar.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_LUNCH);
                 break;
 
             default:
@@ -238,23 +232,25 @@ public class Schedule implements Serializable {
         Calendar now = Calendar.getInstance();
         now.setTime(time.now());
         Calendar comparison = Calendar.getInstance();
+        comparison.setTime(time.now());
+
         comparison.set(Calendar.MINUTE, 0);
         comparison.set(Calendar.SECOND, 0);
         comparison.set(Calendar.MILLISECOND, 0);
 
-        comparison.set(Calendar.HOUR_OF_DAY, MORNING_PERIOD_BEGINNING);
+        comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_MORNING);
         if (now.getTime().before(comparison.getTime())) {
             return comparison.getTime();
         } else {
-            comparison.set(Calendar.HOUR_OF_DAY, LUNCH_PERIOD_BEGINNING);
+            comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_LUNCH);
             if (now.getTime().before(comparison.getTime())) {
                 return comparison.getTime();
             } else {
-                comparison.set(Calendar.HOUR_OF_DAY, EVENING_PERIOD_BEGINNING);
+                comparison.set(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_EVENING);
                 if (now.getTime().before(comparison.getTime())) {
                     return comparison.getTime();
                 } else {
-                    comparison.add(Calendar.HOUR_OF_DAY, EVENING_PERIOD_BEGINNING - MORNING_PERIOD_BEGINNING);
+                    comparison.add(Calendar.HOUR_OF_DAY, PERIOD_BEGINNING_EVENING - PERIOD_BEGINNING_MORNING);
                     return comparison.getTime();
                 }
             }
