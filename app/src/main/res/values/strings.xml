@@ -1,13 +1,19 @@
 <resources>
     <string name="app_name">Medituner Kids</string>
-    <string name="streak">Streak: %1$d</string>
-    <string name="streak_popup">GREAT JOB!\n%1$d in a row!</string>
-    <string name="popup_question">Have you taken your %1$s?</string>
-    <string name="btn_generate_schedule">Generate Schedule</string>
-    <string name="btn_reset_queue">Reset Queue</string>
-    <string name="btn_yes">Yes!</string>
-    <string name="btn_no">No.</string>
-
+    <string name="streak">Nivå: %1$d</string>
+    <string name="streak_popup">Bra jobbat!\n%1$d in a row!</string>
+    <string name="popup_question">Har du tagit %1$s?</string>
+    <string name="btn_reset_highscore">Återställ rekord</string>
+    <string name="btn_generate_schedule">Skapa schema</string>
+    <string name="btn_reset_queue">Återställ kön</string>
+    <string name="btn_reset_streak">Återställ nivå</string>
+    <string name="btn_yes">Ja!</string>
+    <string name="btn_no">Nej.</string>
+    <string name="btn_play">Spela!</string>
+    <string name="game_speed">Spelhastighet: %1$.2f</string>
+    <string name="score_current">Poäng: %1$d</string>
+    <string name="score_high">Rekord: %1$d</string>
+    <string name="menu_options">Inställningar</string>
 
     <!-- Medication Names -->
     <string name="aerobec">AeroBec</string>
@@ -34,7 +40,7 @@
     <string name="dukalirgenuair">Dukalir Genuari</string>
     <string name="duorespspiromax">Duores spiromax</string>
     <string name="ekliragenuair">Eklira genuair</string>
-    <string name="eyedrop">Eyedrop</string>
+    <string name="eyedrop">ögondropparna</string>
     <string name="flutide">Flutide</string>
     <string name="flutidediskusorange">Flutide</string>
     <string name="flutiform">Flutiform</string>
@@ -43,11 +49,11 @@
     <string name="incruseellipta">Incruse Ellipta</string>
     <string name="innovair">Innovair</string>
     <string name="missing">missing</string>
-    <string name="nosespray">Nose spray</string>
+    <string name="nosespray">nässprayen</string>
     <string name="novopulmonnovolizer">Novopulmon Novolizer</string>
     <string name="onbrezbreezhaler">Onbrez breezhaler</string>
     <string name="oxisturbohaler">Oxis Turbohaler</string>
-    <string name="pill">Pill</string>
+    <string name="pill">medicinen</string>
     <string name="pulmicortturbohaler">Pulmicort Turbohaler</string>
     <string name="relanio">Relanio</string>
     <string name="relvar">Relvar</string>
