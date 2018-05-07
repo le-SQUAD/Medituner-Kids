@@ -47,16 +47,6 @@
         app:srcCompat="@mipmap/cogwheel_image" />
 
     <ImageView
-        android:id="@+id/mojoImageView"
-        android:layout_width="278dp"
-        android:layout_height="282dp"
-        android:layout_marginTop="260dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/smiling1" />
-
-    <ImageView
         android:id="@+id/tree"
         android:layout_width="318dp"
         android:layout_height="472dp"
@@ -71,11 +61,10 @@
         android:id="@+id/sunflower"
         android:layout_width="0dp"
         android:layout_height="252dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginRight="28dp"
+        android:layout_marginEnd="220dp"
+        android:layout_marginRight="220dp"
         android:layout_marginTop="292dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/txt_greeting_congratulation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/sunflower" />
@@ -97,6 +86,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.235"
         app:srcCompat="@drawable/sun" />
+
+    <ImageView
+        android:id="@+id/mojoImageView"
+        android:layout_width="278dp"
+        android:layout_height="282dp"
+        android:layout_marginTop="260dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/smiling1" />
 
     <ImageView
         android:id="@+id/mojoHatImageView"
