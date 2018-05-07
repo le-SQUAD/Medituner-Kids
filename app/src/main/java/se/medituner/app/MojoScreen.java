@@ -39,6 +39,10 @@ public class MojoScreen extends AppCompatActivity {
     public static final int MS_REWARD_STREAK_HIDE_DELAY = 1800;     // Delay between the streak popup appearing and disappearing.
     public static final int MS_REWARD_STREAK_SHOW_DELAY = 800;      // A delay before the streak increasing and the reward popup appearing. Should not be 0 for technical reasons
 
+    public static final int MS_OBSTACLE_POPUP_DELAY = 2400;
+    public static final int MS_BUTTON_DELAY = 800;
+    public static final int MS_LUNG_DELAY = 2400;
+
     public static final String SCHEDULE_FILENAME = "schedule";
     public static final String STREAK_FILENAME= "streak";
 
@@ -48,15 +52,16 @@ public class MojoScreen extends AppCompatActivity {
 
     private IClock time = new SystemClock();
 
-    private Popup questionPopup, streakPopup;
+    private Popup questionPopup, streakPopup, gameInstructionPopup;
     private Streak streak;
-    private TextView streakView, questionTextView, rewardStreakTextView;
+    private TextView streakView, questionTextView, rewardStreakTextView, gameInstructionTextView;
     private boolean frownAnimationPlayed = false;
     private boolean smileWaveAnimationPlayed = false;
     private boolean grinWaveAnimationPlayed = false;
+    private boolean gameInstructionsPlayed = false;
     private AnimationDrawable waveAnimation;
     private TimeInterpolator accelerateInterpolator, bounceInterpolator;
-    private ImageView mojoImageView, questionImageView, mojoHatImageView, mojoShoesImageView;//, mojoGlassesImageView;
+    private ImageView mojoImageView, questionImageView, mojoHatImageView, mojoShoesImageView, leftInstructionsImageView, rightInstructionsImageView, centerInstructionsImageView;//, mojoGlassesImageView;
     private View streakPopupView;
     private Persistence persistence;
     private Timer scheduler = new Timer(true);
@@ -98,6 +103,13 @@ public class MojoScreen extends AppCompatActivity {
         streakPopupView = streakPopup.getPopupView();
         rewardStreakTextView = streakPopupView.findViewById(R.id.text_reward_streak);
 
+        gameInstructionPopup = new Popup(this, R.layout.game_instruction_popup);
+        gameInstructionPopup.setAnimationStyle(android.R.style.Animation_Dialog);
+        leftInstructionsImageView = gameInstructionPopup.getPopupView().findViewById(R.id.left_image);
+        rightInstructionsImageView = gameInstructionPopup.getPopupView().findViewById(R.id.right_image);
+        centerInstructionsImageView = gameInstructionPopup.getPopupView().findViewById(R.id.center_image);
+        gameInstructionTextView = gameInstructionPopup.getPopupView().findViewById(R.id.text_instruction);
+
         // Load sounds
         Sounds.getInstance().loadSounds(this);
 
@@ -125,23 +137,19 @@ public class MojoScreen extends AppCompatActivity {
         mojoImageView = (ImageView) findViewById(R.id.mojoImageView);
         mojoHatImageView = (ImageView) findViewById(R.id.mojoHatImageView);
         mojoShoesImageView = (ImageView) findViewById(R.id.mojoShoesImageView);
-        //mojoGlassesImageView = (ImageView) findViewById(R.id.mojoGlassesImageView);
 
         mojoImageView.setImageResource(R.drawable.smiling1);
 
         mojoImageView.bringToFront();
-        //mojoGlassesImageView.bringToFront();
         mojoHatImageView.bringToFront();
         mojoShoesImageView.bringToFront();
 
-        //mojoGlassesImageView.setVisibility(View.INVISIBLE);
         mojoHatImageView.setVisibility(View.INVISIBLE);
         mojoShoesImageView.setVisibility(View.INVISIBLE);
 
         clothingImageViewList = new ArrayList<ImageView>();
         clothingImageViewList.add(mojoHatImageView);
         clothingImageViewList.add(mojoShoesImageView);
-        //clothingImageViewList.add(mojoGlassesImageView);
 
         clothingList = new MojoClothingList();
 
@@ -259,9 +267,75 @@ public class MojoScreen extends AppCompatActivity {
      * @param view Android button view that was pressed.
      */
     public void onButtonPlay(View view) {
-        Intent intent = new Intent(this, GameScreen.class);
-        intent.putExtra(GameScreen.EXTRA_STREAK_SIZE, streak.getValue());
-        startActivity(intent);
+        gameInstructionTextView.setText("Se upp för pollen och rök!");
+        leftInstructionsImageView.setImageResource(R.drawable.avoidpollen);
+        rightInstructionsImageView.setImageResource(R.drawable.avoidsmoke);
+        leftInstructionsImageView.setVisibility(View.VISIBLE);
+        rightInstructionsImageView.setVisibility(View.VISIBLE);
+        centerInstructionsImageView.setImageResource(R.drawable.lungs);
+        centerInstructionsImageView.setVisibility(View.INVISIBLE);
+        showGameInstructionPopup();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                gameInstructionTextView.setText("Tryck för att flytta Mojo!");
+
+                leftInstructionsImageView.setImageResource(R.drawable.mojoleftbubble);
+                rightInstructionsImageView.setImageResource(R.drawable.tryck1);
+            }
+        }, MS_OBSTACLE_POPUP_DELAY);
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                rightInstructionsImageView.setImageResource(R.drawable.tryck2);
+
+            }
+        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY);
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                rightInstructionsImageView.setImageResource(R.drawable.tryck1);
+
+            }
+        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY);
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                leftInstructionsImageView.setVisibility(View.INVISIBLE);
+                rightInstructionsImageView.setImageResource(R.drawable.mojorightbubble);
+
+            }
+        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY);
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                leftInstructionsImageView.setVisibility(View.INVISIBLE);
+                rightInstructionsImageView.setVisibility(View.INVISIBLE);
+                centerInstructionsImageView.setVisibility(View.VISIBLE);
+                gameInstructionTextView.setText("Nu kör vi!");
+
+            }
+        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + (MS_BUTTON_DELAY * 2) + MS_BUTTON_DELAY);
+
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                gameInstructionPopup.dismissPopupWindow();
+                Intent intent = new Intent(MojoScreen.this, GameScreen.class);
+                intent.putExtra(GameScreen.EXTRA_STREAK_SIZE, streak.getValue());
+                startActivity(intent);
+            }
+        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + MS_LUNG_DELAY);
+
     }
 
     /**
@@ -312,6 +386,15 @@ public class MojoScreen extends AppCompatActivity {
         setPopupMedication(medicationQueue.element());
         // Show popup
         questionPopup.showPopupWindow(currentScreen, Gravity.CENTER, 0, questionYOffset);
+    }
+
+    public void showGameInstructionPopup() {
+        // Get the reference to an existing layout.
+        View currentScreen = findViewById(R.id.activity_mojo_screen);
+        // Set the dynamic image and name
+        //setPopupMedication(medicationQueue.element());
+        // Show popup
+        gameInstructionPopup.showPopupWindow(currentScreen);
     }
 
 
