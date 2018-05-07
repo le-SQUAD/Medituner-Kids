@@ -84,8 +84,8 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="304dp"
-        android:layout_height="76dp"
+        android:layout_width="240dp"
+        android:layout_height="99dp"
         android:layout_marginBottom="196dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
