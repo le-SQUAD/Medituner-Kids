@@ -18,7 +18,9 @@ public class Sounds {
     private static final Sounds instance = new Sounds();
 
     private SoundPool soundPool = null;
-    private int jumping, blink, happy, cough, sad, star1, star2, star3, gamejump, gamesong, click;
+
+    private int jumping, blink, happy, cough, sad, star1, star2, star3, gamejump, gamesong, click, sideways;
+
 
     public enum Sound {
         S_JUMP,
@@ -31,7 +33,10 @@ public class Sounds {
         S_STAR3,
         S_GJUMP,
         S_GSONG,
-        S_CLICK
+        S_CLICK,
+        S_SIDEWAYS
+
+
     }
 
     public static Sounds getInstance() {
@@ -57,8 +62,8 @@ public class Sounds {
 
             } else {
 
-                //11 = amout of different sounds were able to play at the same time
-                soundPool = new SoundPool(11, AudioManager.STREAM_MUSIC, 0);
+                //3 = amout of different sounds were able to play at the same time
+                soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
 
 
             }
@@ -74,6 +79,8 @@ public class Sounds {
             gamejump = soundPool.load(context, R.raw.gamejump, 1);
             gamesong = soundPool.load(context, R.raw.gamesong, 1);
             click = soundPool.load(context, R.raw.gamesong, 1);
+            sideways = soundPool.load(context, R.raw.gamesong, 1);
+
 
         }
     }
@@ -143,12 +150,15 @@ public class Sounds {
                 break;
 
             case S_GSONG:
-
-                soundPool.play(gamesong,1,1,0,0,1);
-            break;
+                soundPool.play(gamesong,1,1,0,loopCount,1);
+                break;
 
             case S_CLICK:
-                soundPool.play(click,1,1,0,0,1);
+                soundPool.play(click,1,1,0,loopCount,1);
+                break;
+
+            case S_SIDEWAYS:
+                soundPool.play(sideways,1,1,0,loopCount,1);
                 break;
         }
 

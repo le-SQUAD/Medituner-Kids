@@ -82,7 +82,7 @@ public class GameSurfaceView extends GLSurfaceView{
                  * Sound implementet for each jump
                  * @author Julia Danek
                  */
-                Sounds.getInstance().playSound(Sounds.Sound.S_GJUMP);
+                Sounds.getInstance().playSound(Sounds.Sound.S_SIDEWAYS, 1);
                 scene.toggleMojoLane();
         }
         return true;
