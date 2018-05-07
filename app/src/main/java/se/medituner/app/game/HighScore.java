@@ -59,6 +59,7 @@ public class HighScore {
      */
     public void stop() {
         if (task != null) {
+            task.cancel();
             timer.purge();
             task = null;
         }
@@ -107,4 +108,13 @@ public class HighScore {
         }
         currentScore = 0;
     }
+
+    public static void resetHighScore(Persistence persistence) {
+        try {
+            persistence.saveObject((int) 0, SAVED_SCORE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+

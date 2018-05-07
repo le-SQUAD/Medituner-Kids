@@ -4,6 +4,8 @@ import android.opengl.Matrix;
 
 /**
  * A wrapper class around Quad.
+ *
+ * @author Vendela Vlk, Grigory Glukhov
  */
 public class Obstacle {
 
@@ -28,11 +30,24 @@ public class Obstacle {
         creationTime = 0;
     }
 
+    /**
+     * Set the canvas screen y to x ratio. Used for implicit projection matrix calculation.
+     *
+     * @param ratio The ratio of the screen.
+     */
     public static void setScreenRatio(float ratio) {
         screenRatio = ratio;
         inverseRatio = 1.0f / ratio;
     }
 
+    /**
+     * Set new variables for the Obstacle
+     *
+     * @param angle         The new angle of the obstacle.
+     * @param textureHandle The handle to texture to be used for drawing the obstacle.
+     * @param creationTime  The time of creation of the obstacle.
+     * @param lane          The lane of the obstacle.
+     */
     public void set(float angle, int textureHandle, long creationTime, Lane lane) {
         cachedCos = (float) Math.cos(angle);
         cachedSin = (float) Math.sin(angle);
@@ -41,6 +56,11 @@ public class Obstacle {
         this.lane = lane;
     }
 
+    /**
+     * Draw the Obstacle with given offset.
+     *
+     * @param offset Offset parameter.
+     */
     public void draw(float offset) {
         Matrix.setIdentityM(transformMatrix, 0);
         Matrix.translateM(transformMatrix, 0,

@@ -9,46 +9,42 @@
     android:orientation="vertical"
     tools:layout_editor_absoluteY="81dp">
 
-    <Button
-        android:id="@+id/btn_generate_schedule"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:onClick="onButtonGenerateSchedule"
-        android:text="@string/btn_generate_schedule"
-        app:layout_constraintBottom_toTopOf="@+id/sun"
-        app:layout_constraintEnd_toStartOf="@+id/btn_reset_queue"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/streak_text" />
-
     <TextView
         android:id="@+id/streak_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
         android:text="Streak"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
-        app:layout_constraintBottom_toTopOf="@+id/btn_generate_schedule"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_play_game"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.49" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_play_game"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:onClick="onButtonPlay"
+        android:text="@string/btn_play"
+        app:layout_constraintEnd_toEndOf="@+id/streak_text"
+        app:layout_constraintStart_toStartOf="@+id/streak_text"
+        app:layout_constraintTop_toBottomOf="@+id/streak_text" />
 
     <ImageView
-        android:id="@+id/mojoImageView"
-        android:layout_width="278dp"
-        android:layout_height="282dp"
-        android:layout_marginTop="256dp"
+        android:id="@+id/btn_options"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="onOptionsClick"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/smiling1" />
+        app:srcCompat="@mipmap/cogwheel_image" />
 
     <ImageView
         android:id="@+id/tree"
@@ -63,12 +59,13 @@
 
     <ImageView
         android:id="@+id/sunflower"
-        android:layout_width="170dp"
+        android:layout_width="0dp"
         android:layout_height="252dp"
-        android:layout_marginEnd="236dp"
-        android:layout_marginRight="236dp"
+        android:layout_marginEnd="220dp"
+        android:layout_marginRight="220dp"
         android:layout_marginTop="292dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/sunflower" />
 
@@ -90,31 +87,62 @@
         app:layout_constraintVertical_bias="0.235"
         app:srcCompat="@drawable/sun" />
 
-    <Button
-        android:id="@+id/btn_reset_queue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="8dp"
-        android:onClick="onButtonResetQueue"
-        android:text="@string/btn_reset_queue"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_generate_schedule"
+    <ImageView
+        android:id="@+id/mojoImageView"
+        android:layout_width="278dp"
+        android:layout_height="282dp"
+        android:layout_marginTop="260dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btn_generate_schedule"
-        app:layout_constraintTop_toTopOf="@+id/btn_generate_schedule" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/smiling1" />
 
-    <Button
-        android:id="@+id/btn_play_game"
+    <ImageView
+        android:id="@+id/mojoHatImageView"
+        android:layout_width="154dp"
+        android:layout_height="214dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.733"
+        app:srcCompat="@drawable/mojohat" />
+
+    <ImageView
+        android:id="@+id/mojoShoesImageView"
+        android:layout_width="128dp"
+        android:layout_height="167dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="416dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/mojoshoes" />
+
+    <TextView
+        android:id="@+id/txt_greeting_congratulation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:onClick="onButtonPlay"
-        android:text="@string/btn_play"
-        app:layout_constraintEnd_toEndOf="@+id/streak_text"
-        app:layout_constraintStart_toStartOf="@+id/streak_text"
-        app:layout_constraintTop_toBottomOf="@+id/btn_generate_schedule" />
+        android:layout_marginBottom="200dp"
+        android:layout_marginEnd="65dp"
+        android:layout_marginRight="65dp"
+        android:background="@drawable/speech_bubble"
+        android:gravity="center_horizontal"
+        android:minHeight="70dp"
+        android:text="@string/hello"
+        android:textColor="@color/dialogText"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/mojoImageView"
+        app:layout_constraintEnd_toEndOf="@id/mojoImageView" />
 
 </android.support.constraint.ConstraintLayout>
