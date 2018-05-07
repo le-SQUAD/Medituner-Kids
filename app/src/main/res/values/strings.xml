@@ -17,6 +17,7 @@
     <string name="settings">INSTÄLLNINGAR</string>
     <string name="game_settings">SPELINSTÄLLNINGAR</string>
     <string name="good_job">Bra\njobbat!</string>
+    <string name="hello">Hej!</string>
 
     <!-- Medication Names -->
     <string name="aerobec">AeroBec</string>

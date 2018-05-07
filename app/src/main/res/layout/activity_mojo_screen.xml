@@ -140,7 +140,7 @@
         android:background="@drawable/speech_bubble"
         android:gravity="center_horizontal"
         android:minHeight="70dp"
-        android:text="@string/good_job"
+        android:text="@string/hello"
         android:textColor="@color/dialogText"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@id/mojoImageView"
