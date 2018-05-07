@@ -221,8 +221,9 @@ public class Scene implements IScene, GLSurfaceView.Renderer {
         for (int i = 0; i < obstacles.length; i++)
             if (obstacles[i].creationTime > moment)
                 obstacles[i].creationTime = moment - MS_ANIMATION_TIME;
+
         // cough sound
-        Sounds.getInstance().playSound(Sounds.Sound.S_COUGH);
+       // Sounds.getInstance().playSound(Sounds.Sound.S_COUGH);
 
         if (highScore != null)
             highScore.resetScore();
