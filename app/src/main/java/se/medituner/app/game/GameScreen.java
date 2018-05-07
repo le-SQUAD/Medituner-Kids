@@ -63,13 +63,6 @@ public class GameScreen extends AppCompatActivity {
         highScoreView.bringToFront();
         scoreView = findViewById(R.id.currentScoreId);
         scoreView.bringToFront();
-
-        /**
-         * Implementing looping game sound
-         * @author Julia Danek
-         */
-        Sounds.getInstance().playSound(Sounds.Sound.S_GSONG, -1);
-
     }
 
     @Override
@@ -78,6 +71,11 @@ public class GameScreen extends AppCompatActivity {
 
         glSurfaceView.scene.resetMojoInvulnerability();
 
+        /**
+         * Implementing looping game sound
+         * @author Julia Danek
+         */
+        Sounds.getInstance().playSound(Sounds.Sound.S_GSONG, -1);
         highScore.begin();
     }
 
@@ -107,6 +105,7 @@ public class GameScreen extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+        Sounds.getInstance().stopSound();
         highScore.resetScore();
         highScore.stop();
     }
