@@ -16,6 +16,8 @@ import android.os.Handler;
 
 public class Sounds {
 
+    private static final int MAX_CONCURRENT_SOUNDS = 3;
+
     private static final Sounds instance = new Sounds();
 
     private SoundPool soundPool = null;
@@ -49,7 +51,7 @@ public class Sounds {
 
     private Sounds() {}
 
-    public void loadSounds(Context context, int numOfSonds) {
+    public void loadSounds(Context context) {
         if (soundPool == null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
@@ -60,15 +62,12 @@ public class Sounds {
 
                 soundPool = new SoundPool.Builder()
                         // number of different sounds
-                        .setMaxStreams(8)
+                        .setMaxStreams(MAX_CONCURRENT_SOUNDS)
                         .setAudioAttributes(audioAttributes)
                         .build();
 
             } else {
-
-                soundPool = new SoundPool(numOfSonds, AudioManager.STREAM_MUSIC, 0);
-
-
+                soundPool = new SoundPool(MAX_CONCURRENT_SOUNDS, AudioManager.STREAM_MUSIC, 0);
             }
 
             jumping = soundPool.load(context, R.raw.jumping, 1);
@@ -171,8 +170,6 @@ public class Sounds {
 
     }
 
-<<<<<<< HEAD
-=======
     /**
      * Stop the last looping sound.
      */
@@ -182,6 +179,5 @@ public class Sounds {
             currentSoundID = 0;
         }
     }
->>>>>>> 4e9e7f0849ebc1f5845ec9e6f45d599820129968
 
 }
