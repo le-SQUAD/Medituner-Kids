@@ -13,6 +13,7 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.os.Handler;
 
+
 public class Sounds {
 
     private static final Sounds instance = new Sounds();
@@ -20,6 +21,8 @@ public class Sounds {
     private SoundPool soundPool = null;
 
     private int jumping, blink, happy, cough, sad, star1, star2, star3, gamejump, gamesong, click, sideways;
+
+    private int numOfSonds = 3;
 
 
     public enum Sound {
@@ -45,7 +48,7 @@ public class Sounds {
 
     private Sounds() {}
 
-    public void loadSounds(Context context) {
+    public void loadSounds(Context context, int numOfSonds) {
         if (soundPool == null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
@@ -62,8 +65,7 @@ public class Sounds {
 
             } else {
 
-                //3 = amout of different sounds were able to play at the same time
-                soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+                soundPool = new SoundPool(numOfSonds, AudioManager.STREAM_MUSIC, 0);
 
 
             }
@@ -78,8 +80,8 @@ public class Sounds {
             star3 = soundPool.load(context, R.raw.star3, 1);
             gamejump = soundPool.load(context, R.raw.gamejump, 1);
             gamesong = soundPool.load(context, R.raw.gamesong, 1);
-            click = soundPool.load(context, R.raw.gamesong, 1);
-            sideways = soundPool.load(context, R.raw.gamesong, 1);
+            click = soundPool.load(context, R.raw.click, 1);
+            sideways = soundPool.load(context, R.raw.sideways, 1);
 
 
         }
@@ -163,5 +165,6 @@ public class Sounds {
         }
 
     }
+
 
 }
