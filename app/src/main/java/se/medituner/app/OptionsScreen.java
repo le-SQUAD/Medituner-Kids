@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import se.medituner.app.game.HighScore;
@@ -24,6 +26,7 @@ public class OptionsScreen extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private float gameSpeed;
     private TextView gameSpeedText;
+    private Switch switchButton;
 
     /**
      * Options menu with buttons
@@ -38,6 +41,20 @@ public class OptionsScreen extends AppCompatActivity {
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        switchButton = (Switch) findViewById(R.id.switch1);
+        // Set the switch to ON
+        switchButton.setChecked(true);
+        // Attach listener to check for changes in state
+        switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    onButtonResetHighScore(buttonView);
+                }
+            }
+        });
+
 
 
         sharedPreferences = getSharedPreferences(
