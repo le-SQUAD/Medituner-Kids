@@ -16,6 +16,7 @@
     <string name="menu_options">Inställningar</string>
     <string name="settings">INSTÄLLNINGAR</string>
     <string name="game_settings">SPELINSTÄLLNINGAR</string>
+    <string name="good_job">Bra\njobbat!</string>
 
     <!-- Medication Names -->
     <string name="aerobec">AeroBec</string>

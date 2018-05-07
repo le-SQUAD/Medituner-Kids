@@ -50,7 +50,7 @@ public class MojoScreen extends AppCompatActivity {
 
     private Popup questionPopup, streakPopup;
     private Streak streak;
-    private TextView streakView, questionTextView, rewardStreakTextView;
+    private TextView streakView, questionTextView, rewardStreakTextView, congratulationTextView;
     private boolean frownAnimationPlayed = false;
     private boolean smileWaveAnimationPlayed = false;
     private boolean grinWaveAnimationPlayed = false;
@@ -129,10 +129,12 @@ public class MojoScreen extends AppCompatActivity {
 
         mojoImageView.setImageResource(R.drawable.smiling1);
 
+        /*
         mojoImageView.bringToFront();
         //mojoGlassesImageView.bringToFront();
         mojoHatImageView.bringToFront();
         mojoShoesImageView.bringToFront();
+        */
 
         //mojoGlassesImageView.setVisibility(View.INVISIBLE);
         mojoHatImageView.setVisibility(View.INVISIBLE);
