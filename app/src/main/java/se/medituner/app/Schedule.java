@@ -133,14 +133,14 @@ public class Schedule implements Serializable {
             updateQueue();
             streakUpdated = false;
         } else {
-            if (activeQueue.isEmpty() && updateStreak && !streakUpdated && streak != null) {
+            if (activeQueue.isEmpty() && updateStreak
+                    && !streakUpdated && streak != null) {
                 // Queue is empty, it doesn't need to update,
                 // However we want to reward the player immediately
                 streakUpdated = true;
                 streak.increment();
             }
         }
-
     }
 
 
