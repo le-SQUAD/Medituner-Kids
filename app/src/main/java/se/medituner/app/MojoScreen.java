@@ -10,7 +10,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
@@ -42,6 +42,8 @@ public class MojoScreen extends AppCompatActivity {
     public static final String SCHEDULE_FILENAME = "schedule";
     public static final String STREAK_FILENAME= "streak";
 
+    private static final float QUESTION_POPUP_OFFSET_Y_RELATIVE = -0.1f;
+
     private static MojoScreen instance;
 
     private IClock time = new SystemClock();
@@ -68,6 +70,8 @@ public class MojoScreen extends AppCompatActivity {
     private ArrayList<ObjectAnimator> fallObjectAnimators;
     private AnimatorSet jumpClothingAnimations;
     private AnimatorSet fallClothingAnimations;
+
+    private int questionYOffset;
 
     /**
      * The first thing to be called on app startup.
@@ -157,6 +161,8 @@ public class MojoScreen extends AppCompatActivity {
         fallObjectAnimators = clothingList.getFallClothingAnimations();
         jumpClothingAnimations = new AnimatorSet();
         fallClothingAnimations = new AnimatorSet();
+
+        questionYOffset = (int) (getResources().getDisplayMetrics().heightPixels * QUESTION_POPUP_OFFSET_Y_RELATIVE);
 
         // Set up schedule
         initializeSchedule();
@@ -305,7 +311,7 @@ public class MojoScreen extends AppCompatActivity {
         // Set the dynamic image and name
         setPopupMedication(medicationQueue.element());
         // Show popup
-        questionPopup.showPopupWindow(currentScreen);
+        questionPopup.showPopupWindow(currentScreen, Gravity.CENTER, 0, questionYOffset);
     }
 
 
