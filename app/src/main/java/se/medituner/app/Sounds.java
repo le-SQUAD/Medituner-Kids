@@ -13,12 +13,20 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.os.Handler;
 
+
 public class Sounds {
+
+    private static final int MAX_CONCURRENT_SOUNDS = 3;
 
     private static final Sounds instance = new Sounds();
 
     private SoundPool soundPool = null;
-    private int jumping, blink, happy, cough, sad, star1, star2, star3, gamejump, gamesong, click;
+
+    private int jumping, blink, happy, cough, sad, star1, star2, star3, gamejump, gamesong, click, sideways;
+    private int currentSoundID = 0;
+
+    private int numOfSonds = 3;
+
 
     public enum Sound {
         S_JUMP,
@@ -31,7 +39,10 @@ public class Sounds {
         S_STAR3,
         S_GJUMP,
         S_GSONG,
-        S_CLICK
+        S_CLICK,
+        S_SIDEWAYS
+
+
     }
 
     public static Sounds getInstance() {
@@ -51,16 +62,12 @@ public class Sounds {
 
                 soundPool = new SoundPool.Builder()
                         // number of different sounds
-                        .setMaxStreams(8)
+                        .setMaxStreams(MAX_CONCURRENT_SOUNDS)
                         .setAudioAttributes(audioAttributes)
                         .build();
 
             } else {
-
-                //11 = amout of different sounds were able to play at the same time
-                soundPool = new SoundPool(11, AudioManager.STREAM_MUSIC, 0);
-
-
+                soundPool = new SoundPool(MAX_CONCURRENT_SOUNDS, AudioManager.STREAM_MUSIC, 0);
             }
 
             jumping = soundPool.load(context, R.raw.jumping, 1);
@@ -73,7 +80,9 @@ public class Sounds {
             star3 = soundPool.load(context, R.raw.star3, 1);
             gamejump = soundPool.load(context, R.raw.gamejump, 1);
             gamesong = soundPool.load(context, R.raw.gamesong, 1);
-            click = soundPool.load(context, R.raw.gamesong, 1);
+            click = soundPool.load(context, R.raw.click, 1);
+            sideways = soundPool.load(context, R.raw.sideways, 1);
+
 
         }
     }
@@ -83,6 +92,10 @@ public class Sounds {
     }
 
     public void playSound(Sound sound, final int loopCount) {
+        if (loopCount != 0 && currentSoundID != 0) {
+            soundPool.stop(currentSoundID);
+            currentSoundID = 0;
+        }
         switch (sound){
             case S_JUMP:
                 final Handler handler = new Handler();
@@ -111,47 +124,60 @@ public class Sounds {
                 break;
 
             case S_BLINK:
-                soundPool.play(blink, 1, 1, 0, loopCount, 1);
+                currentSoundID = soundPool.play(blink, 1, 1, 0, loopCount, 1);
                 break;
 
             case S_HAPPY:
-                soundPool.play(happy, 1, 1, 0, loopCount, 1);
+                currentSoundID = soundPool.play(happy, 1, 1, 0, loopCount, 1);
                 break;
 
             case S_COUGH:
-                soundPool.play(cough, 1, 1, 0, loopCount, 1);
+                currentSoundID = soundPool.play(cough, 1, 1, 0, loopCount, 1);
                 break;
 
             case S_SAD:
-                soundPool.play(sad, 1, 1, 0, loopCount, 1);
+                currentSoundID = soundPool.play(sad, 1, 1, 0, loopCount, 1);
                 break;
 
             case S_STAR1:
-                soundPool.play(star1, 1, 1, 0, loopCount, 1);
+                currentSoundID = soundPool.play(star1, 1, 1, 0, loopCount, 1);
                 break;
 
             case S_STAR2:
-                soundPool.play(star2, 1, 1, 0, loopCount, 1);
+                currentSoundID = soundPool.play(star2, 1, 1, 0, loopCount, 1);
                 break;
 
             case S_STAR3:
-                soundPool.play(star3, 1, 1, 0, loopCount, 1);
+                currentSoundID = soundPool.play(star3, 1, 1, 0, loopCount, 1);
                 break;
 
             case S_GJUMP:
-                soundPool.play(gamejump,1,1,0,loopCount,1);
+                currentSoundID = soundPool.play(gamejump,1,1,0,loopCount,1);
                 break;
 
             case S_GSONG:
-
-                soundPool.play(gamesong,1,1,0,0,1);
-            break;
+                currentSoundID = soundPool.play(gamesong,1,1,0,loopCount,1);
+                break;
 
             case S_CLICK:
-                soundPool.play(click,1,1,0,0,1);
+                currentSoundID = soundPool.play(click,1,1,0,loopCount,1);
+                break;
+
+            case S_SIDEWAYS:
+                currentSoundID = soundPool.play(sideways,1,1,0,loopCount,1);
                 break;
         }
 
+    }
+
+    /**
+     * Stop the last looping sound.
+     */
+    public void stopSound() {
+        if (currentSoundID != 0) {
+            soundPool.stop(currentSoundID);
+            currentSoundID = 0;
+        }
     }
 
 }
