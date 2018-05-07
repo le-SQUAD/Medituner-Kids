@@ -141,6 +141,30 @@ public class ScheduleUnitTests {
     }
 
     @Test
+    public void scheduleHandlesDaySkipping() {
+        clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_LUNCH + 1);
+
+        schedule.validateQueue(false);
+        Queue<Medication> testQueue = schedule.getActiveQueue();
+
+        assertEquals(2, testQueue.size());
+        assertEquals(Medication.MISSING, testQueue.remove());
+        assertEquals(Medication.AEROBEC, testQueue.remove());
+        schedule.validateQueue(false);
+
+        testQueue = schedule.getActiveQueue();
+        assertEquals(0, testQueue.size());
+
+        clock.simulatedNow.add(Calendar.DATE, 1);
+        schedule.validateQueue(false);
+        testQueue = schedule.getActiveQueue();
+
+        assertEquals(2, testQueue.size());
+        assertEquals(Medication.MISSING, testQueue.remove());
+        assertEquals(Medication.AEROBEC, testQueue.remove());
+    }
+
+    @Test
     public void scheduleUpdatesStreakAccordingly() {
         clock.simulatedNow.set(Calendar.HOUR_OF_DAY, Schedule.PERIOD_BEGINNING_MORNING + 1);
         schedule.validateQueue(false);
