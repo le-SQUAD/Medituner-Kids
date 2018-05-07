@@ -32,7 +32,7 @@ import static android.view.Gravity.CENTER;
 public class MojoScreen extends AppCompatActivity {
 
     public static final int MS_SNOOZE_DELAY = 60000;                // Snooze time after answering 'no'
-    public static final int MS_FIRST_POPUP_DELAY = 1000;            // Delay between the start of the app and the first question popup appearing
+    public static final int MS_FIRST_POPUP_DELAY = 2400;            // Delay between the start of the app and the first question popup appearing
     public static final int MS_POPUP_DELAY = 1500;                  // Delay between stacked popups appearing
     public static final int MS_REWARD_STREAK_SHOW_DURATION = 1600;  // Duration of the streak popup appearing animation
     public static final int MS_REWARD_STREAK_HIDE_DURATION = 1200;  // Duration of the streak popup disappearing animation
@@ -50,7 +50,7 @@ public class MojoScreen extends AppCompatActivity {
 
     private Popup questionPopup, streakPopup;
     private Streak streak;
-    private TextView streakView, questionTextView, rewardStreakTextView;
+    private TextView streakView, questionTextView, rewardStreakTextView, congratulationTextView;
     private boolean frownAnimationPlayed = false;
     private boolean smileWaveAnimationPlayed = false;
     private boolean grinWaveAnimationPlayed = false;
@@ -129,10 +129,12 @@ public class MojoScreen extends AppCompatActivity {
 
         mojoImageView.setImageResource(R.drawable.smiling1);
 
+        /*
         mojoImageView.bringToFront();
         //mojoGlassesImageView.bringToFront();
         mojoHatImageView.bringToFront();
         mojoShoesImageView.bringToFront();
+        */
 
         //mojoGlassesImageView.setVisibility(View.INVISIBLE);
         mojoHatImageView.setVisibility(View.INVISIBLE);
@@ -163,6 +165,7 @@ public class MojoScreen extends AppCompatActivity {
         fallClothingAnimations = new AnimatorSet();
 
         questionYOffset = (int) (getResources().getDisplayMetrics().heightPixels * QUESTION_POPUP_OFFSET_Y_RELATIVE);
+        congratulationTextView = findViewById(R.id.txt_greeting_congratulation);
 
         // Set up schedule
         initializeSchedule();
@@ -204,6 +207,14 @@ public class MojoScreen extends AppCompatActivity {
                     checkMedication();
                 }
             }, Schedule.getBeginningOfNextPeriod(time));
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    congratulationTextView.setText(R.string.good_job);
+                    congratulationTextView.setVisibility(View.VISIBLE);
+                }
+            });
         } else {
             runOnUiThread(new Runnable() {
                 @Override
@@ -310,6 +321,7 @@ public class MojoScreen extends AppCompatActivity {
         View currentScreen = findViewById(R.id.activity_mojo_screen);
         // Set the dynamic image and name
         setPopupMedication(medicationQueue.element());
+        congratulationTextView.setVisibility(View.INVISIBLE);
         // Show popup
         questionPopup.showPopupWindow(currentScreen, Gravity.CENTER, 0, questionYOffset);
     }
@@ -588,8 +600,4 @@ public class MojoScreen extends AppCompatActivity {
         Intent intent = new Intent(this, OptionsScreen.class);
         startActivity(intent);
     }
-
-
-
-
 }
