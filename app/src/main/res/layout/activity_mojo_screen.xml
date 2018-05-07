@@ -47,16 +47,6 @@
         app:srcCompat="@mipmap/cogwheel_image" />
 
     <ImageView
-        android:id="@+id/mojoImageView"
-        android:layout_width="278dp"
-        android:layout_height="282dp"
-        android:layout_marginTop="260dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/smiling1" />
-
-    <ImageView
         android:id="@+id/tree"
         android:layout_width="318dp"
         android:layout_height="472dp"
@@ -69,12 +59,13 @@
 
     <ImageView
         android:id="@+id/sunflower"
-        android:layout_width="170dp"
+        android:layout_width="0dp"
         android:layout_height="252dp"
-        android:layout_marginEnd="236dp"
-        android:layout_marginRight="236dp"
+        android:layout_marginEnd="220dp"
+        android:layout_marginRight="220dp"
         android:layout_marginTop="292dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/sunflower" />
 
@@ -95,6 +86,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.235"
         app:srcCompat="@drawable/sun" />
+
+    <ImageView
+        android:id="@+id/mojoImageView"
+        android:layout_width="278dp"
+        android:layout_height="282dp"
+        android:layout_marginTop="260dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/smiling1" />
 
     <ImageView
         android:id="@+id/mojoHatImageView"
@@ -127,5 +128,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/mojoshoes" />
+
+    <TextView
+        android:id="@+id/txt_greeting_congratulation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="200dp"
+        android:layout_marginEnd="65dp"
+        android:layout_marginRight="65dp"
+        android:background="@drawable/speech_bubble"
+        android:gravity="center_horizontal"
+        android:minHeight="70dp"
+        android:text="@string/hello"
+        android:textColor="@color/dialogText"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/mojoImageView"
+        app:layout_constraintEnd_toEndOf="@id/mojoImageView" />
 
 </android.support.constraint.ConstraintLayout>
