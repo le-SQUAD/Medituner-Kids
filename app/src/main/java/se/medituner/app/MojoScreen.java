@@ -40,7 +40,8 @@ public class MojoScreen extends AppCompatActivity {
     public static final int MS_REWARD_STREAK_SHOW_DELAY = 800;      // A delay before the streak increasing and the reward popup appearing. Should not be 0 for technical reasons
 
     public static final int MS_OBSTACLE_POPUP_DELAY = 2400;
-    public static final int MS_BUTTON_DELAY = 800;
+    public static final int MS_BUTTON_DELAY = 200;
+    public static final int MS_MOVE_INSTRUCTION_DELAY = 1200;
     public static final int MS_LUNG_DELAY = 2400;
 
     public static final String SCHEDULE_FILENAME = "schedule";
@@ -290,11 +291,11 @@ public class MojoScreen extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-
+                Sounds.getInstance().playSound(Sounds.Sound.S_CLICK, 0);
                 rightInstructionsImageView.setImageResource(R.drawable.tryck2);
 
             }
-        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY);
+        }, MS_OBSTACLE_POPUP_DELAY + MS_MOVE_INSTRUCTION_DELAY);
 
         handler.postDelayed(new Runnable() {
             @Override
@@ -303,7 +304,7 @@ public class MojoScreen extends AppCompatActivity {
                 rightInstructionsImageView.setImageResource(R.drawable.tryck1);
 
             }
-        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY);
+        }, MS_OBSTACLE_POPUP_DELAY + MS_MOVE_INSTRUCTION_DELAY + MS_BUTTON_DELAY);
 
         handler.postDelayed(new Runnable() {
             @Override
@@ -312,7 +313,7 @@ public class MojoScreen extends AppCompatActivity {
                 rightInstructionsImageView.setImageResource(R.drawable.mojorightbubble);
 
             }
-        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY);
+        }, MS_OBSTACLE_POPUP_DELAY + MS_MOVE_INSTRUCTION_DELAY + (MS_BUTTON_DELAY * 2));
 
         handler.postDelayed(new Runnable() {
             @Override
@@ -323,7 +324,7 @@ public class MojoScreen extends AppCompatActivity {
                 gameInstructionTextView.setText("Nu kör vi!");
 
             }
-        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + (MS_BUTTON_DELAY * 2) + MS_BUTTON_DELAY);
+        }, MS_OBSTACLE_POPUP_DELAY + MS_MOVE_INSTRUCTION_DELAY + (MS_BUTTON_DELAY * 2) + MS_MOVE_INSTRUCTION_DELAY);
 
 
         handler.postDelayed(new Runnable() {
@@ -334,7 +335,7 @@ public class MojoScreen extends AppCompatActivity {
                 intent.putExtra(GameScreen.EXTRA_STREAK_SIZE, streak.getValue());
                 startActivity(intent);
             }
-        }, MS_OBSTACLE_POPUP_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + MS_BUTTON_DELAY + MS_LUNG_DELAY);
+        }, MS_OBSTACLE_POPUP_DELAY + MS_MOVE_INSTRUCTION_DELAY + (MS_BUTTON_DELAY * 2) + MS_MOVE_INSTRUCTION_DELAY + MS_LUNG_DELAY);
 
     }
 
