@@ -9,12 +9,12 @@
     tools:layout_editor_absoluteY="81dp">
 
     <TextView
-        android:id="@+id/textSettings"
+        android:id="@+id/txt_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:text="@string/settings"
         android:textColor="@android:color/background_dark"
         android:textSize="18sp"
@@ -22,6 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:layout_constraintVertical_chainStyle="spread" />
 
     <Button
@@ -33,7 +34,7 @@
         app:layout_constraintBottom_toTopOf="@+id/btn_reset_queue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textSettings" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_settings" />
     <Button
         android:id="@+id/btn_reset_queue"
         android:layout_width="wrap_content"
@@ -51,14 +52,14 @@
         android:layout_height="wrap_content"
         android:onClick="onButtonResetStreak"
         android:text="@string/btn_reset_streak"
-        app:layout_constraintBottom_toTopOf="@+id/textGameSettings"
+        app:layout_constraintBottom_toTopOf="@+id/txt_game_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_reset_queue" />
 
 
     <TextView
-        android:id="@+id/textGameSettings"
+        android:id="@+id/txt_game_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -80,19 +81,19 @@
         app:layout_constraintBottom_toTopOf="@id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textGameSettings" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_game_settings" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="240dp"
-        android:layout_height="99dp"
-        android:layout_marginBottom="183dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_reset_highscore">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.65">
 
         <TextView
             android:id="@+id/txt_game_speed"
