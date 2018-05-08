@@ -30,7 +30,9 @@
         <activity
             android:name=".game.GameScreen"
             android:screenOrientation="portrait" />
-        <activity android:name=".OptionsScreen"/>
+        <activity
+            android:name=".OptionsScreen"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
